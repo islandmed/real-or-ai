@@ -365,44 +365,50 @@
     align-items: flex-end;
     background: #080d1a;
     border: 1.5px solid var(--neon-cyan);
-    box-shadow: 0 0 14px rgba(0, 240, 255, 0.3), inset 0 0 8px rgba(0, 240, 255, 0.08);
-    padding: 4px 10px;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.4), inset 0 0 10px rgba(0, 240, 255, 0.12);
+    padding: 5px 12px;
     border-radius: 8px;
+    min-width: 105px;
   }
   .speed-label {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 9px;
+    gap: 5px;
+    font-size: 10px;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 800;
     color: #8b97bc;
     letter-spacing: 0.06em;
     line-height: 1;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
+  }
+  .speed-bonus-val {
+    color: #39ff14;
+    font-weight: 900;
+    text-shadow: 0 0 8px rgba(57, 255, 20, 0.7);
   }
   .speed-label::before {
     content: "";
     display: inline-block;
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     background: var(--neon-cyan);
     border-radius: 50%;
-    box-shadow: 0 0 6px var(--neon-cyan);
+    box-shadow: 0 0 8px var(--neon-cyan);
     animation: speedLiveDot 1s infinite alternate;
   }
   @keyframes speedLiveDot {
     from { opacity: 0.3; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1.2); }
+    to { opacity: 1; transform: scale(1.3); }
   }
   .speed-timer {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 900;
     color: var(--neon-cyan);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     line-height: 1;
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+    text-shadow: 0 0 12px rgba(0, 240, 255, 0.85);
   }
   .speed-summary-row {
     display: flex;
@@ -1361,15 +1367,15 @@
   .countdown-overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at center, rgba(10, 16, 32, 0.92) 0%, rgba(4, 6, 12, 0.98) 100%);
-    backdrop-filter: blur(14px);
-    z-index: 998;
+    background: radial-gradient(circle at center, rgba(10, 16, 32, 0.94) 0%, rgba(4, 6, 12, 0.98) 100%);
+    backdrop-filter: blur(16px);
+    z-index: 99999;
     display: none;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     opacity: 0;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.25s ease, transform 0.25s ease;
     cursor: pointer;
     user-select: none;
     overflow: hidden;
@@ -1380,7 +1386,29 @@
   }
   .countdown-overlay.closing {
     opacity: 0;
+    transform: scale(1.04);
     pointer-events: none;
+  }
+  .cd-skip-btn {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #8b97bc;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+  .cd-skip-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    border-color: var(--neon-cyan);
   }
   .cd-laser-sweep {
     position: absolute;
@@ -1399,8 +1427,8 @@
   }
   .cd-ring-wrap {
     position: relative;
-    width: min(85vw, 440px);
-    height: min(85vw, 440px);
+    width: min(88vw, 460px);
+    height: min(88vw, 460px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1418,18 +1446,70 @@
   }
   .cd-svg-ring-reverse {
     position: absolute;
-    inset: 30px;
-    width: calc(100% - 60px);
-    height: calc(100% - 60px);
+    inset: 28px;
+    width: calc(100% - 56px);
+    height: calc(100% - 56px);
     animation: cdHudRotateRev 7s linear infinite;
   }
   @keyframes cdHudRotateRev {
     from { transform: rotate(360deg); }
     to { transform: rotate(0deg); }
   }
+  .cd-center-body {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .cd-ready-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .cd-ready-icon {
+    font-size: 42px;
+    color: #ffaa00;
+    filter: drop-shadow(0 0 15px rgba(255, 170, 0, 0.7));
+    animation: floatUpDown 2s ease-in-out infinite alternate;
+  }
+  @keyframes floatUpDown {
+    from { transform: translateY(-3px); }
+    to { transform: translateY(3px); }
+  }
+  .cd-start-btn {
+    background: linear-gradient(135deg, #00f0ff 0%, #0077ff 100%);
+    color: #030611;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    padding: 16px 36px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.6), 0 0 60px rgba(0, 240, 255, 0.25);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    animation: startBtnPulse 1.8s infinite;
+  }
+  @keyframes startBtnPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(0, 240, 255, 0.6); }
+    50% { transform: scale(1.05); box-shadow: 0 0 45px rgba(0, 240, 255, 0.9); }
+  }
+  .cd-start-btn:hover {
+    transform: scale(1.08);
+  }
+  .cd-ready-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #8b97bc;
+    letter-spacing: 0.05em;
+  }
   .cd-number {
     font-family: 'JetBrains Mono', monospace;
-    font-size: min(36vw, 180px);
+    font-size: min(38vw, 190px);
     font-weight: 900;
     color: var(--neon-cyan);
     line-height: 1;
@@ -1454,21 +1534,30 @@
   }
   .cd-badge {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 800;
     color: #ffaa00;
     background: rgba(255, 170, 0, 0.14);
     border: 1.5px solid rgba(255, 170, 0, 0.5);
-    padding: 8px 18px;
+    padding: 8px 20px;
     border-radius: 999px;
     letter-spacing: 0.1em;
     text-shadow: 0 0 10px rgba(255, 170, 0, 0.6);
-    margin-bottom: 28px;
+    margin-bottom: 8px;
     box-shadow: 0 0 20px rgba(255, 170, 0, 0.25);
+  }
+  .cd-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.12em;
+    margin-bottom: 24px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
   }
   .cd-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 800;
     color: #d1dffb;
     letter-spacing: 0.15em;
@@ -1481,7 +1570,7 @@
     font-size: 13px;
     font-weight: 600;
     color: #8b97bc;
-    margin-top: 12px;
+    margin-top: 10px;
     opacity: 0.9;
     letter-spacing: 0.02em;
   }
@@ -1558,7 +1647,7 @@
       </div>
       <div class="mission-meta-group">
         <div class="speed-box">
-          <div class="speed-label">TIME</div>
+          <div class="speed-label">TIME · <span class="speed-bonus-val" id="liveSpeedBonus">+100 PTS</span></div>
           <div class="speed-timer" id="liveTimer">00:00.0</div>
         </div>
         <div class="lives-box">
@@ -1731,6 +1820,7 @@
     <div class="next-timer-box">
       <div class="timer-label">Next Daily Case Drops In</div>
       <div class="timer-val" id="nextCaseTimer">00:00:00</div>
+    </div>
   </div>
 </div>
 
@@ -1769,31 +1859,43 @@
       <!-- Populated dynamically -->
     </div>
   </div>
+</div>
+
 <!-- HTML5 Big Cyber Countdown Overlay -->
-<div class="countdown-overlay" id="countdownOverlay" onclick="dismissCountdown(event)">
+<div class="countdown-overlay open" id="countdownOverlay" onclick="handleOverlayClick(event)">
   <div class="cd-laser-sweep"></div>
-  <div class="cd-badge" id="cdBadge">🎃 HALLOWEEN SPEED CASE</div>
+  <button class="cd-skip-btn" onclick="dismissCountdown(event)">Skip Intro ✕</button>
+  
+  <div class="cd-badge" id="cdBadge">🎃 HALLOWEEN SPEED CASE #66</div>
+  <div class="cd-title" id="cdTitle">HAUNTED LEGACY · 4 ROUNDS</div>
   
   <div class="cd-ring-wrap">
-    <!-- Outer segmented SVG HUD ring (440x440) -->
-    <svg class="cd-svg-ring" viewBox="0 0 440 440">
-      <circle cx="220" cy="220" r="210" fill="none" stroke="rgba(0, 240, 255, 0.18)" stroke-width="2" />
-      <circle cx="220" cy="220" r="210" fill="none" stroke="#00f0ff" stroke-width="5" stroke-dasharray="40 90 60 50" stroke-linecap="round" />
-      <circle cx="220" cy="220" r="195" fill="none" stroke="rgba(255, 42, 133, 0.45)" stroke-width="2" stroke-dasharray="16 30" />
-      <circle cx="220" cy="220" r="175" fill="none" stroke="rgba(0, 240, 255, 0.15)" stroke-width="1" stroke-dasharray="6 12" />
+    <!-- Outer segmented SVG HUD ring (460x460) -->
+    <svg class="cd-svg-ring" viewBox="0 0 460 460">
+      <circle cx="230" cy="230" r="220" fill="none" stroke="rgba(0, 240, 255, 0.18)" stroke-width="2" />
+      <circle cx="230" cy="230" r="220" fill="none" stroke="#00f0ff" stroke-width="5" stroke-dasharray="45 85 70 60" stroke-linecap="round" />
+      <circle cx="230" cy="230" r="202" fill="none" stroke="rgba(255, 42, 133, 0.45)" stroke-width="2.5" stroke-dasharray="20 28" />
+      <circle cx="230" cy="230" r="182" fill="none" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1.5" stroke-dasharray="6 14" />
     </svg>
-    <!-- Inner reverse rotating ring (380x380) -->
-    <svg class="cd-svg-ring-reverse" viewBox="0 0 380 380">
-      <circle cx="190" cy="190" r="175" fill="none" stroke="rgba(0, 240, 255, 0.35)" stroke-width="3" stroke-dasharray="90 45 30 50" stroke-linecap="round" />
-      <circle cx="190" cy="190" r="150" fill="none" stroke="rgba(57, 255, 20, 0.3)" stroke-width="1.5" stroke-dasharray="12 12" />
+    <!-- Inner reverse rotating ring (400x400) -->
+    <svg class="cd-svg-ring-reverse" viewBox="0 0 400 400">
+      <circle cx="200" cy="200" r="185" fill="none" stroke="rgba(0, 240, 255, 0.4)" stroke-width="3" stroke-dasharray="80 50 40 60" stroke-linecap="round" />
+      <circle cx="200" cy="200" r="160" fill="none" stroke="rgba(57, 255, 20, 0.35)" stroke-width="1.5" stroke-dasharray="14 14" />
     </svg>
     
-    <!-- Giant Glowing HTML5 Number -->
-    <div class="cd-number pulsing" id="cdNumber">3</div>
+    <!-- Center State: Ready Prompt OR Giant Countdown Number -->
+    <div class="cd-center-body" id="cdCenterBody">
+      <div class="cd-ready-container" id="cdReadyBox">
+        <div class="cd-ready-icon">⚡</div>
+        <button class="cd-start-btn" id="cdStartBtn" onclick="triggerCyberCountdown(event)">START SPEED RUN</button>
+        <div class="cd-ready-hint">Tap button or press SPACE</div>
+      </div>
+      <div class="cd-number pulsing" id="cdNumber" style="display:none;">3</div>
+    </div>
   </div>
 
-  <div class="cd-label" id="cdLabel">CALIBRATING FORENSIC SCANNER</div>
-  <div class="cd-hint">Tap anywhere to launch immediately · Max +100 speed bonus</div>
+  <div class="cd-label" id="cdLabel">CALIBRATING FORENSIC MATRIX</div>
+  <div class="cd-hint" id="cdHint">Max +100 Speed Bonus · Rapid Unmasking Unlocks Hall of Fame</div>
 </div>
 
 <!-- Canvas for generating Story card -->
@@ -1819,36 +1921,70 @@ let caseEndTime = null;
 let timerInterval = null;
 let elapsedSeconds = 0;
 
-function startSpeedCountdown() {
-  if (countdownInterval) clearInterval(countdownInterval);
-  if (timerInterval) clearInterval(timerInterval);
+let isCountingDown = false;
+
+function showCountdownReadyState() {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
   caseStartTime = null;
   elapsedSeconds = 0;
+  isCountingDown = false;
 
   const overlay = $("countdownOverlay");
+  const readyBox = $("cdReadyBox");
   const numEl = $("cdNumber");
-  const labelEl = $("cdLabel");
   const badgeEl = $("cdBadge");
+  const titleEl = $("cdTitle");
+  const labelEl = $("cdLabel");
 
-  if (dailyCaseData && dailyCaseData.eventBadge) {
-    badgeEl.textContent = `${dailyCaseData.eventBadge} · SPEED RUN`;
-  } else if (dailyCaseData) {
-    badgeEl.textContent = `CASE #${dailyCaseData.caseNumber} · SPEED RUN`;
+  if (dailyCaseData) {
+    if (dailyCaseData.eventBadge) {
+      if (badgeEl) badgeEl.textContent = `${dailyCaseData.eventBadge} · CASE #${dailyCaseData.caseNumber}`;
+    } else {
+      if (badgeEl) badgeEl.textContent = `CASE #${dailyCaseData.caseNumber} · SPEED RUN`;
+    }
+    if (titleEl) titleEl.textContent = `${dailyCaseData.title.toUpperCase()} · 4 ROUNDS`;
   }
+
+  if (readyBox) readyBox.style.display = "flex";
+  if (numEl) numEl.style.display = "none";
+  if (labelEl) labelEl.textContent = "CALIBRATING FORENSIC MATRIX";
 
   if (overlay) {
     overlay.classList.remove("closing");
     overlay.classList.add("open");
   }
+}
 
+function triggerCyberCountdown(e) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  if (isCountingDown) return;
+  isCountingDown = true;
+
+  const readyBox = $("cdReadyBox");
+  const numEl = $("cdNumber");
+  const labelEl = $("cdLabel");
+
+  if (readyBox) readyBox.style.display = "none";
   if (numEl) {
+    numEl.style.display = "block";
     numEl.className = "cd-number pulsing";
     numEl.textContent = "3";
   }
-  if (labelEl) labelEl.textContent = "CALIBRATING FORENSIC SCANNER";
+  if (labelEl) labelEl.textContent = "CALIBRATING FORENSIC MATRIX";
   playSound("count");
 
   let count = 3;
+  if (countdownInterval) clearInterval(countdownInterval);
   countdownInterval = setInterval(() => {
     count--;
     if (count > 0) {
@@ -1859,7 +1995,7 @@ function startSpeedCountdown() {
         numEl.textContent = count;
       }
       if (labelEl) {
-        labelEl.textContent = count === 2 ? "MATCHING LIGHTING & PERSPECTIVES" : "SPOTTING DIFFUSION ARTIFACTS";
+        labelEl.textContent = count === 2 ? "SPOTTING DIFFUSION ARTIFACTS" : "LOCKING TARGET PERSPECTIVE";
       }
       playSound("count");
     } else if (count === 0) {
@@ -1872,20 +2008,33 @@ function startSpeedCountdown() {
     } else {
       clearInterval(countdownInterval);
       countdownInterval = null;
+      isCountingDown = false;
+      const overlay = $("countdownOverlay");
       if (overlay) {
         overlay.classList.add("closing");
         setTimeout(() => overlay.classList.remove("open", "closing"), 220);
       }
       startSpeedTimer();
     }
-  }, 650);
+  }, 700);
+}
+
+function handleOverlayClick(e) {
+  if (e.target && e.target.classList.contains("cd-skip-btn")) return;
+  if (!isCountingDown) {
+    triggerCyberCountdown(e);
+  } else {
+    dismissCountdown(e);
+  }
 }
 
 function dismissCountdown(e) {
+  if (e) e.stopPropagation();
   if (countdownInterval) {
     clearInterval(countdownInterval);
     countdownInterval = null;
   }
+  isCountingDown = false;
   const overlay = $("countdownOverlay");
   if (overlay && overlay.classList.contains("open")) {
     overlay.classList.add("closing");
@@ -1929,7 +2078,26 @@ function updateLiveTimerUI(secs) {
   if (el) {
     el.textContent = `${secs.toFixed(1)}s`;
   }
+  const bonusEl = $("liveSpeedBonus");
+  if (bonusEl) {
+    const liveBonus = calculateSpeedBonus(secs, 4);
+    bonusEl.textContent = `+${liveBonus} PTS`;
+  }
 }
+
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    const overlay = $("countdownOverlay");
+    if (overlay && overlay.classList.contains("open")) {
+      e.preventDefault();
+      if (!isCountingDown) {
+        triggerCyberCountdown();
+      } else {
+        dismissCountdown();
+      }
+    }
+  }
+});
 
 function calculateSpeedBonus(secs, totalWon) {
   if (totalWon === 0) return 0;
@@ -2341,7 +2509,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.0').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=2.1').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -2382,7 +2550,7 @@ function loadRound(rIndex) {
   isCurrentRoundOver = false;
 
   if (rIndex === 0 && !caseStartTime) {
-    startSpeedCountdown();
+    showCountdownReadyState();
   }
 
   const round = dailyCaseData.rounds[rIndex];
