@@ -3642,7 +3642,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.4').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.5').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4656,19 +4656,31 @@ function remindReg() {
     new Promise((_, rej) => setTimeout(() => rej(new Error('sw timeout')), 8000))]);
 }
 
-async function remindSubscribe(quiet) {
+function remindReport(stage, err) {
   try {
-    if (Notification.permission === 'denied') { remindSave({ push: false }); remindRender(); showToast('Blocked in settings: see the steps below the button.'); return; }
+    fetch(REMIND_API + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true,
+      body: JSON.stringify({ stage, err: String((err && (err.name + ': ' + err.message)) || err || ''),
+        perm: ('Notification' in window) ? Notification.permission : 'none', sa: remindStandalone }) });
+  } catch (e) {}
+}
+
+async function remindSubscribe(quiet) {
+  let stage = 'permission';
+  try {
+    if (Notification.permission === 'denied') { remindReport('already-denied', ''); remindSave({ push: false }); remindRender(); showToast('Blocked in settings: see the steps below the button.'); return; }
     const perm = await Notification.requestPermission();
-    if (perm === 'denied') { remindSave({ push: false }); remindRender(); showToast('Blocked: see the steps below the button to allow.'); return; }
+    if (perm === 'denied') { remindReport('denied', ''); remindSave({ push: false }); remindRender(); showToast('Blocked: see the steps below the button to allow.'); return; }
     if (perm !== 'granted') {
-      remindSave({ push: false }); remindRender();
+      remindReport('perm-' + perm, ''); remindSave({ push: false }); remindRender();
       showToast(remindIsAndroid ? 'No prompt? Tap the 🔔 in the address bar, then Allow.' : 'Tap Allow when asked to turn on reminders.');
       return;
     }
+    stage = 'sw-ready';
     const reg = await remindReg();
+    stage = 'push-subscribe';
     const sub = (await reg.pushManager.getSubscription()) ||
       await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: remindKey(REMIND_VAPID) });
+    stage = 'server';
     const res = await fetch(REMIND_API + '/subscribe', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subscription: sub.toJSON(), hour: remindHour(), tzOffsetMinutes: new Date().getTimezoneOffset() })
@@ -4678,7 +4690,8 @@ async function remindSubscribe(quiet) {
     remindRender();
     showToast(quiet ? '🔔 Reminder moved to ' + remindHourLabel(remindHour()) : '🔔 You will get a nudge daily at ' + remindHourLabel(remindHour()));
   } catch (err) {
-    console.log('remind subscribe error', err);
+    console.log('remind subscribe error', stage, err);
+    remindReport(stage, err);
     const why = String((err && (err.name + ': ' + err.message)) || err);
     let help = 'Could not turn on notifications (' + why.slice(0, 120) + '). The calendar works everywhere.';
     if (/sw timeout/.test(why)) help = 'The app is still installing. Close and reopen the page, then try again.';

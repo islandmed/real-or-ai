@@ -86,6 +86,14 @@ export default {
       return json(await sendHour(env, h), 200, null);
     }
 
+    // Client-side failure reports (error text + user agent only), kept 7 days, read with wrangler.
+    if (url.pathname === '/report' && req.method === 'POST' && origin) {
+      let b = {}; try { b = await req.json(); } catch {}
+      const rec = { t: new Date().toISOString(), stage: String(b.stage || '').slice(0, 40), err: String(b.err || '').slice(0, 300),
+        perm: String(b.perm || '').slice(0, 20), sa: !!b.sa, ua: (req.headers.get('User-Agent') || '').slice(0, 300), origin };
+      await env.PUSH_KV.put('r:' + Date.now() + ':' + Math.random().toString(36).slice(2, 6), JSON.stringify(rec), { expirationTtl: 604800 });
+      return json({ ok: true }, 200, origin);
+    }
     if (req.method !== 'POST' || !['/subscribe', '/unsubscribe'].includes(url.pathname)) return json({ error: 'not found' }, 404, origin);
     if (!origin) return json({ error: 'origin' }, 403, null);
     if ((Number(req.headers.get('Content-Length')) || 0) > 4096) return json({ error: 'too large' }, 413, origin);
