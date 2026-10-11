@@ -630,12 +630,16 @@
     box-sizing: border-box;
   }
   @media (min-width: 768px) {
+    /* One centred column: share first, then the breakdown as a 2-up grid */
     .results-bottom-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 14px;
       align-items: start;
     }
+    .results-bottom-row > .share-grid { width: 100%; max-width: 480px; justify-self: center; }
+    .results-bottom-row > .round-breakdown { display: grid; grid-template-columns: 1fr 1fr; }
+    .results-bottom-row > .photo-credits { justify-self: center; text-align: center; }
     .share-grid {
       margin-bottom: 0;
     }
@@ -3638,7 +3642,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.2').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.3').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4549,15 +4553,23 @@ function remindSave(patch) { const s = Object.assign(remindState(), patch); try 
 function remindHour() { const h = remindState().hour; return Number.isInteger(h) && h >= 0 && h < 24 ? h : 8; }
 function remindHourLabel(h) { const d = new Date(2000, 0, 1, h); return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
 
+const remindIsAndroid = /Android/i.test(navigator.userAgent);
+// The browser never asks twice: once blocked, only the user can undo it in settings.
+function remindBlockedHelp() {
+  if (remindIsIOS) return 'Notifications are off for Imposter. Open iPhone Settings → Notifications → Imposter → Allow Notifications, then come back.';
+  if (remindIsAndroid) return 'Notifications are blocked for this site. Tap the icon left of the address bar (or ⋮ → ⓘ) → Permissions → Notifications → Allow, then tap Turn on again.';
+  return 'Notifications are blocked for this site. Click the icon left of the address bar → Notifications → Allow, then tap Turn on again.';
+}
+
 function remindRender() {
   const s = remindState(), on = !!s.push, h = remindHour();
   const btn = $('remindBtn');
   if (btn) { btn.classList.toggle('on', on); btn.textContent = on ? '🔔 Daily at ' + remindHourLabel(h) : '🔔 Remind me daily'; }
   let hint = '';
   const pushAvail = remindPushOK && (!remindIsIOS || remindStandalone);
-  if (remindIsIOS && !remindStandalone) hint = 'Add to Home Screen for notifications.';
-  else if (!remindPushOK) hint = 'Notifications are not supported in this browser. The calendar works everywhere.';
-  else if (Notification.permission === 'denied' && !on) hint = 'Notifications are blocked for this site in your browser settings.';
+  if (remindIsIOS && !remindStandalone) hint = 'iPhone only allows notifications from home screen apps: tap Share ⬆️, then "Add to Home Screen", open Imposter from there and turn them on.';
+  else if (!remindPushOK) hint = 'This browser cannot send notifications (in-app browsers like X or Instagram cannot). Open play-imposter.lol in Safari or Chrome, or use the calendar.';
+  else if (Notification.permission === 'denied' && !on) hint = remindBlockedHelp();
   document.querySelectorAll('.js-remind-push').forEach(b => {
     b.hidden = !pushAvail;
     b.textContent = on ? '🔕 Turn off notifications' : '🔔 Turn on notifications';
@@ -4646,8 +4658,14 @@ function remindReg() {
 
 async function remindSubscribe(quiet) {
   try {
+    if (Notification.permission === 'denied') { remindSave({ push: false }); remindRender(); showToast('Blocked in settings: see the steps below the button.'); return; }
     const perm = await Notification.requestPermission();
-    if (perm !== 'granted') { remindSave({ push: false }); remindRender(); showToast('Notifications not allowed. Try the calendar instead.'); return; }
+    if (perm === 'denied') { remindSave({ push: false }); remindRender(); showToast('Blocked: see the steps below the button to allow.'); return; }
+    if (perm !== 'granted') {
+      remindSave({ push: false }); remindRender();
+      showToast(remindIsAndroid ? 'No prompt? Tap the 🔔 in the address bar, then Allow.' : 'Tap Allow when asked to turn on reminders.');
+      return;
+    }
     const reg = await remindReg();
     const sub = (await reg.pushManager.getSubscription()) ||
       await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: remindKey(REMIND_VAPID) });

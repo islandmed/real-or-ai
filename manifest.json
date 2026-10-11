@@ -1,7 +1,7 @@
 {
   "name": "Imposter · The Daily AI Detective Game",
   "short_name": "Imposter",
-  "description": "4 rounds. 4 photos each. Spot the synthetic AI imposter among authentic real photos.",
+  "description": "6 rounds, 4 photos each. One is AI. Spot the fake. New case every day.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
