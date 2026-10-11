@@ -1318,6 +1318,99 @@
   .lb-score { font-weight: 800; color: var(--neon-green); }
   .lb-time { font-size: 10px; color: #8b97bc; }
 
+  /* Arcade Countdown Overlay */
+  .countdown-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 10, 18, 0.92);
+    backdrop-filter: blur(10px);
+    z-index: 998;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.15s;
+  }
+  .countdown-overlay.open { display: flex; }
+  .countdown-box {
+    background: #0d111d;
+    border: 2px solid var(--neon-cyan);
+    box-shadow: 0 0 32px rgba(0, 240, 255, 0.3), inset 0 0 16px rgba(0, 240, 255, 0.05);
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+  .countdown-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #ffaa00;
+    background: rgba(255, 170, 0, 0.12);
+    border: 1px solid rgba(255, 170, 0, 0.35);
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+    letter-spacing: 0.04em;
+  }
+  .countdown-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 19px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 8px;
+    letter-spacing: 0.03em;
+  }
+  .countdown-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--neon-cyan);
+    line-height: 1;
+    margin: 14px 0 16px;
+    text-shadow: 0 0 24px rgba(0, 240, 255, 0.7);
+    display: none;
+    min-height: 72px;
+  }
+  .countdown-display.pulsing {
+    animation: cdPulse 0.7s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  }
+  @keyframes cdPulse {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.25); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .countdown-sub {
+    font-size: 12px;
+    color: #8fa0cb;
+    line-height: 1.45;
+    margin-bottom: 22px;
+    max-width: 300px;
+  }
+  .btn-start-countdown {
+    all: unset;
+    cursor: pointer;
+    background: var(--neon-pink);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 13px 26px;
+    border-radius: 8px;
+    border: 2px solid #fff;
+    box-shadow: 0 4px 0 #900040, 0 0 16px rgba(255, 42, 133, 0.4);
+    transition: all 0.1s;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .btn-start-countdown:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-start-countdown:active { transform: translateY(2px); box-shadow: 0 1px 0 #900040; }
+
   /* Toast */
   .toast {
     position: fixed;
@@ -1602,6 +1695,17 @@
   </div>
 </div>
 
+<!-- Arcade Countdown Modal -->
+<div class="countdown-overlay" id="countdownOverlay">
+  <div class="countdown-box">
+    <div class="countdown-badge" id="cdBadge">🎃 HALLOWEEN SPECIAL · SPEED CASE</div>
+    <div class="countdown-title" id="cdTitle">READY DETECTIVE?</div>
+    <div class="countdown-display" id="cdDisplay">3</div>
+    <div class="countdown-sub" id="cdSub">4 themed rounds. Exactly 1 AI imposter each. Solve fast for up to +100 speed bonus!</div>
+    <button class="btn-start-countdown" id="btnStartCountdown" onclick="beginCountdown()">START CASE ▶</button>
+  </div>
+</div>
+
 <!-- Canvas for generating Story card -->
 <canvas id="storyCanvas" width="1080" height="1920" style="display:none;"></canvas>
 
@@ -1616,12 +1720,74 @@ let selectedCardId = null;
 let attemptsUsedThisRound = 0;
 let isCurrentRoundOver = false;
 let userProfile = null;
+let countdownActive = false;
+let autoAdvanceTimeout = null;
 
 // Live Speed Stopwatch
 let caseStartTime = null;
 let caseEndTime = null;
 let timerInterval = null;
 let elapsedSeconds = 0;
+
+function showCountdownModal() {
+  if (autoAdvanceTimeout) {
+    clearTimeout(autoAdvanceTimeout);
+    autoAdvanceTimeout = null;
+  }
+  countdownActive = true;
+  const overlay = $("countdownOverlay");
+  if (!overlay) return;
+  if (dailyCaseData && dailyCaseData.eventBadge) {
+    $("cdBadge").textContent = `${dailyCaseData.eventBadge} · SPEED RUN`;
+  } else if (dailyCaseData) {
+    $("cdBadge").textContent = `CASE #${dailyCaseData.caseNumber} · SPEED RUN`;
+  }
+  $("cdTitle").textContent = "READY DETECTIVE?";
+  $("cdSub").textContent = "4 themed rounds. Exactly 1 AI imposter each. Solve fast for up to +100 speed bonus!";
+  $("cdDisplay").style.display = "none";
+  $("btnStartCountdown").style.display = "block";
+  overlay.classList.add("open");
+}
+
+function beginCountdown() {
+  getAudioContext();
+  countdownActive = true;
+  $("btnStartCountdown").style.display = "none";
+  $("cdTitle").textContent = "CASE COMMENCING IN";
+  const display = $("cdDisplay");
+  display.style.display = "block";
+  display.style.color = "var(--neon-cyan)";
+  
+  let count = 3;
+  display.textContent = count;
+  display.classList.remove("pulsing");
+  void display.offsetWidth;
+  display.classList.add("pulsing");
+  playSound("count");
+
+  const interval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      display.textContent = count;
+      display.classList.remove("pulsing");
+      void display.offsetWidth;
+      display.classList.add("pulsing");
+      playSound("count");
+    } else if (count === 0) {
+      display.textContent = "GO!";
+      display.style.color = "#39ff14";
+      display.classList.remove("pulsing");
+      void display.offsetWidth;
+      display.classList.add("pulsing");
+      playSound("go");
+    } else {
+      clearInterval(interval);
+      countdownActive = false;
+      $("countdownOverlay").classList.remove("open");
+      startSpeedTimer();
+    }
+  }, 750);
+}
 
 function startSpeedTimer() {
   if (timerInterval) clearInterval(timerInterval);
@@ -1911,6 +2077,29 @@ function playSound(type) {
         osc.start(now + n.t);
         osc.stop(now + n.t + n.d);
       });
+    } else if (type === "count") {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, now);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } else if (type === "go") {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.2);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
     }
   } catch (_) {}
 }
@@ -2038,6 +2227,7 @@ async function init() {
     });
 
     loadRound(0);
+    showCountdownModal();
   } catch (err) {
     console.error("Failed to load cases", err);
   }
@@ -2073,6 +2263,7 @@ function switchCase(caseId) {
   $("viewPlaying").style.display = "block";
   caseStartTime = null;
   loadRound(0);
+  showCountdownModal();
   showToast(`Loaded ${dailyCaseData.title}`);
 }
 
@@ -2081,10 +2272,6 @@ function loadRound(rIndex) {
   selectedCardId = null;
   attemptsUsedThisRound = 0;
   isCurrentRoundOver = false;
-
-  if (rIndex === 0 && !caseStartTime) {
-    startSpeedTimer();
-  }
 
   const round = dailyCaseData.rounds[rIndex];
 
@@ -2128,7 +2315,7 @@ function loadRound(rIndex) {
 }
 
 function selectCard(id) {
-  if (isCurrentRoundOver) return;
+  if (countdownActive || isCurrentRoundOver) return;
   const cardEl = $(`card_${id}`);
   if (cardEl.classList.contains("eliminated") || cardEl.classList.contains("caught")) return;
 
@@ -2215,19 +2402,33 @@ function finishRoundUI(didWin) {
   btnNext.classList.add("show");
 
   if (currentRoundIndex < 3) {
-    btnNext.textContent = `Stage ${currentRoundIndex + 1} Cleared · Next Stage →`;
+    btnNext.textContent = `Stage ${currentRoundIndex + 1} Cleared · Next in 1.2s (or tap) →`;
   } else {
-    btnNext.textContent = `View Final Scorecard 🏆`;
+    btnNext.textContent = `Case Complete! Opening Scorecard...`;
   }
+
+  // Smooth auto-advance without requiring click
+  if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
+  autoAdvanceTimeout = setTimeout(() => {
+    advanceToNextStage();
+  }, 1200);
 }
 
-$("btnNextRound").onclick = () => {
-  playSound("tap");
+function advanceToNextStage() {
+  if (autoAdvanceTimeout) {
+    clearTimeout(autoAdvanceTimeout);
+    autoAdvanceTimeout = null;
+  }
   if (currentRoundIndex < 3) {
     loadRound(currentRoundIndex + 1);
   } else {
     showFinalResults();
   }
+}
+
+$("btnNextRound").onclick = () => {
+  playSound("tap");
+  advanceToNextStage();
 };
 
 function showFinalResults() {
