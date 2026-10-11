@@ -2,14 +2,12 @@
   {
     "id": "daily_halloween_2026",
     "caseNumber": 66,
-    "isSpecialEvent": true,
-    "eventBadge": "🎃 HALLOWEEN SPECIAL",
     "title": "Halloween Special Case #66: The Haunted Legacy",
-    "totalRounds": 4,
+    "eventBadge": "🎃 HALLOWEEN SPECIAL",
     "rounds": [
       {
         "roundIndex": 1,
-        "theme": "Round 1 of 4 · Haunted Mansions",
+        "theme": "Round 1 of 6 · Haunted Mansions",
         "tagline": "3 authentic Victorian Gothic houses built in reality. 1 synthetic haunted manor hallucinated by AI.",
         "shortName": "MANSIONS",
         "cards": [
@@ -45,7 +43,7 @@
       },
       {
         "roundIndex": 2,
-        "theme": "Round 2 of 4 · Carved Jack-o'-Lanterns",
+        "theme": "Round 2 of 6 · Carved Jack-o'-Lanterns",
         "tagline": "3 real pumpkins carved by human hands. 1 synthetic pumpkin hallucinated by mathematical pixels.",
         "shortName": "PUMPKINS",
         "cards": [
@@ -81,7 +79,7 @@
       },
       {
         "roundIndex": 3,
-        "theme": "Round 3 of 4 · Midnight Black Cats",
+        "theme": "Round 3 of 6 · Midnight Black Cats",
         "tagline": "Organic fur and whiskers are a nightmare for AI models. 3 real cats; 1 synthetic machine.",
         "shortName": "BLACK CATS",
         "cards": [
@@ -117,7 +115,7 @@
       },
       {
         "roundIndex": 4,
-        "theme": "Round 4 of 4 · Skull Costumes & Makeup",
+        "theme": "Round 4 of 6 · Skull Costumes & Makeup",
         "tagline": "Elaborate human Halloween makeup. 3 real costumed humans; 1 neural synthesis.",
         "shortName": "COSTUMES",
         "cards": [
@@ -150,20 +148,10 @@
             "details": "AUTHENTIC HUMAN. Authentic hand-painted cosmetic crack lines, genuine skin pore micro-details, and natural fingernail cuticle anatomy."
           }
         ]
-      }
-    ]
-  },
-  {
-    "id": "halloween_case_67",
-    "caseNumber": 67,
-    "isSpecialEvent": true,
-    "eventBadge": "🎃 HALLOWEEN PACK #67",
-    "title": "Halloween Case #67: Monsters & Mythos",
-    "totalRounds": 4,
-    "rounds": [
+      },
       {
-        "roundIndex": 1,
-        "theme": "Round 1 of 4 · Gothic Stone Gargoyles",
+        "roundIndex": 5,
+        "theme": "Round 5 of 6 · Gothic Stone Gargoyles",
         "tagline": "Ancient medieval stonework. 3 real cathedral gargoyles; 1 algorithmic stone hallucination.",
         "shortName": "GARGOYLES",
         "cards": [
@@ -198,80 +186,8 @@
         ]
       },
       {
-        "roundIndex": 2,
-        "theme": "Round 2 of 4 · Subterranean Catacomb Skulls",
-        "tagline": "Aged ossuary relics. 3 real historic crypt walls; 1 neural bone synthesis.",
-        "shortName": "CATACOMBS",
-        "cards": [
-          {
-            "id": "A",
-            "image": "assets/cases/halloween/case67/r2_real_a.jpg",
-            "isAi": false,
-            "title": "Paris Catacombs Wall",
-            "details": "AUTHENTIC OSTEOLOGY. Real cranial suture lines, organic bone density variations, and authentic subterranean calcium decay."
-          },
-          {
-            "id": "B",
-            "image": "assets/cases/halloween/case67/r2_ai.jpg",
-            "isAi": true,
-            "title": "The Neural Imposter",
-            "details": "SYNTHETIC AI. Diffusion model. Under close inspection, note the repetitive skull eye socket depths, merged nasal cavities, and unnaturally geometric crossbone stack patterns in the archway."
-          },
-          {
-            "id": "C",
-            "image": "assets/cases/halloween/case67/r2_real_b.jpg",
-            "isAi": false,
-            "title": "Sedlec Ossuary Relics",
-            "details": "AUTHENTIC OSTEOLOGY. Genuine historic osteological arrangements with authentic candlelight falloff and real dust."
-          },
-          {
-            "id": "D",
-            "image": "assets/cases/halloween/case67/r2_real_c.jpg",
-            "isAi": false,
-            "title": "Crypt Bone Vault",
-            "details": "AUTHENTIC OSTEOLOGY. Physically verified underground limestone arches with natural low-light shadow depth."
-          }
-        ]
-      },
-      {
-        "roundIndex": 3,
-        "theme": "Round 3 of 4 · Ravens & Midnight Crows",
-        "tagline": "Iridescent black feathers and corvid intelligence. 3 real birds; 1 synthetic avian render.",
-        "shortName": "RAVENS",
-        "cards": [
-          {
-            "id": "A",
-            "image": "assets/cases/halloween/case67/r3_real_a.jpg",
-            "isAi": false,
-            "title": "Autumn Branch Raven",
-            "details": "AUTHENTIC WILDLIFE. Natural iridescent feather barbules, genuine talon anatomy, and real wood bark lichen."
-          },
-          {
-            "id": "B",
-            "image": "assets/cases/halloween/case67/r3_real_b.jpg",
-            "isAi": false,
-            "title": "Calling Black Crow",
-            "details": "AUTHENTIC WILDLIFE. Physically accurate corvid cornea light reflection, natural nasal bristle tufts, and genuine outdoor depth of field."
-          },
-          {
-            "id": "C",
-            "image": "assets/cases/halloween/case67/r3_ai.jpg",
-            "isAi": true,
-            "title": "The Neural Imposter",
-            "details": "SYNTHETIC AI. Generative diffusion. Inspect the foot claws gripping the branch: unnatural digital talon curvature, melted moss texture, and feathers blurring artificially into background bokeh."
-          },
-          {
-            "id": "D",
-            "image": "assets/cases/halloween/case67/r3_real_c.jpg",
-            "isAi": false,
-            "title": "Perched Forest Raven",
-            "details": "AUTHENTIC WILDLIFE. High-speed shutter capture showing realistic aerodynamic feather separation and natural eye moisture."
-          }
-        ]
-      },
-      {
-        "roundIndex": 4,
-        "theme": "Round 4 of 4 · Foggy Haunted Woodlands",
+        "roundIndex": 6,
+        "theme": "Round 6 of 6 · Foggy Haunted Woodlands",
         "tagline": "Atmospheric mist and twilight tree silhouettes. 3 real forests; 1 neural diffusion dream.",
         "shortName": "FORESTS",
         "cards": [
@@ -308,16 +224,86 @@
     ]
   },
   {
-    "id": "halloween_case_68",
-    "caseNumber": 68,
-    "isSpecialEvent": true,
-    "eventBadge": "🎃 HALLOWEEN PACK #68",
-    "title": "Halloween Case #68: Witchcraft & Harvest Curios",
-    "totalRounds": 4,
+    "id": "halloween_case_67",
+    "caseNumber": 67,
+    "title": "Halloween Case #67: Witchcraft & Crypts",
+    "eventBadge": "🎃 HALLOWEEN SPECIAL",
     "rounds": [
       {
         "roundIndex": 1,
-        "theme": "Round 1 of 4 · Apothecary Cauldrons & Potions",
+        "theme": "Round 1 of 6 · Subterranean Catacomb Skulls",
+        "tagline": "Aged ossuary relics. 3 real historic crypt walls; 1 neural bone synthesis.",
+        "shortName": "CATACOMBS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case67/r2_real_a.jpg",
+            "isAi": false,
+            "title": "Paris Catacombs Wall",
+            "details": "AUTHENTIC OSTEOLOGY. Real cranial suture lines, organic bone density variations, and authentic subterranean calcium decay."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case67/r2_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Diffusion model. Under close inspection, note the repetitive skull eye socket depths, merged nasal cavities, and unnaturally geometric crossbone stack patterns in the archway."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case67/r2_real_b.jpg",
+            "isAi": false,
+            "title": "Sedlec Ossuary Relics",
+            "details": "AUTHENTIC OSTEOLOGY. Genuine historic osteological arrangements with authentic candlelight falloff and real dust."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case67/r2_real_c.jpg",
+            "isAi": false,
+            "title": "Crypt Bone Vault",
+            "details": "AUTHENTIC OSTEOLOGY. Physically verified underground limestone arches with natural low-light shadow depth."
+          }
+        ]
+      },
+      {
+        "roundIndex": 2,
+        "theme": "Round 2 of 6 · Ravens & Midnight Crows",
+        "tagline": "Iridescent black feathers and corvid intelligence. 3 real birds; 1 synthetic avian render.",
+        "shortName": "RAVENS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case67/r3_real_a.jpg",
+            "isAi": false,
+            "title": "Autumn Branch Raven",
+            "details": "AUTHENTIC WILDLIFE. Natural iridescent feather barbules, genuine talon anatomy, and real wood bark lichen."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case67/r3_real_b.jpg",
+            "isAi": false,
+            "title": "Calling Black Crow",
+            "details": "AUTHENTIC WILDLIFE. Physically accurate corvid cornea light reflection, natural nasal bristle tufts, and genuine outdoor depth of field."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case67/r3_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative diffusion. Inspect the foot claws gripping the branch: unnatural digital talon curvature, melted moss texture, and feathers blurring artificially into background bokeh."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case67/r3_real_c.jpg",
+            "isAi": false,
+            "title": "Perched Forest Raven",
+            "details": "AUTHENTIC WILDLIFE. High-speed shutter capture showing realistic aerodynamic feather separation and natural eye moisture."
+          }
+        ]
+      },
+      {
+        "roundIndex": 3,
+        "theme": "Round 3 of 6 · Apothecary Cauldrons & Potions",
         "tagline": "Dark herbs, vials, and candle wax. 3 real still-life setups; 1 synthetic witch's brew.",
         "shortName": "POTIONS",
         "cards": [
@@ -352,8 +338,8 @@
         ]
       },
       {
-        "roundIndex": 2,
-        "theme": "Round 2 of 4 · Jack-o'-Lantern Porches & Steps",
+        "roundIndex": 4,
+        "theme": "Round 4 of 6 · Jack-o'-Lantern Porches & Steps",
         "tagline": "Festive autumn twilight porches. 3 real decorated front doors; 1 neural doorstep.",
         "shortName": "PORCHES",
         "cards": [
@@ -388,8 +374,8 @@
         ]
       },
       {
-        "roundIndex": 3,
-        "theme": "Round 3 of 4 · Dew-Drop Spider Webs",
+        "roundIndex": 5,
+        "theme": "Round 5 of 6 · Dew-Drop Spider Webs",
         "tagline": "Tensile silk threads and morning condensation. 3 real orb webs; 1 neural web matrix.",
         "shortName": "SPIDER WEBS",
         "cards": [
@@ -424,8 +410,8 @@
         ]
       },
       {
-        "roundIndex": 4,
-        "theme": "Round 4 of 4 · Antique Grimoires & Curios",
+        "roundIndex": 6,
+        "theme": "Round 6 of 6 · Antique Grimoires & Curios",
         "tagline": "Aged parchment and library candlelight. 3 real historical tomes; 1 synthetic book of shadows.",
         "shortName": "GRIMOIRES",
         "cards": [
@@ -462,16 +448,14 @@
     ]
   },
   {
-    "id": "case_69_crypts",
-    "caseNumber": 69,
-    "isSpecialEvent": false,
-    "eventBadge": "DAILY CASE #69",
-    "title": "Case #69: Crypts & Masquerades",
-    "totalRounds": 4,
+    "id": "case_68_crypts",
+    "caseNumber": 68,
+    "title": "Case #68: Crypts, Autumn & Masquerades",
+    "eventBadge": null,
     "rounds": [
       {
         "roundIndex": 1,
-        "theme": "Round 1 of 4 · Victorian Crypts & Mausoleums",
+        "theme": "Round 1 of 6 · Victorian Crypts & Mausoleums",
         "tagline": "3 historic stone cemetery crypts · 1 neural AI generation",
         "shortName": "VICTORIAN",
         "cards": [
@@ -507,7 +491,7 @@
       },
       {
         "roundIndex": 2,
-        "theme": "Round 2 of 4 · Autumn Pumpkin Harvest",
+        "theme": "Round 2 of 6 · Autumn Pumpkin Harvest",
         "tagline": "3 real heirloom pumpkin patches · 1 generative diffusion harvest",
         "shortName": "AUTUMN",
         "cards": [
@@ -543,7 +527,7 @@
       },
       {
         "roundIndex": 3,
-        "theme": "Round 3 of 4 · Black Felines in Low Light",
+        "theme": "Round 3 of 6 · Black Felines in Low Light",
         "tagline": "3 authentic black cats · 1 synthetic feline portrait",
         "shortName": "BLACK",
         "cards": [
@@ -579,7 +563,7 @@
       },
       {
         "roundIndex": 4,
-        "theme": "Round 4 of 4 · Handmade Masquerade & Costumes",
+        "theme": "Round 4 of 6 · Handmade Masquerade & Costumes",
         "tagline": "3 authentic textile costumes · 1 synthetic synthetic outfit",
         "shortName": "HANDMADE",
         "cards": [
@@ -612,20 +596,10 @@
             "details": "AUTHENTIC. Natural fabric drape obeying gravitational physics."
           }
         ]
-      }
-    ]
-  },
-  {
-    "id": "case_70_shadows",
-    "caseNumber": 70,
-    "isSpecialEvent": false,
-    "eventBadge": "DAILY CASE #70",
-    "title": "Case #70: Shadows & Theatrics",
-    "totalRounds": 4,
-    "rounds": [
+      },
       {
-        "roundIndex": 1,
-        "theme": "Round 1 of 4 · Gothic Architecture & Turrets",
+        "roundIndex": 5,
+        "theme": "Round 5 of 6 · Gothic Architecture & Turrets",
         "tagline": "3 historic stone structures · 1 mathematical illusion",
         "shortName": "GOTHIC",
         "cards": [
@@ -660,8 +634,8 @@
         ]
       },
       {
-        "roundIndex": 2,
-        "theme": "Round 2 of 4 · Candlelit Jack-o'-Lanterns",
+        "roundIndex": 6,
+        "theme": "Round 6 of 6 · Candlelit Jack-o'-Lanterns",
         "tagline": "3 real glowing pumpkins · 1 neural rendering",
         "shortName": "CANDLELIT",
         "cards": [
@@ -694,10 +668,18 @@
             "details": "AUTHENTIC. Realistic cut rind edge bevels."
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    "id": "case_69_spirits",
+    "caseNumber": 69,
+    "title": "Case #69: Nocturnal Spirits & Ancient Stones",
+    "eventBadge": null,
+    "rounds": [
       {
-        "roundIndex": 3,
-        "theme": "Round 3 of 4 · Nocturnal Animals & Shadows",
+        "roundIndex": 1,
+        "theme": "Round 1 of 6 · Nocturnal Animals & Shadows",
         "tagline": "3 real nighttime animals · 1 generative imposter",
         "shortName": "NOCTURNAL",
         "cards": [
@@ -732,8 +714,8 @@
         ]
       },
       {
-        "roundIndex": 4,
-        "theme": "Round 4 of 4 · Theatrical Makeup & Masks",
+        "roundIndex": 2,
+        "theme": "Round 2 of 6 · Theatrical Makeup & Masks",
         "tagline": "3 authentic face paint jobs · 1 neural portrait",
         "shortName": "THEATRICAL",
         "cards": [
@@ -766,20 +748,10 @@
             "details": "SYNTHETIC AI. Symmetrical perfection impossible by hand, eye lashes blending directly into eyelids."
           }
         ]
-      }
-    ]
-  },
-  {
-    "id": "case_71_spirits",
-    "caseNumber": 71,
-    "isSpecialEvent": false,
-    "eventBadge": "DAILY CASE #71",
-    "title": "Case #71: Spirits & Stones",
-    "totalRounds": 4,
-    "rounds": [
+      },
       {
-        "roundIndex": 1,
-        "theme": "Round 1 of 4 · Ancient Stone Manors",
+        "roundIndex": 3,
+        "theme": "Round 3 of 6 · Ancient Stone Manors",
         "tagline": "3 authentic historic manors · 1 neural estate",
         "shortName": "ANCIENT",
         "cards": [
@@ -814,8 +786,8 @@
         ]
       },
       {
-        "roundIndex": 2,
-        "theme": "Round 2 of 4 · Artisan Jack-o'-Lanterns",
+        "roundIndex": 4,
+        "theme": "Round 4 of 6 · Artisan Jack-o'-Lanterns",
         "tagline": "3 human-carved pumpkins · 1 algorithmic fake",
         "shortName": "ARTISAN",
         "cards": [
@@ -850,8 +822,8 @@
         ]
       },
       {
-        "roundIndex": 3,
-        "theme": "Round 3 of 4 · Black Cats on Prowl",
+        "roundIndex": 5,
+        "theme": "Round 5 of 6 · Black Cats on Prowl",
         "tagline": "3 real cats · 1 synthetic imposter",
         "shortName": "BLACK",
         "cards": [
@@ -886,8 +858,8 @@
         ]
       },
       {
-        "roundIndex": 4,
-        "theme": "Round 4 of 4 · Dia de los Muertos Artistry",
+        "roundIndex": 6,
+        "theme": "Round 6 of 6 · Dia de los Muertos Artistry",
         "tagline": "3 real skull facepaint artists · 1 synthetic portrait",
         "shortName": "DIA",
         "cards": [
@@ -924,16 +896,14 @@
     ]
   },
   {
-    "id": "archive_case_65",
-    "caseNumber": 65,
-    "isSpecialEvent": false,
-    "eventBadge": "CASE #65",
-    "title": "Master Forensics Case #65: Portraits, Wildlife & Cities",
-    "totalRounds": 4,
+    "id": "case_70_master",
+    "caseNumber": 70,
+    "title": "Master Forensics Case #70: Portraits, Mechanics & Cities",
+    "eventBadge": "⭐ MASTER INVESTIGATION",
     "rounds": [
       {
         "roundIndex": 1,
-        "theme": "Round 1 of 4 · Street & Studio Portraits",
+        "theme": "Round 1 of 6 · Street & Studio Portraits",
         "tagline": "3 authentic human portraits photographed in 35mm. 1 synthetic neural face hallucinated by AI.",
         "shortName": "PORTRAITS",
         "cards": [
@@ -969,7 +939,7 @@
       },
       {
         "roundIndex": 2,
-        "theme": "Round 2 of 4 · Wildlife & Biological Optics",
+        "theme": "Round 2 of 6 · Wildlife & Biological Optics",
         "tagline": "Nature creates organic perfection. 3 real animal photos; 1 AI animal synthesis.",
         "shortName": "WILDLIFE",
         "cards": [
@@ -1005,7 +975,7 @@
       },
       {
         "roundIndex": 3,
-        "theme": "Round 3 of 4 · Metropolitan Architecture",
+        "theme": "Round 3 of 6 · Metropolitan Architecture",
         "tagline": "Complex perspectives and architectural physics. 3 real buildings; 1 generative hallucination.",
         "shortName": "CITIES",
         "cards": [
@@ -1041,7 +1011,7 @@
       },
       {
         "roundIndex": 4,
-        "theme": "Round 4 of 4 · Culinary & Food Optics",
+        "theme": "Round 4 of 6 · Culinary & Food Optics",
         "tagline": "Organic food textures, melting cheese, and glazes. 3 real dishes; 1 AI food render.",
         "shortName": "CUISINE",
         "cards": [
@@ -1072,6 +1042,78 @@
             "isAi": true,
             "title": "The Neural Imposter",
             "details": "SYNTHETIC AI. Generative food model. Look closely at the plastic hyper-glossy reflections, impossible noodle merging, and unnatural sauce specular highlights."
+          }
+        ]
+      },
+      {
+        "roundIndex": 5,
+        "theme": "Round 5 of 6 · Mechanical Watches & Horology",
+        "tagline": "3 authentic Swiss mechanical movements. 1 generative watch movement with impossible gear geometry.",
+        "shortName": "WATCHES",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/watch_real_1.jpg",
+            "isAi": false,
+            "title": "Authentic Swiss Movement",
+            "details": "AUTHENTIC HOROLOGY. Genuine escapement mechanism, physically turned screw heads, and microscopic chamfered bevels."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/watch_ai.jpg",
+            "isAi": true,
+            "title": "The Synthetic Horologist",
+            "details": "SYNTHETIC AI. Generative diffusion hallucination. Notice how the gear teeth near the bridge fuse into adjacent wheels without functional gear meshing, and the jewel bearing settings have asymmetrical bezel rims."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/watch_real_2.jpg",
+            "isAi": false,
+            "title": "Chronograph Caliber",
+            "details": "AUTHENTIC HOROLOGY. Authentic brushed Geneva stripes, precise circular graining (perlage), and physical depth of field."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/watch_real_3.jpg",
+            "isAi": false,
+            "title": "Automatic Rotor Assembly",
+            "details": "AUTHENTIC HOROLOGY. Physically accurate steel pinions, real synthetic ruby lubrication wells, and true macro lens optics."
+          }
+        ]
+      },
+      {
+        "roundIndex": 6,
+        "theme": "Round 6 of 6 · Vintage Sports Roadsters",
+        "tagline": "3 authentic vintage automobile photographs. 1 synthetic sports car hallucinated by AI diffusion.",
+        "shortName": "CLASSIC CARS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/car_real_1.jpg",
+            "isAi": false,
+            "title": "1960s Sports Coupe",
+            "details": "AUTHENTIC AUTOMOTIVE. Real 35mm photograph, genuine asphalt texture, and physically correct chrome reflections of the surrounding landscape."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/car_real_2.jpg",
+            "isAi": false,
+            "title": "Vintage Grand Tourer",
+            "details": "AUTHENTIC AUTOMOTIVE. Genuine factory panel gaps, authentic glass windshield curvature, and true wheel spoke geometry."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/car_ai.jpg",
+            "isAi": true,
+            "title": "The Hallucinated Roadster",
+            "details": "SYNTHETIC AI. Generative diffusion artifact. Notice the subtle distortion along the front bumper chrome, the impossible wire spoke density on the wheels, and surreal text on the front license plate badge."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/car_real_3.jpg",
+            "isAi": false,
+            "title": "Classic Open Top Roadster",
+            "details": "AUTHENTIC AUTOMOTIVE. Physical sunlight specular highlights, genuine tire tread wear, and authentic background foliage."
           }
         ]
       }

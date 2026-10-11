@@ -2213,7 +2213,7 @@
     
     <div class="cd-hook-box">
       <div class="cd-hook-heading">3 Real Photos · 1 Synthetic AI Fake</div>
-      <div class="cd-hook-sub">4 themed rounds daily. Exactly 1 synthetic AI imposter per round. Tap to accuse. Speed & accuracy earn top ranks.</div>
+      <div class="cd-hook-sub">6 themed rounds daily. Exactly 1 synthetic AI imposter per round. Tap to accuse. Speed & accuracy earn top ranks.</div>
     </div>
 
     <!-- Action Launch -->
@@ -2228,7 +2228,7 @@
   <!-- Countdown Stage (Visible during 3... 2... 1... GO!) -->
   <div class="cd-active-stage" id="cdActiveStage" style="display:none;">
     <div class="cd-badge" id="cdActiveBadge">🎃 HALLOWEEN SPEED CASE #66</div>
-    <div class="cd-title" id="cdActiveTitle">HAUNTED LEGACY · 4 ROUNDS</div>
+    <div class="cd-title" id="cdActiveTitle">HAUNTED LEGACY · 6 ROUNDS</div>
 
     <div class="cd-ring-wrap">
       <!-- Outer segmented SVG HUD ring (460x460) -->
@@ -2359,7 +2359,7 @@ function showCountdownReadyState() {
       : `CASE #${dailyCaseData.caseNumber} · DAILY SPECIAL`;
     if (badgeEl) badgeEl.textContent = badgeText;
     if (activeBadge) activeBadge.textContent = badgeText;
-    if (activeTitle) activeTitle.textContent = `${dailyCaseData.title.toUpperCase()} · 4 ROUNDS`;
+    if (activeTitle) activeTitle.textContent = `${dailyCaseData.title.toUpperCase()} · ${dailyCaseData.rounds.length} ROUNDS`;
   }
 
   if (briefing) briefing.style.display = "flex";
@@ -2537,22 +2537,14 @@ window.addEventListener("keydown", (e) => {
 });
 
 // Challenging speed bonus formula:
-// 100 max points, begins decaying after 3s, hits 0 at 60s (15s per round average).
-// Heavily weighted by 1st-try accuracy to prevent blind spam clicking.
+// 100 max points, begins decaying after 3s, hits 0 at cutoff (15s per round average).
+// Heavily weighted by 1st-try accuracy to reward careful observation over panic clicking.
 function calculateSpeedBonus(secs, resultsOrCount) {
-  if (secs >= 60) return 0; // Hard cutoff after 60 seconds
+  const totalRounds = dailyCaseData?.rounds?.length || 6;
+  const cutoff = totalRounds * 15; // 90 seconds for 6 rounds
+  if (secs >= cutoff) return 0;
 
-  let raw = 0;
-  if (secs <= 3) {
-    raw = 100;
-  } else if (secs <= 20) {
-    raw = 100 - (secs - 3) * (40 / 17); // 100 down to 60 (at ~2.35 pts/s)
-  } else if (secs <= 40) {
-    raw = 60 - (secs - 20) * (35 / 20); // 60 down to 25 (at 1.75 pts/s)
-  } else {
-    raw = 25 - (secs - 40) * (25 / 20); // 25 down to 0 (at 1.25 pts/s)
-  }
-  raw = Math.max(0, Math.min(100, Math.round(raw)));
+  const raw = Math.max(0, Math.min(100, Math.round(100 * (1 - (secs / cutoff)))));
 
   let accuracyMult = 1.0;
   if (Array.isArray(resultsOrCount)) {
@@ -2561,27 +2553,26 @@ function calculateSpeedBonus(secs, resultsOrCount) {
     const firstTry = resultsOrCount.filter(r => r.solved && r.attempts === 1).length;
     const secondTry = resultsOrCount.filter(r => r.solved && r.attempts === 2).length;
     const thirdTry = resultsOrCount.filter(r => r.solved && r.attempts === 3).length;
-    accuracyMult = (firstTry * 1.0 + secondTry * 0.4 + thirdTry * 0.1) / 4;
+    accuracyMult = (firstTry * 1.0 + secondTry * 0.4 + thirdTry * 0.1) / totalRounds;
   } else if (typeof resultsOrCount === "number") {
-    accuracyMult = Math.max(0, Math.min(1, resultsOrCount / 4));
+    accuracyMult = Math.max(0, Math.min(1, resultsOrCount / totalRounds));
   }
 
   return Math.round(raw * accuracyMult);
 }
 
-// Daily Hall of Fame Leaderboard (Recalibrated for challenging speed curve)
-// Funny, unique AI Detective Rival Roster
+// Daily Hall of Fame Leaderboard (Recalibrated for 6-round case)
 const DEFAULT_LEADERBOARD = [
-  { rank: 1, name: "SirSquintsALot", score: 486, time: 9.8, accuracy: "4/4 (1st try)", badge: "👑" },
-  { rank: 2, name: "SixFingerSam", score: 474, time: 14.2, accuracy: "4/4 (1st try)", badge: "🥈" },
-  { rank: 3, name: "InspectorPigeon", score: 464, time: 18.6, accuracy: "4/4 (1st try)", badge: "🥉" },
-  { rank: 4, name: "SherlockBones", score: 455, time: 23.4, accuracy: "4/4 (1st try)", badge: "🎃" },
-  { rank: 5, name: "ArtifactAndy", score: 446, time: 29.1, accuracy: "4/4 (1st try)", badge: "🕵️" },
-  { rank: 6, name: "DeepfakeDundee", score: 436, time: 35.8, accuracy: "4/4 (1st try)", badge: "🦇" },
-  { rank: 7, name: "TeethCounter-99", score: 426, time: 42.5, accuracy: "4/4 (1st try)", badge: "⚡" },
-  { rank: 8, name: "OverthinkingOtter", score: 376, time: 48.0, accuracy: "4/4 (2nd try)", badge: "👻" },
-  { rank: 9, name: "WeirdHandsWilly", score: 369, time: 54.2, accuracy: "4/4 (2nd try)", badge: "🔍" },
-  { rank: 10, name: "CadetClueless", score: 265, time: 63.1, accuracy: "3/4", badge: "💀" }
+  { rank: 1, name: "SirSquintsALot", score: 686, time: 14.8, accuracy: "6/6 (1st try)", badge: "👑" },
+  { rank: 2, name: "SixFingerSam", score: 674, time: 19.2, accuracy: "6/6 (1st try)", badge: "🥈" },
+  { rank: 3, name: "InspectorPigeon", score: 664, time: 24.6, accuracy: "6/6 (1st try)", badge: "🥉" },
+  { rank: 4, name: "SherlockBones", score: 655, time: 31.4, accuracy: "6/6 (1st try)", badge: "🎃" },
+  { rank: 5, name: "ArtifactAndy", score: 646, time: 38.1, accuracy: "6/6 (1st try)", badge: "🕵️" },
+  { rank: 6, name: "DeepfakeDundee", score: 636, time: 45.8, accuracy: "6/6 (1st try)", badge: "🦇" },
+  { rank: 7, name: "TeethCounter-99", score: 626, time: 54.5, accuracy: "6/6 (1st try)", badge: "⚡" },
+  { rank: 8, name: "OverthinkingOtter", score: 576, time: 62.0, accuracy: "6/6 (2nd try)", badge: "👻" },
+  { rank: 9, name: "WeirdHandsWilly", score: 569, time: 71.2, accuracy: "6/6 (2nd try)", badge: "🔍" },
+  { rank: 10, name: "CadetClueless", score: 465, time: 82.1, accuracy: "5/6", badge: "💀" }
 ];
 
 // Funny, quirky, unique detective aliases & combinatorial pools
@@ -2762,9 +2753,10 @@ function submitScoreToLeaderboard(finalScore, elapsedSecs, firstTryCount, totalW
   const lb = getLeaderboard().filter(e => !e.isUser);
   const callsign = getDetectiveCallsign();
 
-  let accStr = `${totalWon}/4`;
-  if (firstTryCount === 4) accStr = "4/4 (1st try)";
-  else if (firstTryCount > 0) accStr = `${totalWon}/4 (${firstTryCount} 1st)`;
+  const totalRounds = dailyCaseData?.rounds?.length || 6;
+  let accStr = `${totalWon}/${totalRounds}`;
+  if (firstTryCount === totalRounds) accStr = `${totalRounds}/${totalRounds} (1st try)`;
+  else if (firstTryCount > 0) accStr = `${totalWon}/${totalRounds} (${firstTryCount} 1st)`;
 
   const userEntry = {
     name: callsign,
@@ -3218,9 +3210,10 @@ function showAlreadyCompletedToday(record) {
   const overlay = $("countdownOverlay");
   if (overlay) overlay.classList.remove("open");
 
-  const score = record.score || 400;
-  const time = typeof record.time === "number" ? record.time : 25.0;
-  $("summaryScoreBadge").innerHTML = `${record.won || 4} / 4 <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${score} PTS · ⚡ ${time.toFixed(1)}s</span>`;
+  const totalRounds = dailyCaseData?.rounds?.length || 6;
+  const score = record.score || (totalRounds * 100);
+  const time = typeof record.time === "number" ? record.time : 35.0;
+  $("summaryScoreBadge").innerHTML = `${record.won || totalRounds} / ${totalRounds} <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${score} PTS · ⚡ ${time.toFixed(1)}s</span>`;
   $("summaryTimeVal").textContent = `${time.toFixed(1)}s`;
   $("summarySpeedBonusVal").textContent = `${score} PTS`;
   $("resultTitle").textContent = "Today's Case Complete! 🕵️";
@@ -3273,7 +3266,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.8').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=2.9').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3292,7 +3285,8 @@ function loadRound(rIndex) {
   const round = dailyCaseData.rounds[rIndex];
   if (!round) return;
 
-  $("roundCountLabel").textContent = `ROUND ${rIndex + 1}/4`;
+  const totalRounds = dailyCaseData.rounds.length;
+  $("roundCountLabel").textContent = `ROUND ${rIndex + 1}/${totalRounds}`;
   $("themeName").textContent = round.shortName || round.theme.replace(/^Round \d+ of \d+ · /, "");
 
   // Reset Hearts
@@ -3307,7 +3301,7 @@ function loadRound(rIndex) {
   // Next Stage Button
   const btnNext = $("btnNextRound");
   btnNext.classList.remove("show");
-  btnNext.textContent = (rIndex === 3) ? "Finish Case & View Score →" : "Next Round →";
+  btnNext.textContent = (rIndex === totalRounds - 1) ? "Finish Case & View Score →" : "Next Round →";
 
   // Preload next round images
   if (rIndex + 1 < dailyCaseData.rounds.length) {
@@ -3421,17 +3415,18 @@ function finishRoundUI(didWin) {
   const btnNext = $("btnNextRound");
   btnNext.classList.add("show");
 
-  if (currentRoundIndex < 3) {
-    btnNext.textContent = `Stage ${currentRoundIndex + 1} Cleared · Next in 1.2s (or tap) →`;
+  const totalRounds = dailyCaseData.rounds.length;
+  if (currentRoundIndex < totalRounds - 1) {
+    btnNext.textContent = `Stage ${currentRoundIndex + 1} Cleared · Next (or tap) →`;
   } else {
     btnNext.textContent = `Case Complete! Opening Scorecard...`;
   }
 
-  // Smooth auto-advance without requiring click
+  // Smooth auto-advance with comfortable observation time
   if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
   autoAdvanceTimeout = setTimeout(() => {
     advanceToNextStage();
-  }, 1200);
+  }, 1600);
 }
 
 function advanceToNextStage() {
@@ -3439,7 +3434,8 @@ function advanceToNextStage() {
     clearTimeout(autoAdvanceTimeout);
     autoAdvanceTimeout = null;
   }
-  if (currentRoundIndex < 3) {
+  const totalRounds = dailyCaseData.rounds.length;
+  if (currentRoundIndex < totalRounds - 1) {
     loadRound(currentRoundIndex + 1);
   } else {
     showFinalResults();
@@ -3458,46 +3454,48 @@ function showFinalResults() {
   $("viewPlaying").style.display = "none";
   $("viewResults").style.display = "flex";
 
+  const totalRounds = dailyCaseData.rounds.length;
+  const maxScore = (totalRounds * 100) + 100;
   const totalWon = roundResults.filter(r => r.solved).length;
   const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
   const secondTryCount = roundResults.filter(r => r.solved && r.attempts === 2).length;
   const thirdTryCount = roundResults.filter(r => r.solved && r.attempts === 3).length;
 
-  // Base forensic score: 1st try = 100pts, 2nd try = 45pts, 3rd try = 15pts, fail = 0pts (Max 400pts)
+  // Base forensic score: 1st try = 100pts, 2nd try = 45pts, 3rd try = 15pts, fail = 0pts
   const baseScore = (firstTryCount * 100) + (secondTryCount * 45) + (thirdTryCount * 15);
   // Speed bonus: up to 100 bonus pts based on solve time, weighted by accuracy
   const speedBonus = calculateSpeedBonus(finalSecs, roundResults);
-  const finalScore = baseScore + speedBonus; // Max 500 PTS
+  const finalScore = baseScore + speedBonus;
 
   $("summaryTimeVal").textContent = `${finalSecs.toFixed(1)}s`;
   $("summarySpeedBonusVal").textContent = `+${speedBonus} pts`;
 
   let stars = "⭐⭐⭐⭐";
   let title = "Grand Detective 🕵️‍♂️";
-  let desc = `You unmasked ${totalWon} of 4 AI imposters in ${finalSecs.toFixed(1)}s today.`;
+  let desc = `You unmasked ${totalWon} of ${totalRounds} AI imposters in ${finalSecs.toFixed(1)}s today.`;
 
-  if (firstTryCount === 4) {
-    $("summaryScoreBadge").innerHTML = `FLAWLESS 4/4 <span style="font-size:16px;color:#39ff14;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+  if (firstTryCount === totalRounds) {
+    $("summaryScoreBadge").innerHTML = `FLAWLESS ${totalRounds}/${totalRounds} <span style="font-size:16px;color:#39ff14;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "⭐⭐⭐⭐⭐";
     title = "Master Detective · Flawless Run 🏆";
-    desc = `Incredible forensics in ${finalSecs.toFixed(1)}s! You aced all 4 rounds on your first guess (+${speedBonus} speed bonus)!`;
-  } else if (totalWon === 4) {
-    $("summaryScoreBadge").innerHTML = `4 / 4 CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+    desc = `Incredible forensics in ${finalSecs.toFixed(1)}s! You aced all ${totalRounds} rounds on your first guess (+${speedBonus} speed bonus)!`;
+  } else if (totalWon === totalRounds) {
+    $("summaryScoreBadge").innerHTML = `${totalRounds} / ${totalRounds} CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "⭐⭐⭐⭐";
-    title = "All 4 Imposters Caught 🎯";
+    title = `All ${totalRounds} Imposters Caught 🎯`;
     desc = `You caught every single AI imposter in ${finalSecs.toFixed(1)}s! (${firstTryCount} on 1st guess, +${speedBonus} speed bonus).`;
-  } else if (totalWon === 3) {
-    $("summaryScoreBadge").innerHTML = `3 / 4 CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+  } else if (totalWon >= Math.ceil(totalRounds * 0.75)) {
+    $("summaryScoreBadge").innerHTML = `${totalWon} / ${totalRounds} CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "⭐⭐⭐";
     title = "Sharp Sleuth 🔍";
-    desc = `3 out of 4 AI imposters caught in ${finalSecs.toFixed(1)}s (+${speedBonus} speed bonus). You outsmarted AI models on almost every stage.`;
-  } else if (totalWon === 2) {
-    $("summaryScoreBadge").innerHTML = `2 / 4 CLEARED <span style="font-size:16px;color:#ffaa00;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+    desc = `${totalWon} out of ${totalRounds} AI imposters caught in ${finalSecs.toFixed(1)}s (+${speedBonus} speed bonus).`;
+  } else if (totalWon >= Math.ceil(totalRounds * 0.5)) {
+    $("summaryScoreBadge").innerHTML = `${totalWon} / ${totalRounds} CLEARED <span style="font-size:16px;color:#ffaa00;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "⭐⭐";
     title = "Keen Observer 👀";
-    desc = `2 out of 4 AI imposters detected in ${finalSecs.toFixed(1)}s (+${speedBonus} speed bonus). The boundary between photography and AI is getting razor thin.`;
+    desc = `${totalWon} out of ${totalRounds} AI imposters detected in ${finalSecs.toFixed(1)}s.`;
   } else {
-    $("summaryScoreBadge").innerHTML = `${totalWon} / 4 CLEARED <span style="font-size:16px;color:#ff3344;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+    $("summaryScoreBadge").innerHTML = `${totalWon} / ${totalRounds} CLEARED <span style="font-size:16px;color:#ff3344;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "💀";
     title = "Tricked by AI 🤖";
     desc = `AI diffusion artifacts fooled your eye today. Come back tomorrow for a fresh daily case!`;
@@ -3530,7 +3528,7 @@ function showFinalResults() {
 
   // Update & Save Player Stats
   playerStats.played++;
-  if (totalWon >= 3 || firstTryCount === 4) {
+  if (totalWon >= Math.ceil(totalRounds * 0.6) || firstTryCount === totalRounds) {
     playerStats.won++;
     playerStats.currentStreak++;
     if (playerStats.currentStreak > playerStats.maxStreak) {
@@ -3542,24 +3540,24 @@ function showFinalResults() {
   playerStats.aces += firstTryCount;
   playerStats.catches2 += secondTryCount;
   playerStats.catches3 += thirdTryCount;
-  playerStats.strikes += (4 - totalWon);
+  playerStats.strikes += (totalRounds - totalWon);
   playerStats.history[dailyCaseData.id] = { won: totalWon, score: finalScore, time: finalSecs, date: new Date().toISOString() };
   saveStats();
 
   // Award Career Progression XP & Medals
-  let earnedXp = 100; // Base daily solve XP
-  if (totalWon === 4) earnedXp += 50;
-  if (firstTryCount === 4) earnedXp += 50;
+  let earnedXp = 100;
+  if (totalWon === totalRounds) earnedXp += 50;
+  if (firstTryCount === totalRounds) earnedXp += 50;
   awardCareerXp(earnedXp);
 
-  if (firstTryCount === 4) {
+  if (firstTryCount === totalRounds) {
     unlockBadge("flawless_case");
     unlockBadge("eagle_eye");
   }
-  if (finalScore >= 450) unlockBadge("top_detective");
+  if (finalScore >= (totalRounds * 100)) unlockBadge("top_detective");
   if (playerStats.currentStreak >= 3) unlockBadge("streak_master");
   if (playerStats.won >= 7) unlockBadge("case_veteran");
-  if (finalSecs < 12.0 && firstTryCount >= 3) unlockBadge("lightning_instinct");
+  if (finalSecs < 20.0 && firstTryCount >= (totalRounds - 1)) unlockBadge("lightning_instinct");
 
   // Save official daily completion record
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -3641,7 +3639,9 @@ function getDailyShareText() {
     return `R${r.roundIndex} · ${r.theme}: 🟥 (fooled)`;
   }).join("\n");
 
-  const grade = firstTryCount === 4 ? `FLAWLESS 4/4 ⭐⭐⭐⭐⭐ (${finalScore}/500 PTS)` : `${totalWon}/4 Imposters Caught (${finalScore}/500 PTS)`;
+  const totalRounds = dailyCaseData?.rounds?.length || 6;
+  const maxScore = (totalRounds * 100) + 100;
+  const grade = firstTryCount === totalRounds ? `FLAWLESS ${totalRounds}/${totalRounds} ⭐⭐⭐⭐⭐ (${finalScore}/${maxScore} PTS)` : `${totalWon}/${totalRounds} Imposters Caught (${finalScore}/${maxScore} PTS)`;
 
   return `Imposter Case #${dailyCaseData.caseNumber} ${dailyCaseData.eventBadge || ''}\n${grade}\n⚡ Time: ${elapsedSeconds.toFixed(1)}s (+${speedBonus} Speed Bonus)\n\n${rows}\n\nCan you spot which photo is AI?\nPlay: ${window.location.origin}`;
 }
@@ -3693,41 +3693,43 @@ $("btnShareStory").onclick = async () => {
   const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
   const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
   const finalScore = baseScore + speedBonus;
+  const totalRounds = dailyCaseData?.rounds?.length || 6;
+  const maxScore = (totalRounds * 100) + 100;
 
   // Score Area
-  if (firstTryCount === 4) {
+  if (firstTryCount === totalRounds) {
     ctx.font = "800 100px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#39ff14";
     ctx.fillText("FLAWLESS", 540, 450);
 
     ctx.font = "700 36px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText("4 / 4 ACED ON 1ST TRY ⭐⭐⭐⭐⭐", 540, 520);
+    ctx.fillText(`${totalRounds} / ${totalRounds} ACED ON 1ST TRY ⭐⭐⭐⭐⭐`, 540, 520);
 
     ctx.font = "700 32px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#00f0ff";
-    ctx.fillText(`⚡ ${elapsedSeconds.toFixed(1)}s · ${finalScore} / 500 PTS`, 540, 585);
+    ctx.fillText(`⚡ ${elapsedSeconds.toFixed(1)}s · ${finalScore} / ${maxScore} PTS`, 540, 585);
   } else {
     ctx.font = "800 110px 'JetBrains Mono', monospace";
-    ctx.fillStyle = totalWon >= 3 ? "#39ff14" : (totalWon === 2 ? "#ffde59" : "#ff3344");
-    ctx.fillText(`${totalWon} / 4`, 540, 450);
+    ctx.fillStyle = totalWon >= Math.ceil(totalRounds * 0.75) ? "#39ff14" : (totalWon >= Math.ceil(totalRounds * 0.5) ? "#ffde59" : "#ff3344");
+    ctx.fillText(`${totalWon} / ${totalRounds}`, 540, 450);
 
     ctx.font = "700 36px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#ffffff";
-    const subText = totalWon === 4 ? `4 / 4 CAUGHT · ${firstTryCount} ON 1ST TRY` : (totalWon >= 2 ? `${totalWon} IMPOSTERS CAUGHT` : `FOOLED BY AI`);
+    const subText = totalWon === totalRounds ? `${totalRounds} / ${totalRounds} CAUGHT · ${firstTryCount} ON 1ST TRY` : (totalWon >= 2 ? `${totalWon} IMPOSTERS CAUGHT` : `FOOLED BY AI`);
     ctx.fillText(subText, 540, 520);
 
     ctx.font = "700 32px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#00f0ff";
-    ctx.fillText(`⚡ ${elapsedSeconds.toFixed(1)}s · ${finalScore} / 500 PTS`, 540, 585);
+    ctx.fillText(`⚡ ${elapsedSeconds.toFixed(1)}s · ${finalScore} / ${maxScore} PTS`, 540, 585);
   }
 
-  // 4 Round Blocks in Card (Plenty of vertical breathing room, zero text smushing)
+  // Round Blocks in Card (Dynamic sizing for 6 rounds)
   const boxW = 860;
-  const boxH = 140;
-  const gap = 24;
+  const boxH = totalRounds > 4 ? 110 : 140;
+  const gap = totalRounds > 4 ? 16 : 24;
   const startX = 110;
-  const startY = 700;
+  const startY = totalRounds > 4 ? 650 : 700;
 
   roundResults.forEach((r, i) => {
     const y = startY + i * (boxH + gap);
