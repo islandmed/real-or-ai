@@ -2241,7 +2241,15 @@
   @media (max-width: 430px) { .cd-badge { font-size: 11px; letter-spacing: 0.05em; padding: 7px 12px; white-space: nowrap; } }
 
   /* ===== DAILY REMINDER (remind branch) ===== */
-  .remind-box { position: relative; display: flex; justify-content: center; margin: -4px 0 14px; width: 100%; }
+  .remind-box { position: relative; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: -4px 0 14px; width: 100%; }
+  .remind-btn[hidden] { display: none; }
+  .install-sheet { position: fixed; inset: 0; z-index: 100001; display: flex; align-items: flex-end; justify-content: center; background: rgb(0 0 0 / 0.6); }
+  .install-sheet[hidden] { display: none; }
+  .install-card { width: min(420px, 100%); margin: 0 12px 16px; padding: 18px; background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 14px; color: var(--fg); font-family: var(--mono-font); font-size: 0.82rem; line-height: 1.5; }
+  .install-card h3 { margin: 0 0 10px; font: 800 1rem 'Plus Jakarta Sans', system-ui, sans-serif; }
+  .install-card ol { margin: 0 0 14px; padding-left: 20px; }
+  .install-card button { width: 100%; }
   .remind-btn {
     font: 700 0.82rem var(--mono-font); color: var(--accent); background: rgb(var(--accent-rgb) / 0.08);
     border: 1.5px solid rgb(var(--accent-rgb) / 0.4); border-radius: 999px; padding: 8px 16px; cursor: pointer;
@@ -2370,6 +2378,7 @@
     <!-- Daily reminder (remind branch): calendar everywhere, web push where supported -->
     <div class="remind-box" id="remindBox">
       <button class="remind-btn" id="remindBtn" type="button" aria-expanded="false" aria-controls="remindPop" onclick="toggleRemindPop(event)">🔔 Remind me daily</button>
+      <button class="remind-btn" id="installBtn" type="button" onclick="installApp()" hidden>📲 Install app</button>
       <div class="remind-pop" id="remindPop" role="dialog" aria-label="Daily reminder" hidden>
         <div class="remind-row"><label for="remindHour">Remind me at</label><select id="remindHour" onchange="remindHourChanged()"></select></div>
         <div class="remind-actions">
@@ -3642,7 +3651,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.5').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.6').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4720,10 +4729,42 @@ async function remindUnsubscribe() {
 function remindPushToggle() { return remindState().push ? remindUnsubscribe() : remindSubscribe(false); }
 
 remindInit();
+
+// --- Install app: Chrome/Edge/Samsung get the one-tap prompt, iPhone gets the Share steps ---
+let installPrompt = null;
+function installRender() {
+  const btn = $('installBtn');
+  if (!btn) return;
+  btn.hidden = remindStandalone || !(installPrompt || remindIsIOS);
+}
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; installRender(); });
+window.addEventListener('appinstalled', () => { installPrompt = null; $('installBtn').hidden = true; showToast('📲 Installed! Find Imposter on your Home Screen.'); });
+async function installApp() {
+  if (installPrompt) {
+    installPrompt.prompt();
+    try { await installPrompt.userChoice; } catch (e) {}
+    installPrompt = null; installRender();
+    return;
+  }
+  const steps = remindIsIOS
+    ? ['Tap the <b>Share</b> button ⬆️ at the bottom of Safari.', 'Scroll down and tap <b>Add to Home Screen</b>.', 'Open Imposter from your Home Screen, then turn on reminders 🔔.']
+    : ['Open your browser menu <b>⋮</b>.', 'Tap <b>Install app</b> or <b>Add to Home screen</b>.'];
+  $('installSteps').innerHTML = steps.map(t => '<li>' + t + '</li>').join('');
+  $('installSheet').hidden = false;
+}
+installRender();
 /* ===== END DAILY REMINDER ===== */
 
 window.onload = init;
 </script>
+
+    <div class="install-sheet" id="installSheet" hidden onclick="if (event.target === this) this.hidden = true">
+      <div class="install-card" role="dialog" aria-label="Install Imposter">
+        <h3>📲 Put Imposter on your Home Screen</h3>
+        <ol id="installSteps"></ol>
+        <button class="remind-act primary" type="button" onclick="$('installSheet').hidden = true">Got it</button>
+      </div>
+    </div>
 
 </body>
 </html>
