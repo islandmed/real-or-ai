@@ -173,7 +173,7 @@
       "human skull",
       "charnel house bones"
      ],
-     "match": "\\bskulls?\\b|ossuar|catacomb|charnel|schädel|beinhaus|crâne|kostnice",
+     "match": "\\bskulls?\\b|schädel|\\bcrânes?\\b|calavera|totenkopf|lebka",
      "prompts": [
       "stacked human skulls in an old ossuary",
       "a wall of skulls and bones in catacombs",
@@ -233,7 +233,7 @@
     },
     {
      "key": "cornmazes",
-     "name": "Corn Mazes",
+     "name": "Corn Mazes & Fields",
      "short": "CORN MAZES",
      "queries": [
       "corn maze",

@@ -72,7 +72,14 @@ python3 gen/imposter_gen.py --redo-ai 2026-10-12:3   # new AI only
 python3 gen/imposter_gen.py --swap 2026-10-12:3:B    # replace one real photo
 ```
 
-Contact sheets for checking a day by eye land in `private/sheets/`.
+Real photos are only used after a human passes them: `--review all` writes
+numbered sheets to `private/review/`, then `--decide POOL:3,7,12` rejects
+those numbers and approves the rest. A day is never built from unreviewed
+photos. Contact sheets for checking a finished day land in `private/sheets/`.
+
+Note: the answers (`private/state.json`) exist only on the machine that ran the
+generator, so builds and deploys must run there, or the state must be handed
+to CI as an encrypted secret.
 
 ## Build and deploy (free tier only)
 

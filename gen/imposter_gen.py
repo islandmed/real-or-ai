@@ -33,6 +33,7 @@ import secrets
 import struct
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -46,12 +47,13 @@ POOLS = PRIV / "pools"
 RAW = PRIV / "raw"
 IMG = PRIV / "img"
 SHEETS = PRIV / "sheets"
+REVIEW = PRIV / "review"
 SEASONS_PATH = ROOT / "gen" / "seasons.json"
 
 W, H = 960, 720           # every card, real or AI (flux gives 1024, so no upscaling)
 QUALITY = 70              # one WebP quality for every card
 MAX_REAL_BYTES = 165_000  # skip very detailed photos so a day stays light
-NEURONS_PER_IMAGE = 60    # flux-1-schnell ~58 at 4 steps, rounded up
+NEURONS_PER_IMAGE = 120   # measured: 85 images used the 10,000 free neurons (2026-10-11)
 DAILY_NEURON_CAP = 9000   # free tier is 10,000 per UTC day
 FIRST_DATE = dt.date(2026, 10, 11)
 FIRST_CASE_NUMBER = 71
@@ -103,6 +105,7 @@ def load_state():
     s.setdefault("used", [])        # Commons pageids ever used in a case
     s.setdefault("blacklist", [])   # pageids rejected by a human look
     s.setdefault("days", {})
+    s.setdefault("approved", [])    # "pool:pageid" a human looked at and passed for that theme
     return s
 
 
@@ -391,7 +394,8 @@ def pick_reals(theme, state, n, avoid, rng, date):
     pool = get_pool(theme)
     used = set(state["used"]) | set(state["blacklist"]) | set(avoid)
     # Pageids taken by unfinished rounds of this run count as used too.
-    q = [c for c in pool if c["pageid"] not in used and strong(c, theme)]
+    ok = set(state["approved"])
+    q = [c for c in pool if c["pageid"] not in used and f"{theme['pool']}:{c['pageid']}" in ok]
     rng.shuffle(q)
     q.sort(key=lambda c: (not strong(c, theme), not c["quality"]))
     picked, artists = [], set()
@@ -418,7 +422,8 @@ def pick_reals(theme, state, n, avoid, rng, date):
 def available(theme, state):
     pool = get_pool(theme)
     used = set(state["used"]) | set(state["blacklist"])
-    return sum(1 for c in pool if c["pageid"] not in used and strong(c, theme))
+    ok = set(state["approved"])
+    return sum(1 for c in pool if c["pageid"] not in used and f"{theme['pool']}:{c['pageid']}" in ok)
 
 
 def build_round(date, slot, theme, state, secret, rng, keep_reals=None, keep_ai=None):
@@ -438,7 +443,7 @@ def build_round(date, slot, theme, state, secret, rng, keep_reals=None, keep_ai=
         if not reals:
             return None
     if keep_ai is not None:
-        ai_path, prompt = Path(keep_ai["src"]), keep_ai["prompt"]
+        ai_path, prompt = ROOT / keep_ai["src"], keep_ai["prompt"]
     else:
         prompt = build_prompt(theme, [c for c, _ in reals], [im for _, im in reals], rng)
         ai_path = None
@@ -450,6 +455,16 @@ def build_round(date, slot, theme, state, secret, rng, keep_reals=None, keep_ai=
             try:
                 data = gen_ai(prompt, secret, rng.randrange(1, 2**31))
                 Image.open(io.BytesIO(data)).verify()
+            except urllib.error.HTTPError as e:
+                body = e.read().decode("utf-8", "replace")[:300]
+                if "4006" in body or "daily free allocation" in body:
+                    # The free tier is exhausted for this UTC day: stop, never retry.
+                    state["neurons"][utc_today().isoformat()] = DAILY_NEURON_CAP + 1000
+                    save_json(STATE_PATH, state)
+                    return "budget"
+                log(f"    AI attempt {attempt + 1} failed: {e} {body}")
+                time.sleep(4)
+                continue
             except Exception as e:
                 log(f"    AI attempt {attempt + 1} failed: {e}")
                 time.sleep(4)
@@ -490,7 +505,7 @@ def themes_by_key(season):
     return {t["key"]: t for t in season["themes"]}
 
 
-def choose_theme(date, slot, season, state, day):
+def choose_theme(date, slot, season, state, day, tried=()):
     tk = themes_by_key(season)
     want = planned_theme(date, slot, season)
     taken = {r["theme"] for r in day["rounds"] if r}
@@ -502,9 +517,9 @@ def choose_theme(date, slot, season, state, day):
     order = [want] + [k for k in theme_perm(season, date.year) if k != want]
     for strict in (True, False):
         for k in order:
-            if k in taken or (strict and k in neighbours):
+            if k in taken or k in tried or (strict and k in neighbours):
                 continue
-            if available(tk[k], state) >= 6:
+            if available(tk[k], state) >= 3:
                 return tk[k]
     return None
 
@@ -521,19 +536,20 @@ def seed_day(date, state, seasons, secret):
     for slot in range(ROUNDS):
         if day["rounds"][slot]:
             continue
-        theme = choose_theme(date, slot, season, state, day)
-        if not theme:
-            log(f"{key} R{slot + 1}: no theme has photos left")
-            return "stuck"
-        res = build_round(date, slot, theme, state, secret, rng)
-        if res == "budget":
-            save_json(STATE_PATH, state)
-            return "budget"
-        if res is None:
-            log(f"{key} R{slot + 1}: could not build {theme['key']}, trying another theme next run")
-            state["blacklist"]  # unchanged
-            save_json(STATE_PATH, state)
-            return "stuck"
+        tried, res = set(), None
+        while res is None:
+            theme = choose_theme(date, slot, season, state, day, tried)
+            if not theme:
+                log(f"{key} R{slot + 1}: no theme has approved photos left (run --review)")
+                save_json(STATE_PATH, state)
+                return "stuck"
+            res = build_round(date, slot, theme, state, secret, rng)
+            if res == "budget":
+                save_json(STATE_PATH, state)
+                return "budget"
+            if res is None:
+                log(f"{key} R{slot + 1}: not enough usable photos for {theme['key']}, trying another theme")
+                tried.add(theme["key"])
         day["rounds"][slot] = res
         state["used"].extend(c["pageid"] for c in res["cards"] if not c["ai"])
         save_json(STATE_PATH, state)
@@ -575,6 +591,9 @@ def redo(state, seasons, secret, target, mode):
     if mode == "redo":
         state["blacklist"].extend(c["pageid"] for c in reals)
         res = build_round(date, slot, theme, state, secret, rng)
+    elif mode == "rereal":
+        state["blacklist"].extend(c["pageid"] for c in reals)
+        res = build_round(date, slot, theme, state, secret, rng, keep_reals=[], keep_ai=ai)
     elif mode == "redo-ai":
         res = build_round(date, slot, theme, state, secret, rng, keep_reals=[c["cand"] for c in reals])
     else:
@@ -624,6 +643,63 @@ def contact_sheet(key, day, seasons):
     return out
 
 
+# ---------------------------------------------------------------- review
+# Text matching alone lets through a "witches' broom" tree growth or a tractor
+# in a "maize" photo, so a real photo is only used after a human has passed it
+# on a review sheet. Unreviewed candidates are never picked.
+
+def review_sheets(state, seasons, keys, n):
+    tw, th = 200, 150
+    REVIEW.mkdir(parents=True, exist_ok=True)
+    done = set(state["approved"])
+    seen = set(state["blacklist"]) | set(state["used"])
+    out = []
+    for s in seasons:
+        for t in s["themes"]:
+            if keys != ["all"] and t["pool"] not in keys and t["key"] not in keys:
+                continue
+            pend = [c for c in get_pool(t) if c["pageid"] not in seen and strong(c, t)
+                    and f"{t['pool']}:{c['pageid']}" not in done]
+            pend.sort(key=lambda c: not c["quality"])
+            pend = pend[:n]
+            if not pend:
+                continue
+            cols = 6
+            rows = (len(pend) + cols - 1) // cols
+            sheet = Image.new("RGB", (cols * (tw + 4) + 4, rows * (th + 4) + 4), (20, 20, 24))
+            dr = ImageDraw.Draw(sheet)
+            for i, c in enumerate(pend):
+                url = re.sub(r"/\d+px-", "/330px-", c["thumb"])
+                try:
+                    im = open_image(http_get(url, binary=True))
+                    im = ImageOps.fit(im, (tw, th))
+                except Exception:
+                    im = Image.new("RGB", (tw, th), (60, 0, 0))
+                x, y = 4 + (i % cols) * (tw + 4), 4 + (i // cols) * (th + 4)
+                sheet.paste(im, (x, y))
+                dr.rectangle((x, y, x + 26, y + 16), fill=(0, 0, 0))
+                dr.text((x + 3, y + 2), str(i), fill=(255, 255, 0))
+                time.sleep(0.1)
+            base = REVIEW / t["pool"]
+            sheet.save(f"{base}.jpg", quality=80)
+            save_json(f"{base}.json", [c["pageid"] for c in pend])
+            out.append(f"{base}.jpg")
+            done.update(f"{t['pool']}:{c['pageid']}" for c in pend)
+    return out
+
+
+def decide(state, pool_key, bad):
+    ids = load_json(REVIEW / f"{pool_key}.json", [])
+    bad = {int(x) for x in bad.split(",") if x.strip() != ""}
+    for i, pid in enumerate(ids):
+        if i in bad:
+            state["blacklist"].append(pid)
+        else:
+            state["approved"].append(f"{pool_key}:{pid}")
+    save_json(STATE_PATH, state)
+    log(f"{pool_key}: {len(ids) - len(bad)} approved, {len(bad)} rejected")
+
+
 # ---------------------------------------------------------------- main
 
 def main():
@@ -635,6 +711,10 @@ def main():
     ap.add_argument("--redo-ai", action="append", default=[])
     ap.add_argument("--swap", action="append", default=[])
     ap.add_argument("--sheets", action="store_true")
+    ap.add_argument("--review", help="comma list of theme/pool keys or 'all': write review sheets")
+    ap.add_argument("--review-n", type=int, default=36)
+    ap.add_argument("--decide", action="append", default=[], help="POOL:bad,idx,list (others approved)")
+    ap.add_argument("--rereal", action="append", default=[], help="DATE:R keep the AI, new real photos")
     a = ap.parse_args()
 
     seasons = load_seasons()
@@ -652,16 +732,25 @@ def main():
     if a.status:
         report()
         return 0
+    if a.review:
+        for p in review_sheets(state, seasons, a.review.split(","), a.review_n):
+            log(p)
+        return 0
+    if a.decide:
+        for d in a.decide:
+            k, _, bad = d.partition(":")
+            decide(state, k, bad)
+        return 0
     if a.sheets:
         for k, d in sorted(state["days"].items()):
             log(contact_sheet(k, d, seasons))
         return 0
 
     secret = os.environ.get("IMPOSTER_GEN_SECRET") or (PRIV / "gen_secret.txt").read_text().strip()
-    for mode, targets in (("redo", a.redo), ("redo-ai", a.redo_ai), ("swap", a.swap)):
+    for mode, targets in (("redo", a.redo), ("redo-ai", a.redo_ai), ("swap", a.swap), ("rereal", a.rereal)):
         for t in targets:
             redo(state, seasons, secret, t, mode)
-    if a.redo or a.redo_ai or a.swap:
+    if a.redo or a.redo_ai or a.swap or a.rereal:
         report()
         return 0
 
