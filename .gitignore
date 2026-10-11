@@ -21,3 +21,7 @@ test-results/
 private/
 dist/
 functions/_data/
+
+# Push worker secrets (never commit)
+push-worker/.vapid.local.json
+push-worker/.dev.vars

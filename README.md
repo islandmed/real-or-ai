@@ -85,3 +85,18 @@ npx wrangler pages deploy dist --project-name=imposter-game --branch=main
 ```
 
 Local: `npx wrangler pages dev dist` (Functions included).
+## 🔔 Daily Reminder (calendar + Web Push)
+
+The 🔔 button under the next-case countdown (and the How to Play modal) offers two reminders. Nothing ever asks for notification permission until the player clicks.
+
+- **Add to calendar** works everywhere with no server: the page builds an `.ics` with a daily `RRULE` at the chosen local hour (10 minutes, floating time so it follows the device's time zone).
+- **Notifications** use Web Push where `PushManager` exists. iOS only supports it from a home-screen install, so iOS Safari shows the calendar plus an "Add to Home Screen" hint.
+
+How push works:
+
+1. The page subscribes with the VAPID public key (in `index.html` and `push-worker/wrangler.toml`) and POSTs `{subscription, hour, tzOffsetMinutes}` to the `imposter-push` Worker (`push-worker/`, https://imposter-push.human-number.workers.dev).
+2. The Worker validates the origin (playimposter / imposter-game-c73 / localhost) and that the endpoint is https on a known push service, then stores it in KV under `h<UTC hour>:<sha256(endpoint)>` (endpoint in key metadata) plus an index key `e:<hash>` so changing the hour moves the record. `POST /unsubscribe {endpoint}` deletes both.
+3. An hourly cron lists `h<current UTC hour>:` and sends an **empty** push (no payload, so no encryption) signed with an ES256 VAPID JWT (one per push-service origin per run), `TTL: 14400`, `Urgency: normal`. 404/410 deletes the record.
+4. `sw.js` handles `push` by showing the fixed "New case is live" notification (tag `daily-case`); clicking focuses or opens the site.
+
+Keys and limits: the VAPID private key exists only as the Worker secret `VAPID_PRIVATE_JWK` and in the gitignored `push-worker/.vapid.local.json`. Free tier: 24 KV list ops a day; a free Worker invocation allows 50 outbound requests, so one cron run can reach about 50 subscribers in a given hour before needing a paid plan or a fan-out. `/test-send` is inert unless a `TEST_SECRET` secret is set (it is not). Deploy with `cd push-worker && npx wrangler deploy`.

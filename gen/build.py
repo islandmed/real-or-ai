@@ -22,7 +22,8 @@ DATA = ROOT / "functions" / "_data" / "cases.json"
 
 # The only files players get. Everything else (README, server.py, gen/,
 # private/, old case data) is never served.
-PUBLIC = ["index.html", "sw.js", "manifest.json", "favicon.svg", "og-image.png", "robots.txt",
+PUBLIC = ["index.html", "sw.js", "manifest.json", "favicon.svg", "og-image.png", "og-thanksgiving.png",
+          "og-christmas.png", "robots.txt",
           "sitemap.xml", "_headers", "assets/icons/apple-touch-icon.png", "assets/icons/icon-192.png",
           "assets/icons/icon-512.png", "assets/icons/favicon.svg", "assets/icons/og-image.png"]
 
