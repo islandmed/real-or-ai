@@ -884,13 +884,18 @@
 
   /* Next Case Countdown Box (Pure Daily Game Cycle) */
   .next-case-box {
-    margin-top: 14px;
+    margin: 16px auto;
     padding: 16px 20px;
     background: #0f1424;
     border: 1.5px solid #232d4b;
     border-radius: 12px;
     text-align: center;
     width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   }
   .next-case-label {
@@ -2293,6 +2298,13 @@
       <!-- Dynamically generated rows -->
     </div>
 
+    <!-- Next Daily Mystery Countdown (Middle of Results) -->
+    <div class="next-case-box" id="nextCaseBox">
+      <div class="next-case-label">NEXT DAILY MYSTERY IN</div>
+      <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
+      <div class="next-case-sub">A brand new forensic case with 6 unique themes drops every day at midnight.</div>
+    </div>
+
     <!-- Social Viral Share Buttons & Replay -->
     <div class="share-grid">
       <button class="btn-share" id="btnShareStory">
@@ -2307,13 +2319,6 @@
       <button class="btn-replay" id="btnReplayDaily" onclick="resetDailyChallenge()">
         <span>🔄 Play Case Again (Reset)</span>
       </button>
-    </div>
-
-    <!-- Next Daily Mystery Countdown -->
-    <div class="next-case-box" id="nextCaseBox">
-      <div class="next-case-label">NEXT DAILY MYSTERY IN</div>
-      <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
-      <div class="next-case-sub">A brand new forensic case with 6 unique themes drops every day at midnight.</div>
     </div>
   </section>
 </div>
@@ -3636,7 +3641,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.2').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.3').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
