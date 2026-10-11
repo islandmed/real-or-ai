@@ -1,4 +1,4 @@
-const CACHE_NAME = 'imposter-v2.6';
+const CACHE_NAME = 'imposter-v2.7';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './favicon.svg',
@@ -23,8 +23,8 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Network-first for HTML pages, navigation, cases.json, and endless_vault.json so updates are immediate
-  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('cases.json') || url.pathname.endsWith('endless_vault.json')) {
+  // Network-first for HTML pages, navigation, and cases.json so daily updates are immediate
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('cases.json')) {
     event.respondWith(
       fetch(event.request)
         .then(response => {

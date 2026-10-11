@@ -68,547 +68,244 @@
 
   .app {
     width: 100%;
-    max-width: 540px;
-    padding: 8px 10px;
+    max-width: 520px;
+    padding: 10px 12px 24px;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
     position: relative;
     z-index: 1;
     margin: 0 auto;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
-  /* Desktop & Laptop Viewport Adaptation: Wide 1x4 Fitted Grid */
   @media (min-width: 768px) {
     .app {
-      max-width: 1020px;
-      padding: 16px 20px;
-      height: 100vh;
-      height: 100dvh;
-      overflow-y: auto;
-      justify-content: flex-start;
+      max-width: 960px;
+      padding: 16px 20px 32px;
     }
   }
 
-  /* Header - Bold, High-Contrast & Legible */
+  /* Clean Minimal Header */
   .app-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 14px;
-    background: #121524;
-    border: 2px solid #2e3756;
+    padding: 8px 12px;
+    background: #101524;
+    border: 1px solid #232c44;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     margin-bottom: 8px;
     flex-shrink: 0;
   }
   .header-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .brand-titles {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.1;
+    gap: 8px;
   }
   .logo-text {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 900;
-    font-size: 17px;
+    font-size: 18px;
     letter-spacing: -0.01em;
     color: #ffffff;
     text-transform: uppercase;
   }
-  .logo-sub {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    font-weight: 800;
-    color: var(--neon-cyan);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .event-pill {
+  .case-badge {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
     font-weight: 800;
-    background: #ff5500;
-    color: #ffffff;
-    border: 1px solid #ffaa00;
-    padding: 3px 10px;
-    border-radius: 999px;
-    letter-spacing: 0.03em;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    box-shadow: 0 0 10px rgba(255, 85, 0, 0.35);
+    color: var(--neon-cyan);
+    background: rgba(0, 240, 255, 0.12);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
     white-space: nowrap;
   }
   .header-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
-  .streak-pill {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    font-weight: 800;
-    color: #ffde59;
-    background: #000;
-    border: 1px solid #3c4669;
-    padding: 4px 8px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    transition: all 0.1s;
-    user-select: none;
-  }
-  .streak-pill:hover { border-color: #ffde59; transform: translateY(-1px); }
-  .sound-btn {
+  .icon-btn {
     all: unset;
     cursor: pointer;
     font-size: 14px;
-    padding: 5px 8px;
-    background: #1a1e30;
-    border: 1px solid #3c4669;
+    padding: 6px 8px;
+    background: #171d30;
+    border: 1px solid #283350;
     border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     transition: all 0.1s;
     user-select: none;
+    line-height: 1;
   }
-  .sound-btn:hover { background: #252c48; border-color: var(--neon-cyan); }
-  .sound-btn:active { transform: translateY(1px); }
-  .help-btn {
-    all: unset;
-    cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 800;
-    color: #8b97bc;
-    background: #181d2f;
-    border: 1px solid #3d476c;
-    padding: 5px 9px;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.1s;
-    user-select: none;
-  }
-  .help-btn:hover { background: #262e49; color: #fff; border-color: var(--neon-cyan); transform: translateY(-1px); }
-  .help-btn:active { transform: translateY(1px); }
-  .leaderboard-btn {
-    all: unset;
-    cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 800;
-    color: #ffde59;
-    background: #181d2f;
-    border: 1px solid #3d476c;
-    padding: 5px 9px;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.1s;
-    user-select: none;
-  }
-  .leaderboard-btn:hover { background: #262e49; border-color: #ffde59; transform: translateY(-1px); }
-  .leaderboard-btn:active { transform: translateY(1px); }
-  .user-btn {
+  .icon-btn:hover { background: #222b46; border-color: var(--neon-cyan); }
+  .user-pill-btn {
     all: unset;
     cursor: pointer;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
     font-size: 11px;
     color: #ffffff;
-    padding: 6px 12px;
-    background: #252c48;
-    border: 1px solid #434e7a;
+    padding: 6px 10px;
+    background: #1a223a;
+    border: 1px solid #324068;
     border-radius: 6px;
-    box-shadow: 0 2px 0 #000;
     transition: all 0.1s;
     white-space: nowrap;
     max-width: 140px;
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: middle;
-    display: inline-block;
   }
-  .user-btn:hover { background: var(--neon-cyan); color: #000; border-color: #fff; }
-  .user-btn:active { transform: translateY(1px); box-shadow: none; }
+  .user-pill-btn:hover { background: var(--neon-cyan); color: #000; border-color: #fff; }
 
-  /* 4-Stage Quest Stepper - Bold, Readable Stage Pills */
-  .round-stepper {
+  /* Clean, Spacious Game Status Bar (Replaces all stacked clutter) */
+  .game-status-bar {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background: #0c0f1c;
-    border: 2px solid #28304c;
-    padding: 4px;
-    margin-bottom: 8px;
-    gap: 4px;
-    flex-shrink: 0;
-    border-radius: 10px;
-    width: 100%;
-  }
-  .step-pill {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    padding: 6px 2px;
-    background: #141829;
-    color: #8b97bc;
-    border: 1px solid #28314e;
-    border-radius: 6px;
-    transition: all 0.15s;
-    text-transform: uppercase;
-    text-align: center;
-  }
-  .step-pill .step-num {
-    font-size: 10px;
-    font-weight: 800;
-    color: #7281a8;
-    letter-spacing: 0.05em;
-    line-height: 1;
-    margin-bottom: 2px;
-  }
-  .step-pill .step-label {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    line-height: 1.1;
-  }
-  @media (min-width: 768px) {
-    .step-pill {
-      flex-direction: row;
-      gap: 6px;
-      padding: 8px 6px;
-    }
-    .step-pill .step-num { margin-bottom: 0; font-size: 11px; }
-    .step-pill .step-label { font-size: 11px; }
-  }
-  .step-pill.active {
-    background: #1e2642;
-    color: #ffffff;
-    border-color: var(--neon-cyan);
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
-  }
-  .step-pill.active .step-num {
-    color: var(--neon-cyan);
-  }
-  .step-pill.active .step-label {
-    color: #ffffff;
-    font-weight: 800;
-  }
-  .step-pill.passed {
-    background: rgba(57, 255, 20, 0.12);
-    border-color: var(--neon-green);
-    color: var(--neon-green);
-  }
-  .step-pill.passed .step-num, .step-pill.passed .step-label {
-    color: var(--neon-green);
-  }
-  .step-pill.failed {
-    background: rgba(255, 51, 68, 0.12);
-    border-color: var(--neon-red);
-    color: var(--neon-red);
-  }
-  .step-pill.failed .step-num, .step-pill.failed .step-label {
-    color: var(--neon-red);
-  }
-
-  /* Combined Mission & Lives Banner - High Contrast & High Legibility */
-  .mission-bar {
-    background: #14182a;
-    border: 2px solid #2d3758;
-    border-radius: 10px;
     padding: 8px 12px;
-    margin-bottom: 6px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    background: #0d1222;
+    border: 1px solid #1c243a;
+    border-radius: 8px;
+    margin-bottom: 8px;
     flex-shrink: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
   }
-  .mission-content {
-    flex: 1;
-    min-width: 0;
-  }
-  .mission-title-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 2px;
-  }
-  .mission-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    font-weight: 800;
-    background: rgba(0, 240, 255, 0.15);
-    color: var(--neon-cyan);
-    border: 1px solid rgba(0, 240, 255, 0.4);
-    padding: 1px 6px;
-    border-radius: 4px;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-  }
-  .mission-title {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-weight: 800;
-    font-size: 13px;
-    color: #ffffff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .mission-sub {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    color: #b5c3e6;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .mission-meta-group {
+  .status-left {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-shrink: 0;
   }
-  .speed-box {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    background: #080d1a;
-    border: 1.5px solid var(--neon-cyan);
-    box-shadow: 0 0 16px rgba(0, 240, 255, 0.4), inset 0 0 10px rgba(0, 240, 255, 0.12);
-    padding: 5px 12px;
-    border-radius: 8px;
-    min-width: 105px;
-  }
-  .time-penalty-badge {
-    position: absolute;
-    top: -14px;
-    right: -4px;
-    background: #ff2a85;
-    color: #fff;
+  .round-badge {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
-    font-weight: 900;
-    padding: 2px 7px;
-    border-radius: 999px;
-    border: 1px solid #fff;
-    box-shadow: 0 0 14px rgba(255, 42, 133, 0.9);
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 10;
-    white-space: nowrap;
+    font-weight: 800;
+    background: rgba(255, 222, 89, 0.15);
+    color: #ffde59;
+    border: 1px solid rgba(255, 222, 89, 0.35);
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
   }
-  .time-penalty-badge.show {
-    opacity: 1;
-    transform: translateY(0);
+  .round-theme {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
   }
-  .speed-label {
+  .status-right {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 10px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 800;
-    color: #8b97bc;
-    letter-spacing: 0.06em;
-    line-height: 1;
-    margin-bottom: 3px;
-  }
-  .speed-bonus-val {
-    color: #39ff14;
-    font-weight: 900;
-    text-shadow: 0 0 8px rgba(57, 255, 20, 0.7);
-  }
-  .speed-label::before {
-    content: "";
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    background: var(--neon-cyan);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--neon-cyan);
-    animation: speedLiveDot 1s infinite alternate;
-  }
-  @keyframes speedLiveDot {
-    from { opacity: 0.3; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1.3); }
-  }
-  .speed-timer {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--neon-cyan);
-    letter-spacing: 0.06em;
-    line-height: 1;
-    text-shadow: 0 0 12px rgba(0, 240, 255, 0.85);
-  }
-  .speed-summary-row {
-    display: flex;
-    justify-content: center;
     gap: 10px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
   }
-  .speed-stat-pill {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--neon-cyan);
-    background: #14192b;
-    border: 1px solid #2d3859;
-    padding: 4px 10px;
-    border-radius: 999px;
-  }
-  .lives-box {
+  .timer-badge {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 3px;
-    flex-shrink: 0;
+    align-items: center;
+    gap: 4px;
+    position: relative;
   }
-  .lives-label {
+  .live-timer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    letter-spacing: 0.02em;
+  }
+  .penalty-toast {
+    position: absolute;
+    top: -18px;
+    right: 0;
+    background: #ff2a4b;
+    color: #fff;
     font-family: 'JetBrains Mono', monospace;
     font-size: 9px;
     font-weight: 800;
-    color: #8b97bc;
-    letter-spacing: 0.05em;
+    padding: 1px 4px;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    transform: translateY(4px);
+    white-space: nowrap;
   }
-  .lives-pips {
+  .penalty-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .lives-hearts {
     display: flex;
-    gap: 4px;
-    font-size: 15px;
+    gap: 2px;
+    font-size: 13px;
     line-height: 1;
   }
-  .heart-pip {
-    transition: transform 0.2s, filter 0.2s;
-    filter: drop-shadow(0 0 4px rgba(255, 51, 68, 0.6));
-    cursor: default;
-  }
-  .heart-pip.lost {
-    filter: grayscale(1) opacity(0.3);
-    transform: scale(0.85);
-  }
-  .heart-pip.solved {
-    filter: drop-shadow(0 0 6px #39ff14);
-  }
 
-  .forensic-hint {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: #8fa0cb;
-    margin-bottom: 6px;
-    padding: 0 4px;
-    flex-shrink: 0;
-  }
-  .forensic-hint strong {
-    color: #ffffff;
-  }
-
-  /* Main Playing View: Flex fitted */
+  /* Main Playing View */
   #viewPlaying {
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-height: 0;
-    overflow: hidden;
+    width: 100%;
   }
 
-  /* Grid of 4 Retro Cards */
+  /* 2x2 Photo Grid - Beautiful edge-to-edge square photos */
   .grid-wrap {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
     gap: 8px;
     width: 100%;
-    margin-bottom: 6px;
-    flex: 1;
-    min-height: 0;
+    margin-bottom: 8px;
   }
-
-  /* On Laptops & Desktop Displays: Show 4 in a horizontal row (1x4) */
   @media (min-width: 768px) {
     .grid-wrap {
       grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: auto;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 14px;
+      margin-bottom: 14px;
     }
   }
 
   .imposter-card {
     position: relative;
-    background: #000;
-    border: 2px solid var(--border);
-    box-shadow: 0 3px 0 #000;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    background: #14192b;
+    border: 2px solid #252e49;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.1s ease;
+    transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
-    min-height: 0;
   }
   @media (min-width: 768px) {
     .imposter-card {
-      border-width: 3px;
-      box-shadow: 0 4px 0 #000;
       aspect-ratio: 3 / 4;
-      max-height: 56vh;
     }
   }
   .imposter-card:hover {
     border-color: var(--neon-cyan);
     transform: translateY(-2px);
-    box-shadow: 0 6px 0 #000;
   }
   .imposter-card.selected {
     border-color: var(--neon-yellow);
-    box-shadow: 0 0 10px rgba(255, 222, 89, 0.5), 0 4px 0 #000;
+    box-shadow: 0 0 12px rgba(255, 222, 89, 0.5);
   }
   .imposter-card.eliminated {
     border-color: var(--neon-green);
     cursor: default;
-    opacity: 0.9;
+    opacity: 0.95;
   }
   .imposter-card.caught {
     border-color: var(--neon-pink);
-    box-shadow: 0 0 14px rgba(255, 42, 133, 0.6), 0 4px 0 #000;
+    box-shadow: 0 0 16px rgba(255, 42, 133, 0.6);
     cursor: default;
   }
+
 
   .card-letter {
     position: absolute;
@@ -661,17 +358,24 @@
     width: 100%;
     height: 100%;
     position: relative;
-    background: #06080e;
+    background: #14192b;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
   }
   .card-img-wrap img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     display: block;
     image-rendering: auto;
+  }
+  .card-img-wrap.img-load-fail::after {
+    content: "📷 Photo Unavailable";
+    color: #8fa0cb;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
   }
 
   /* Status Overlays on flip */
@@ -711,63 +415,36 @@
     overflow-y: auto;
   }
 
-  /* Retro Arcade Push Buttons */
+  /* Control Bar & Next Round Action */
   .control-bar {
     width: 100%;
     display: flex;
-    gap: 8px;
-    margin-top: 4px;
+    justify-content: center;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    min-height: 48px;
   }
-  .btn-accuse {
-    flex: 1;
-    background: var(--neon-pink);
-    color: #fff;
-    font-family: var(--retro-font);
-    font-size: 11px;
-    padding: 14px 10px;
-    border: 3px solid #fff;
-    box-shadow: 0 4px 0 #900040, inset 0 2px 0 rgba(255,255,255,0.4);
-    cursor: pointer;
-    transition: all 0.08s;
-    text-transform: uppercase;
-    text-shadow: 1px 1px 0 #000;
-  }
-  .btn-accuse:hover { filter: brightness(1.1); }
-  .btn-accuse:active {
-    transform: translateY(3px);
-    box-shadow: 0 1px 0 #900040;
-  }
-  .btn-accuse.disabled {
-    background: #1e2235;
-    border-color: #383f5e;
-    color: #555e7e;
-    box-shadow: 0 4px 0 #0f111c;
-    cursor: not-allowed;
-    text-shadow: none;
-    transform: none;
-  }
-
   .btn-next-round {
     width: 100%;
-    background: var(--neon-green);
-    color: #000;
-    font-family: var(--retro-font);
-    font-size: 11px;
-    padding: 14px 10px;
-    border: 3px solid #fff;
-    box-shadow: 0 4px 0 #1b8508, inset 0 2px 0 rgba(255,255,255,0.5);
+    background: linear-gradient(135deg, #00f0ff 0%, #0077ff 100%);
+    color: #030611;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 900;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.45);
     cursor: pointer;
     display: none;
     align-items: center;
     justify-content: center;
     gap: 8px;
     text-transform: uppercase;
+    animation: fadeIn 0.15s ease-out;
   }
-  .btn-next-round:hover { filter: brightness(1.1); }
-  .btn-next-round:active {
-    transform: translateY(3px);
-    box-shadow: 0 1px 0 #1b8508;
-  }
+  .btn-next-round:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-next-round:active { transform: translateY(1px); }
   .btn-next-round.show { display: flex; }
 
   /* Lightbox Zoom Stage */
@@ -940,6 +617,42 @@
     justify-content: center;
     gap: 8px;
     transition: all 0.1s;
+  }
+  .btn-copy:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+
+  /* Next Case Countdown Box (Pure Daily Game Cycle) */
+  .next-case-box {
+    margin-top: 14px;
+    padding: 16px 20px;
+    background: #0f1424;
+    border: 1.5px solid #232d4b;
+    border-radius: 12px;
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .next-case-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 800;
+    color: #8b97bc;
+    letter-spacing: 0.12em;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .next-case-countdown {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--neon-cyan);
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 16px rgba(0, 240, 255, 0.45);
+    margin: 4px 0 6px;
+  }
+  .next-case-sub {
+    font-size: 11px;
+    color: #8fa0cb;
+    line-height: 1.35;
   }
   .btn-copy:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
   .btn-copy:active { transform: translateY(1px); }
@@ -2383,99 +2096,39 @@
 <div class="app">
   <header class="app-header">
     <div class="header-brand">
-      <div class="brand-titles">
-        <span class="logo-text">IMPOSTER</span>
-        <span class="logo-sub">SPOT THE AI FAKE</span>
-      </div>
-      <span class="event-pill" id="caseTag">🎃 HALLOWEEN SPECIAL</span>
+      <span class="logo-text">IMPOSTER</span>
+      <span class="case-badge" id="caseTag">CASE #66</span>
     </div>
     <div class="header-actions">
-      <button class="help-btn" id="btnHelp" onclick="openHowModal()" title="How to Play">❓ How to Play</button>
-      <button class="sound-btn" id="btnSound" title="Toggle Sound">🔊</button>
-      <div class="dossier-pill" id="btnDossier" onclick="openDossierModal()" title="Detective Career Dossier & Progression">
-        <span id="dossierRankIcon">🎖️</span>
-        <span id="dossierRankTitle">Cadet</span>
-        <span style="opacity:0.35;">|</span>
-        <span style="color:#ffb703;">🔥 <span id="streakCount">1</span></span>
-      </div>
-      <button class="leaderboard-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆 Ranks</button>
-      <button class="user-btn" id="btnUserAccount" onclick="promptChangeName()" title="Edit Detective Call-Sign">🕵️ Callsign</button>
+      <button class="icon-btn" onclick="openHowModal()" title="How to Play">❓</button>
+      <button class="icon-btn" id="btnSound" title="Toggle Sound">🔊</button>
+      <button class="icon-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆</button>
+      <button class="user-pill-btn" id="btnUserAccount" onclick="promptChangeName()" title="Your Call-Sign">🕵️ Callsign</button>
     </div>
   </header>
 
-  <!-- Mode Switch Bar: Daily Case vs Endless Survival -->
-  <div class="mode-switch-bar">
-    <button class="mode-tab active" id="tabModeDaily" onclick="switchGameMode('daily')">
-      📅 Daily Case <span class="mode-badge" id="dailyStatusBadge">ACTIVE</span>
-    </button>
-    <button class="mode-tab" id="tabModeEndless" onclick="switchGameMode('endless')">
-      ♾️ Endless Survival <span class="mode-badge" style="background:rgba(255,42,133,0.2);color:#ff2a85;border-color:rgba(255,42,133,0.4)">ARCADE</span>
-    </button>
-  </div>
-
-  <!-- 4-Stage Quest Stepper (Daily Mode) -->
-  <div class="round-stepper" id="roundStepper">
-    <div class="step-pill active" id="stepPill_0">
-      <span class="step-num">R1</span>
-      <span class="step-label">MANSIONS</span>
+  <!-- Clean, Spacious Game Status Bar -->
+  <div class="game-status-bar" id="gameStatusBar">
+    <div class="status-left">
+      <span class="round-badge" id="roundCountLabel">ROUND 1/4</span>
+      <span class="round-theme" id="themeName">Haunted Mansions</span>
     </div>
-    <div class="step-pill" id="stepPill_1">
-      <span class="step-num">R2</span>
-      <span class="step-label">PUMPKINS</span>
+    <div class="status-right">
+      <div class="timer-badge">
+        <span class="penalty-toast" id="timePenaltyBadge">+3.0s ⚠️</span>
+        <span class="live-timer" id="liveTimer">00:00.0</span>
+      </div>
+      <div class="lives-hearts" id="livesDisplay">
+        <span class="heart-pip" id="dot1">❤️</span>
+        <span class="heart-pip" id="dot2">❤️</span>
+        <span class="heart-pip" id="dot3">❤️</span>
+      </div>
     </div>
-    <div class="step-pill" id="stepPill_2">
-      <span class="step-num">R3</span>
-      <span class="step-label">BLACK CATS</span>
-    </div>
-    <div class="step-pill" id="stepPill_3">
-      <span class="step-num">R4</span>
-      <span class="step-label">COSTUMES</span>
-    </div>
-  </div>
-
-  <!-- Endless Survival Stepper (Endless Mode) -->
-  <div class="endless-stepper" id="endlessStepper" style="display:none;">
-    <div class="endless-wave-tag">🌊 WAVE <span id="endlessWaveNum">1</span></div>
-    <div class="endless-lives" id="endlessLivesDisplay">❤️❤️❤️</div>
-    <div class="endless-score">XP: <span id="endlessXpGained">+0</span></div>
   </div>
 
   <!-- Playing View -->
   <main id="viewPlaying">
-    <div class="mission-bar">
-      <div class="mission-content">
-        <div class="mission-title-row">
-          <span class="mission-tag">MISSION</span>
-          <span class="mission-title" id="themeName">Round 1 of 4 · Haunted Mansions</span>
-        </div>
-        <div class="mission-sub" id="themeTagline">
-          3 authentic historic homes · 1 synthetic AI imposter
-        </div>
-      </div>
-      <div class="mission-meta-group">
-        <div class="speed-box">
-          <div class="time-penalty-badge" id="timePenaltyBadge">+3.0s TIME PENALTY ⚠️</div>
-          <div class="speed-label">TIME · <span class="speed-bonus-val" id="liveSpeedBonus">+100 PTS</span></div>
-          <div class="speed-timer" id="liveTimer">00:00.0</div>
-        </div>
-        <div class="lives-box">
-          <div class="lives-label">ATTEMPTS</div>
-          <div class="lives-pips">
-            <span class="heart-pip" id="dot1">❤️</span>
-            <span class="heart-pip" id="dot2">❤️</span>
-            <span class="heart-pip" id="dot3">❤️</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="countdown-banner" id="countdownBanner">⚡ SPEED RUN STARTS IN: 3...</div>
-
-    <div class="forensic-hint">
-      <span>🎯 <strong>OBJECTIVE:</strong> 3 real photos · 1 AI fake. Tap the imposter!</span>
-      <span>🔍 <strong>Zoom:</strong> Inspect forensic details</span>
-    </div>
-
-    <!-- 2x2 Grid -->
+    <!-- 2x2 Grid (Fills square cards with edge-to-edge photos) -->
     <div class="grid-wrap" id="gridWrap">
       <!-- 4 Cards populated dynamically -->
     </div>
@@ -2487,16 +2140,16 @@
     </div>
   </main>
 
-  <!-- 4-Round Solved Summary View -->
+  <!-- 4-Round Solved Summary View (Pure Daily Puzzle Loop) -->
   <section class="case-results" id="viewResults">
     <div class="summary-score-badge" id="summaryScoreBadge">4 / 4</div>
     <div class="speed-summary-row" id="speedSummaryRow">
-      <div class="speed-stat-pill">⚡ Time: <span id="summaryTimeVal">00.0s</span></div>
-      <div class="speed-stat-pill">🚀 Speed Bonus: <span id="summarySpeedBonusVal">+0 pts</span></div>
+      <div class="speed-stat-pill">⏱️ Time: <span id="summaryTimeVal">00.0s</span></div>
+      <div class="speed-stat-pill">⚡ Speed Bonus: <span id="summarySpeedBonusVal">+0 pts</span></div>
     </div>
     <div class="stars-row" id="starsRow">⭐⭐⭐⭐</div>
-    <h2 class="result-title" id="resultTitle">Daily Detective Master</h2>
-    <p class="result-desc" id="resultDesc">You caught all 4 synthetic machine imposters across every theme today.</p>
+    <h2 class="result-title" id="resultTitle">Daily Mystery Solved!</h2>
+    <p class="result-desc" id="resultDesc">You caught all 4 synthetic machine imposters today.</p>
 
     <!-- Round by Round Breakdown -->
     <div class="round-breakdown" id="roundBreakdown">
@@ -2513,74 +2166,11 @@
       </button>
     </div>
 
-    <!-- Forensic Autopsy & Dossier Action Row -->
-    <div style="display:flex;gap:10px;width:100%;max-width:440px;margin:12px auto 0;">
-      <button class="btn-autopsy-action" onclick="openAutopsyModal(0)" style="flex:1;background:rgba(0,240,255,0.1);border:1.5px solid #00f0ff;color:#00f0ff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;padding:12px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-        🔬 Flaw Autopsy
-      </button>
-      <button class="btn-dossier-action" onclick="openDossierModal()" style="flex:1;background:rgba(255,183,3,0.1);border:1.5px solid #ffb703;color:#ffb703;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;padding:12px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-        🎖️ Career Dossier
-      </button>
-    </div>
-
-    <!-- Daily Sponsor Ad Slot -->
-    <div class="ad-slot" id="adBanner">
-      <span>SPONSOR · Daily Partner Placement</span>
-    </div>
-
-    <!-- Replayability Archive Section -->
-    <div class="archive-section">
-      <div class="archive-header">
-        <div class="archive-title">Archive Cases & Packs</div>
-        <div class="archive-badge">300+ Cases</div>
-      </div>
-      <div class="archive-list">
-        <div class="archive-item" onclick="openAuthModal('1920s Vintage Archives')">
-          <div class="arch-info">
-            <h4>Pack #08 · 1920s Historical Archives</h4>
-            <p>Historical photographic forensics across 4 vintage rounds</p>
-          </div>
-          <div class="arch-lock">🔒 Unlock</div>
-        </div>
-        <div class="archive-item" onclick="openAuthModal('Macro Optics')">
-          <div class="arch-info">
-            <h4>Pack #09 · Microscopic & Insect Optics</h4>
-            <p>Extreme macro photography vs procedural AI textures</p>
-          </div>
-          <div class="arch-lock">🔒 Unlock</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Endless Game Over View -->
-  <section class="case-results" id="viewEndlessOver" style="display:none;">
-    <div class="endless-over-card">
-      <div style="font-size:42px;margin-bottom:8px;">💀</div>
-      <h2 class="endless-over-title">SYSTEM COMPROMISED</h2>
-      <p class="endless-over-sub">You survived <strong id="endlessFinalWaves">0</strong> waves of AI deception before losing all forensic lives.</p>
-      <div class="endless-stats-grid">
-        <div class="endless-stat-box">
-          <div class="endless-stat-val" id="endlessFinalWaveVal">0</div>
-          <div class="endless-stat-label">Waves Cleared</div>
-        </div>
-        <div class="endless-stat-box">
-          <div class="endless-stat-val" id="endlessBestWaveVal">0</div>
-          <div class="endless-stat-label">Personal Best</div>
-        </div>
-        <div class="endless-stat-box">
-          <div class="endless-stat-val" id="endlessXpEarnedVal">+0</div>
-          <div class="endless-stat-label">Career XP Earned</div>
-        </div>
-      </div>
-      <div class="share-grid">
-        <button class="btn-share" onclick="restartEndlessSurvival()">
-          <span>🔄 Play Again</span>
-        </button>
-        <button class="btn-copy" onclick="switchGameMode('daily')">
-          <span>📅 Back to Daily Case</span>
-        </button>
-      </div>
+    <!-- Next Daily Mystery Countdown -->
+    <div class="next-case-box" id="nextCaseBox">
+      <div class="next-case-label">NEXT DAILY MYSTERY IN</div>
+      <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
+      <div class="next-case-sub">A brand new forensic case with 4 unique themes drops every day at midnight.</div>
     </div>
   </section>
 </div>
@@ -2763,41 +2353,16 @@
     <div class="cd-hero-tagline">THE DAILY AI DETECTIVE GAME</div>
     
     <div class="cd-hook-box">
-      <div class="cd-hook-heading">3 Real Photos · 1 AI Fake</div>
-      <div class="cd-hook-sub">Can you spot the synthetic AI imposter hidden among authentic photographs?</div>
-    </div>
-
-    <!-- 3 Simple Rules -->
-    <div class="cd-rules-grid">
-      <div class="cd-rule-card">
-        <span class="cd-rule-icon">📸</span>
-        <div class="cd-rule-info">
-          <strong>1. Four Photos</strong>
-          <p>3 authentic photos. 1 synthetic AI fake.</p>
-        </div>
-      </div>
-      <div class="cd-rule-card">
-        <span class="cd-rule-icon">🔍</span>
-        <div class="cd-rule-info">
-          <strong>2. Spot Artifacts</strong>
-          <p>Inspect weird textures, hands & flawed details.</p>
-        </div>
-      </div>
-      <div class="cd-rule-card">
-        <span class="cd-rule-icon">⚡</span>
-        <div class="cd-rule-info">
-          <strong>3. Tap to Accuse</strong>
-          <p>4 daily rounds. Quick solves earn bonus points!</p>
-        </div>
-      </div>
+      <div class="cd-hook-heading">3 Real Photos · 1 Synthetic AI Fake</div>
+      <div class="cd-hook-sub">4 themed rounds daily. Exactly 1 synthetic AI imposter per round. Tap to accuse. Speed & accuracy earn top ranks.</div>
     </div>
 
     <!-- Action Launch -->
     <div class="cd-action-box">
       <button class="cd-start-btn" id="cdStartBtn" onclick="triggerCyberCountdown(event)">
-        🕵️ START TODAY'S CASE
+        ▶ START TODAY'S CASE
       </button>
-      <div class="cd-ready-hint">Press SPACE or click button to start 3-2-1 countdown</div>
+      <div class="cd-ready-hint">Press SPACE or click button to start</div>
     </div>
   </div>
 
@@ -2887,8 +2452,8 @@
         <div class="stat-label">Cases Solved</div>
       </div>
       <div class="stat-box">
-        <div class="stat-val" id="dossierEndlessBest">0</div>
-        <div class="stat-label">Endless Waves</div>
+        <div class="stat-val" id="dossierAccuracy">100%</div>
+        <div class="stat-label">Forensic Accuracy</div>
       </div>
       <div class="stat-box">
         <div class="stat-val" id="dossierCurrentStreak">0</div>
@@ -2924,22 +2489,12 @@ let userProfile = null;
 let countdownInterval = null;
 let autoAdvanceTimeout = null;
 
-// Game Modes & Endless Survival
-let currentGameMode = 'daily'; // 'daily' | 'endless'
-let endlessVault = [];
-let endlessRemainingRounds = [];
-let endlessWave = 1;
-let endlessLives = 3;
-let endlessXpEarned = 0;
-let endlessCurrentRound = null;
-let endlessBestWave = parseInt(localStorage.getItem('imposter_endless_best') || '0', 10);
-
 // Career Progression & Medals
 let playerCareer = {
   xp: 0,
   level: 1,
   unlockedBadges: [],
-  bestEndlessWave: 0,
+  casesCompleted: 0,
   autopsiesViewed: 0
 };
 let currentAutopsyRound = 0;
@@ -3734,7 +3289,9 @@ function renderDossier() {
   $("dossierXpFill").style.width = `${pct}%`;
 
   $("dossierCasesSolved").textContent = playerStats.won;
-  $("dossierEndlessBest").textContent = endlessBestWave;
+  const playedCount = Math.max(1, playerStats.played);
+  const accuracyPct = Math.round((playerStats.won / playedCount) * 100);
+  if ($("dossierAccuracy")) $("dossierAccuracy").textContent = `${playerStats.played > 0 ? accuracyPct : 100}%`;
   $("dossierCurrentStreak").textContent = playerStats.currentStreak;
   $("dossierTotalAces").textContent = playerStats.aces;
 
@@ -3853,183 +3410,42 @@ function checkDailyStatus() {
   } catch (_) {}
 }
 
-// --- Endless Survival Arcade Mode ---
-function switchGameMode(mode) {
-  if (mode === currentGameMode) return;
-  currentGameMode = mode;
-  playSound("tap");
+// --- Daily Countdown & Completion Engine ---
+let countdownTimerInterval = null;
 
-  if (mode === "daily") {
-    $("tabModeDaily").classList.add("active");
-    $("tabModeEndless").classList.remove("active");
-    $("roundStepper").style.display = "flex";
-    $("endlessStepper").style.display = "none";
-    $("viewEndlessOver").style.display = "none";
-    $("viewResults").style.display = "none";
-    $("viewPlaying").style.display = "block";
-
-    loadRound(currentRoundIndex);
-    showToast("Switched to Daily Case");
-  } else if (mode === "endless") {
-    $("tabModeDaily").classList.remove("active");
-    $("tabModeEndless").classList.add("active");
-    $("roundStepper").style.display = "none";
-    $("endlessStepper").style.display = "flex";
-    $("viewResults").style.display = "none";
-    $("viewEndlessOver").style.display = "none";
-    $("viewPlaying").style.display = "block";
-
-    dismissCountdown();
-    startEndlessSurvival();
-    showToast("♾️ Endless Survival Active! 3 Lives.");
-  }
+function updateNextCaseCountdown() {
+  const el = $("nextCaseCountdown");
+  if (!el) return;
+  const now = new Date();
+  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+  const diff = Math.max(0, tomorrow.getTime() - now.getTime());
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const secs = Math.floor((diff % (1000 * 60)) / 1000);
+  const pad = n => n < 10 ? "0" + n : n;
+  el.textContent = `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
 }
 
-async function startEndlessSurvival() {
-  if (endlessVault.length === 0) {
-    try {
-      const res = await fetch("endless_vault.json");
-      endlessVault = await res.json();
-    } catch (err) {
-      console.error("Failed to load endless vault", err);
-      showToast("Failed to load Endless Vault");
-      return;
-    }
-  }
-
-  endlessWave = 1;
-  endlessLives = 3;
-  endlessXpEarned = 0;
-  endlessRemainingRounds = [...endlessVault].sort(() => Math.random() - 0.5);
-
-  $("endlessWaveNum").textContent = "1";
-  $("endlessLivesDisplay").textContent = "❤️❤️❤️";
-  $("endlessXpGained").textContent = "+0";
-
-  loadNextEndlessWave();
+function startMidnightCountdown() {
+  if (countdownTimerInterval) clearInterval(countdownTimerInterval);
+  updateNextCaseCountdown();
+  countdownTimerInterval = setInterval(updateNextCaseCountdown, 1000);
 }
 
-function loadNextEndlessWave() {
-  if (endlessRemainingRounds.length === 0) {
-    endlessRemainingRounds = [...endlessVault].sort(() => Math.random() - 0.5);
-  }
+function showAlreadyCompletedToday(record) {
+  $("viewPlaying").style.display = "none";
+  $("viewResults").style.display = "flex";
+  const overlay = $("countdownOverlay");
+  if (overlay) overlay.classList.remove("open");
 
-  endlessCurrentRound = endlessRemainingRounds.pop();
-  isCurrentRoundOver = false;
-
-  // Shuffle cards so AI imposter isn't in predictable slot
-  const letters = ["A", "B", "C", "D"];
-  const shuffledCards = [...endlessCurrentRound.cards].sort(() => Math.random() - 0.5).map((card, idx) => ({
-    ...card,
-    id: letters[idx]
-  }));
-  endlessCurrentRound.cards = shuffledCards;
-
-  $("themeName").textContent = `Wave ${endlessWave} · ${endlessCurrentRound.theme}`;
-  $("themeTagline").textContent = `${endlessCurrentRound.tagline} (Arcade Survival)`;
-
-  $("liveSpeedBonus").textContent = "+50 XP";
-  $("liveTimer").textContent = `Wave ${endlessWave}`;
-
-  $("btnNextRound").classList.remove("show");
-
-  const wrap = $("gridWrap");
-  wrap.innerHTML = endlessCurrentRound.cards.map(card => `
-    <div class="imposter-card" id="card_${card.id}" onclick="selectCard('${card.id}')">
-      <div class="card-letter">${card.id}</div>
-      <div class="inspect-lens-btn" onclick="openLightbox(event, '${card.id}')">🔍 Zoom</div>
-      <div class="card-img-wrap">
-        <img src="${card.image}" alt="Card ${card.id}" loading="eager">
-      </div>
-      <div class="card-status-badge" id="badge_${card.id}">
-        <div class="badge-icon" id="badgeIcon_${card.id}">🧑</div>
-        <div class="badge-title" id="badgeTitle_${card.id}">AUTHENTIC</div>
-        <div class="badge-desc" id="badgeDesc_${card.id}">${card.details}</div>
-      </div>
-    </div>
-  `).join("");
-}
-
-function handleEndlessCardSelection(id) {
-  const card = endlessCurrentRound.cards.find(c => c.id === id);
-  if (!card) return;
-  const cardEl = $(`card_${id}`);
-
-  if (card.isAi) {
-    playSound("caught");
-    isCurrentRoundOver = true;
-    cardEl.classList.add("caught");
-    $(`badgeIcon_${card.id}`).textContent = "🤖";
-    $(`badgeTitle_${card.id}`).textContent = "AI IMPOSTER CAUGHT";
-    $(`badgeDesc_${card.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(card.id, true)}% caught this AI fake</div><div style="margin-top:4px;">${card.details}</div>`;
-
-    endlessXpEarned += 50;
-    $("endlessXpGained").textContent = `+${endlessXpEarned}`;
-
-    if (endlessWave >= 5) {
-      unlockBadge("survivor");
-    }
-
-    showToast(`🎯 Wave ${endlessWave} Cleared! +50 XP`);
-    endlessWave++;
-    $("endlessWaveNum").textContent = endlessWave;
-
-    setTimeout(() => {
-      loadNextEndlessWave();
-    }, 1100);
-  } else {
-    playSound("strike");
-    endlessLives--;
-    cardEl.classList.add("eliminated");
-    $(`badgeIcon_${card.id}`).textContent = "🏛️";
-    $(`badgeTitle_${card.id}`).textContent = "100% REAL";
-    $(`badgeDesc_${card.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(card.id, false)}% fooled by this photo</div><div style="margin-top:4px;">${card.details}</div>`;
-
-    const hearts = '❤️'.repeat(Math.max(0, endlessLives)) + '🖤'.repeat(3 - Math.max(0, endlessLives));
-    $("endlessLivesDisplay").textContent = hearts;
-
-    if (endlessLives <= 0) {
-      isCurrentRoundOver = true;
-      playSound("strike");
-
-      const imposter = endlessCurrentRound.cards.find(c => c.isAi);
-      if (imposter) {
-        const impEl = $(`card_${imposter.id}`);
-        if (impEl) {
-          impEl.classList.add("caught");
-          $(`badgeIcon_${imposter.id}`).textContent = "🤖";
-          $(`badgeTitle_${imposter.id}`).textContent = "AI IMPOSTER";
-        }
-      }
-
-      const clearedWaves = endlessWave - 1;
-      if (clearedWaves > endlessBestWave) {
-        endlessBestWave = clearedWaves;
-        localStorage.setItem("imposter_endless_best", endlessBestWave);
-      }
-
-      if (endlessXpEarned > 0) {
-        awardCareerXp(endlessXpEarned);
-      }
-
-      setTimeout(() => {
-        $("viewPlaying").style.display = "none";
-        $("viewEndlessOver").style.display = "flex";
-        $("endlessFinalWaves").textContent = clearedWaves;
-        $("endlessFinalWaveVal").textContent = clearedWaves;
-        $("endlessBestWaveVal").textContent = endlessBestWave;
-        $("endlessXpEarnedVal").textContent = `+${endlessXpEarned}`;
-      }, 1200);
-    } else {
-      showToast(`Strike! That photo was real. ${endlessLives} lives left.`);
-    }
-  }
-}
-
-function restartEndlessSurvival() {
-  $("viewEndlessOver").style.display = "none";
-  $("viewPlaying").style.display = "block";
-  startEndlessSurvival();
+  const score = record.score || 400;
+  const time = typeof record.time === "number" ? record.time : 25.0;
+  $("summaryScoreBadge").innerHTML = `${record.won || 4} / 4 <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${score} PTS · ⚡ ${time.toFixed(1)}s</span>`;
+  $("summaryTimeVal").textContent = `${time.toFixed(1)}s`;
+  $("summarySpeedBonusVal").textContent = `${score} PTS`;
+  $("resultTitle").textContent = "Today's Case Complete! 🕵️";
+  $("resultDesc").textContent = "You already solved today's mystery. Come back tonight at midnight for the next case!";
+  startMidnightCountdown();
 }
 
 // --- Initialization ---
@@ -4038,8 +3454,6 @@ async function init() {
   loadCareer();
   updateSoundButton();
   $("btnSound").onclick = toggleSound;
-  if ($("btnDossier")) $("btnDossier").onclick = openDossierModal;
-  if ($("btnStats")) $("btnStats").onclick = openStatsModal;
   if ($("btnLeaderboard")) $("btnLeaderboard").onclick = openLeaderboardModal;
 
   // Load saved profile or initialize active callsign
@@ -4057,68 +3471,32 @@ async function init() {
     const res = await fetch("cases.json");
     allCases = await res.json();
     dailyCaseData = getDailyCaseForToday() || allCases[0];
-    checkDailyStatus();
-    
-    // Check if it's a special seasonal event
-    if (dailyCaseData.eventBadge) {
-      $("caseTag").textContent = dailyCaseData.eventBadge;
-    } else {
-      $("caseTag").textContent = `CASE #${dailyCaseData.caseNumber}`;
+
+    $("caseTag").textContent = `CASE #${dailyCaseData.caseNumber}`;
+    const badgeEl = $("cdBadge");
+    if (badgeEl) {
+      badgeEl.textContent = dailyCaseData.eventBadge || `DAILY CASE #${dailyCaseData.caseNumber}`;
     }
 
-    // Set stage pill names based on themes
-    dailyCaseData.rounds.forEach((r, idx) => {
-      const p = $(`stepPill_${idx}`);
-      if (p) {
-        const title = r.shortName || (r.theme.split("·")[1]?.trim().split(" ")[0]) || `STAGE ${idx+1}`;
-        p.innerHTML = `<span class="step-num">R${idx+1}</span><span class="step-label">${title}</span>`;
-      }
-    });
+    // Check if player already finished today's case
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
+    if (records[todayStr] && records[todayStr].solved) {
+      showAlreadyCompletedToday(records[todayStr]);
+      return;
+    }
 
     loadRound(0);
   } catch (err) {
     console.error("Failed to load cases", err);
   }
 
-  // Pre-fetch endless vault in background
-  fetch("endless_vault.json").then(r => r.json()).then(data => {
-    endlessVault = data;
-  }).catch(() => {});
-
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.6').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=2.7').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
-}
-
-function switchCase(caseId) {
-  const found = allCases.find(c => c.id === caseId);
-  if (!found) return;
-  dailyCaseData = found;
-
-  if (dailyCaseData.eventBadge) {
-    $("caseTag").textContent = dailyCaseData.eventBadge;
-  } else {
-    $("caseTag").textContent = `CASE #${dailyCaseData.caseNumber}`;
-  }
-
-  dailyCaseData.rounds.forEach((r, idx) => {
-    const p = $(`stepPill_${idx}`);
-    if (p) {
-      p.className = "step-pill";
-      const title = r.shortName || (r.theme.split("·")[1]?.trim().split(" ")[0]) || `STAGE ${idx+1}`;
-      p.innerHTML = `<span class="step-num">R${idx+1}</span><span class="step-label">${title}</span>`;
-    }
-  });
-
-  roundResults = [];
-  $("viewResults").style.display = "none";
-  $("viewPlaying").style.display = "block";
-  caseStartTime = null;
-  loadRound(0);
-  showToast(`Loaded ${dailyCaseData.title}`);
 }
 
 function loadRound(rIndex) {
@@ -4132,36 +3510,41 @@ function loadRound(rIndex) {
   }
 
   const round = dailyCaseData.rounds[rIndex];
+  if (!round) return;
 
-  // Update Stepper
-  for (let i = 0; i < 4; i++) {
-    const pill = $(`stepPill_${i}`);
-    pill.classList.remove("active");
-    if (i === rIndex) pill.classList.add("active");
-  }
-
-  // Banner
-  $("themeName").textContent = round.theme;
-  $("themeTagline").textContent = round.tagline;
+  $("roundCountLabel").textContent = `ROUND ${rIndex + 1}/4`;
+  $("themeName").textContent = round.shortName || round.theme.replace(/^Round \d+ of \d+ · /, "");
 
   // Reset Hearts
   for (let i = 1; i <= 3; i++) {
     const dot = $(`dot${i}`);
-    dot.className = "heart-pip";
-    dot.textContent = "❤️";
+    if (dot) {
+      dot.className = "heart-pip";
+      dot.textContent = "❤️";
+    }
   }
 
-  // Buttons
-  $("btnNextRound").classList.remove("show");
+  // Next Stage Button
+  const btnNext = $("btnNextRound");
+  btnNext.classList.remove("show");
+  btnNext.textContent = (rIndex === 3) ? "Finish Case & View Score →" : "Next Round →";
 
-  // Populate 4 cards
+  // Preload next round images
+  if (rIndex + 1 < dailyCaseData.rounds.length) {
+    dailyCaseData.rounds[rIndex + 1].cards.forEach(c => {
+      const img = new Image();
+      img.src = c.image;
+    });
+  }
+
+  // Populate 4 cards with fallback
   const wrap = $("gridWrap");
   wrap.innerHTML = round.cards.map(card => `
     <div class="imposter-card" id="card_${card.id}" onclick="selectCard('${card.id}')">
       <div class="card-letter">${card.id}</div>
       <div class="inspect-lens-btn" onclick="openLightbox(event, '${card.id}')">🔍 Zoom</div>
       <div class="card-img-wrap">
-        <img src="${card.image}" alt="Card ${card.id}" loading="eager">
+        <img src="${card.image}" alt="Photo ${card.id}" loading="eager" onerror="this.style.opacity='0'; this.parentElement.classList.add('img-load-fail');">
       </div>
       <div class="card-status-badge" id="badge_${card.id}">
         <div class="badge-icon" id="badgeIcon_${card.id}">🧑</div>
@@ -4179,13 +3562,7 @@ function selectCard(id) {
   dismissCountdown();
 
   const cardEl = $(`card_${id}`);
-  if (cardEl.classList.contains("eliminated") || cardEl.classList.contains("caught")) return;
-
-  if (currentGameMode === "endless") {
-    handleEndlessCardSelection(id);
-    return;
-  }
-
+  if (!cardEl || cardEl.classList.contains("eliminated") || cardEl.classList.contains("caught")) return;
   // Instant accusation on tap
   attemptsUsedThisRound++;
 
@@ -4206,12 +3583,6 @@ function selectCard(id) {
       solvedPip.className = "heart-pip solved";
       solvedPip.textContent = "🎯";
     }
-
-    // Mark stepper pill
-    const curPill = $(`stepPill_${currentRoundIndex}`);
-    curPill.classList.add("passed");
-    const numEl = curPill.querySelector(".step-num");
-    if (numEl) numEl.textContent = "✓";
 
     roundResults.push({
       roundIndex: currentRoundIndex + 1,
@@ -4244,17 +3615,16 @@ function selectCard(id) {
       // 3 attempts used and still wrong: Failed round
       isCurrentRoundOver = true;
 
-      const curPill = $(`stepPill_${currentRoundIndex}`);
-      curPill.classList.add("failed");
-      const numEl = curPill.querySelector(".step-num");
-      if (numEl) numEl.textContent = "✗";
-
       const imposter = round.cards.find(c => c.isAi);
-      const imposterEl = $(`card_${imposter.id}`);
-      imposterEl.classList.add("caught");
-      $(`badgeIcon_${imposter.id}`).textContent = "🤖";
-      $(`badgeTitle_${imposter.id}`).textContent = "AI IMPOSTER";
-      $(`badgeDesc_${imposter.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(imposter.id, true)}% of detectives caught this AI fake</div><div style="margin-top:4px;">${imposter.details}</div>`;
+      if (imposter) {
+        const imposterEl = $(`card_${imposter.id}`);
+        if (imposterEl) {
+          imposterEl.classList.add("caught");
+          $(`badgeIcon_${imposter.id}`).textContent = "🤖";
+          $(`badgeTitle_${imposter.id}`).textContent = "AI IMPOSTER";
+          $(`badgeDesc_${imposter.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(imposter.id, true)}% of detectives caught this AI fake</div><div style="margin-top:4px;">${imposter.details}</div>`;
+        }
+      }
 
       roundResults.push({
         roundIndex: currentRoundIndex + 1,
@@ -4420,7 +3790,7 @@ function showFinalResults() {
     checkDailyStatus();
   } catch (_) {}
 
-  renderArchiveList();
+  startMidnightCountdown();
 }
 
 function renderArchiveList() {
