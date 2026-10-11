@@ -3642,7 +3642,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.3').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.4').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4679,7 +4679,14 @@ async function remindSubscribe(quiet) {
     showToast(quiet ? '🔔 Reminder moved to ' + remindHourLabel(remindHour()) : '🔔 You will get a nudge daily at ' + remindHourLabel(remindHour()));
   } catch (err) {
     console.log('remind subscribe error', err);
-    showToast('Could not turn on notifications. Try the calendar instead.');
+    const why = String((err && (err.name + ': ' + err.message)) || err);
+    let help = 'Could not turn on notifications (' + why.slice(0, 120) + '). The calendar works everywhere.';
+    if (/sw timeout/.test(why)) help = 'The app is still installing. Close and reopen the page, then try again.';
+    else if (/AbortError|push service|Registration failed/i.test(why)) help = navigator.brave
+      ? 'Brave blocks push by default: Settings → Privacy and security → turn on "Use Google services for push messaging", then try again.'
+      : 'Your browser\'s push service refused (' + why.slice(0, 80) + '). Try Chrome or Safari, or use the calendar.';
+    document.querySelectorAll('.js-remind-hint').forEach(el => { el.textContent = help; });
+    showToast('Could not turn on notifications: see the note below.');
   }
 }
 
