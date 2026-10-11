@@ -1812,6 +1812,472 @@
   }
   .how-play-btn:hover { transform: translateY(-1px); }
 
+  /* Mode Switcher Tabs */
+  .mode-switch-bar {
+    display: flex;
+    gap: 6px;
+    background: #090c17;
+    border: 1px solid #1f2742;
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 8px;
+  }
+  .mode-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: transparent;
+    color: #8b97bc;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 7px 10px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .mode-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
+  .mode-tab.active {
+    background: #192038;
+    color: #00f0ff;
+    border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+  }
+  .tab-badge {
+    font-size: 9px;
+    background: rgba(0, 240, 255, 0.15);
+    color: #00f0ff;
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+  }
+  .tab-sub {
+    font-size: 9px;
+    background: rgba(255, 42, 133, 0.15);
+    color: #ff2a85;
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 42, 133, 0.3);
+  }
+
+  /* Endless Wave Stepper */
+  .endless-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0d1122;
+    border: 2px solid #ff2a85;
+    box-shadow: 0 0 14px rgba(255, 42, 133, 0.25);
+    padding: 6px 12px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .endless-wave-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 900;
+    color: #ff2a85;
+    text-shadow: 0 0 8px rgba(255, 42, 133, 0.7);
+    letter-spacing: 0.05em;
+  }
+  .endless-stats-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .endless-xp-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #39ff14;
+    background: rgba(57, 255, 20, 0.12);
+    border: 1px solid rgba(57, 255, 20, 0.35);
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .endless-best-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #ffde59;
+    background: rgba(255, 222, 89, 0.12);
+    border: 1px solid rgba(255, 222, 89, 0.35);
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  /* Dossier Pill */
+  .dossier-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #00f0ff;
+    background: #0d1222;
+    border: 1.5px solid rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .dossier-pill:hover { border-color: #00f0ff; transform: translateY(-1px); }
+
+  /* Deception Stats on Card */
+  .badge-deception {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 800;
+    color: #00f0ff;
+    background: rgba(0, 240, 255, 0.15);
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    padding: 3px 8px;
+    border-radius: 999px;
+    margin-top: 6px;
+    letter-spacing: 0.02em;
+  }
+  .badge-deception.real {
+    color: #ffde59;
+    background: rgba(255, 222, 89, 0.12);
+    border-color: rgba(255, 222, 89, 0.35);
+  }
+
+  /* Forensic Autopsy Modal */
+  .autopsy-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 10, 18, 0.96);
+    backdrop-filter: blur(12px);
+    z-index: 10001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .autopsy-modal.open { display: flex; }
+  .autopsy-card {
+    background: #0f1426;
+    border: 2px solid var(--neon-cyan);
+    box-shadow: 0 0 35px rgba(0, 240, 255, 0.35);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 22px;
+    position: relative;
+  }
+  .autopsy-close {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    color: #8b97bc;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .autopsy-close:hover { color: #fff; }
+  .autopsy-nav {
+    display: flex;
+    gap: 6px;
+    margin: 12px 0 16px;
+    overflow-x: auto;
+  }
+  .autopsy-nav-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    background: #171d34;
+    border: 1px solid #2e3b63;
+    color: #8b97bc;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .autopsy-nav-btn.active {
+    background: #00f0ff;
+    color: #000;
+    border-color: #fff;
+  }
+  .autopsy-imposter-preview {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #ff2a85;
+    background: #05070e;
+    margin-bottom: 14px;
+    max-height: 320px;
+    display: flex;
+    justify-content: center;
+  }
+  .autopsy-imposter-preview img {
+    max-height: 320px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  .autopsy-reticle {
+    position: absolute;
+    top: 35%;
+    left: 45%;
+    width: 80px;
+    height: 80px;
+    border: 2px dashed #00f0ff;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
+    animation: reticlePulse 2s infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes reticlePulse {
+    from { transform: scale(0.9); opacity: 0.7; }
+    to { transform: scale(1.15); opacity: 1; }
+  }
+  .autopsy-glitch-box {
+    background: rgba(255, 42, 133, 0.1);
+    border: 1.5px solid #ff2a85;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .autopsy-glitch-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 900;
+    color: #ff2a85;
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+  }
+  .autopsy-glitch-desc {
+    font-size: 13px;
+    color: #e2e8f8;
+    line-height: 1.45;
+  }
+  .autopsy-auth-box {
+    background: rgba(57, 255, 20, 0.08);
+    border: 1px solid rgba(57, 255, 20, 0.35);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .autopsy-auth-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 900;
+    color: #39ff14;
+    margin-bottom: 4px;
+  }
+  .autopsy-auth-desc {
+    font-size: 12px;
+    color: #a4b3d6;
+    line-height: 1.4;
+  }
+
+  /* Detective Dossier Modal */
+  .dossier-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 10, 18, 0.96);
+    backdrop-filter: blur(12px);
+    z-index: 10002;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .dossier-modal.open { display: flex; }
+  .dossier-card {
+    background: #0f1426;
+    border: 2px solid #2e3756;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  }
+  .dossier-rank-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #141b33;
+    border: 1.5px solid rgba(0, 240, 255, 0.35);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .dossier-avatar {
+    font-size: 38px;
+    background: #0a0e1c;
+    border: 2px solid var(--neon-cyan);
+    border-radius: 50%;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    flex-shrink: 0;
+  }
+  .dossier-rank-info { flex: 1; }
+  .dossier-rank-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    margin: 0 0 4px;
+  }
+  .dossier-rank-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--neon-cyan);
+    font-weight: 800;
+  }
+  .xp-bar-wrap {
+    margin-top: 10px;
+  }
+  .xp-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 800;
+    color: #8b97bc;
+    margin-bottom: 4px;
+  }
+  .xp-bar-bg {
+    height: 8px;
+    background: #0a0d18;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #232c48;
+  }
+  .xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00f0ff, #39ff14);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+  .badges-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+  @media (max-width: 500px) {
+    .badges-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .badge-item {
+    background: #141a2e;
+    border: 1px solid #263354;
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+    opacity: 0.38;
+    filter: grayscale(0.8);
+    transition: all 0.2s;
+  }
+  .badge-item.unlocked {
+    opacity: 1;
+    filter: none;
+    border-color: #ffde59;
+    background: rgba(255, 222, 89, 0.08);
+    box-shadow: 0 0 10px rgba(255, 222, 89, 0.15);
+  }
+  .badge-item-icon { font-size: 24px; margin-bottom: 4px; }
+  .badge-item-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+  .badge-item-desc {
+    font-size: 9px;
+    color: #8b97bc;
+    line-height: 1.25;
+  }
+
+  /* Endless Game Over View */
+  .endless-over-card {
+    background: #0f1426;
+    border: 2px solid #ff2a85;
+    box-shadow: 0 0 35px rgba(255, 42, 133, 0.4);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    max-width: 480px;
+    width: 100%;
+    margin: 20px auto;
+  }
+  .endless-over-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px;
+    font-weight: 900;
+    color: #ff2a85;
+    text-shadow: 0 0 15px rgba(255, 42, 133, 0.7);
+    margin-bottom: 4px;
+  }
+  .endless-over-sub {
+    color: #8b97bc;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .endless-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .endless-stat-box {
+    background: #161c33;
+    border: 1px solid #283658;
+    border-radius: 8px;
+    padding: 10px 4px;
+  }
+  .endless-stat-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: #00f0ff;
+  }
+  .endless-stat-label {
+    font-size: 10px;
+    color: #8b97bc;
+    margin-top: 2px;
+  }
+  .btn-endless-retry {
+    background: linear-gradient(135deg, #ff2a85 0%, #ff7700 100%);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 900;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255, 42, 133, 0.5);
+    margin-right: 8px;
+  }
+  .btn-endless-daily {
+    background: #171d34;
+    color: #00f0ff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 14px 20px;
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
   /* Toast */
   .toast {
     position: fixed;
@@ -1848,13 +2314,28 @@
     <div class="header-actions">
       <button class="help-btn" id="btnHelp" onclick="openHowModal()" title="How to Play">❓ How to Play</button>
       <button class="sound-btn" id="btnSound" title="Toggle Sound">🔊</button>
-      <div class="streak-pill" id="btnStats" title="View Detective Stats">🔥 <span id="streakCount">1</span></div>
+      <div class="dossier-pill" id="btnDossier" onclick="openDossierModal()" title="Detective Career Dossier & Progression">
+        <span id="dossierRankIcon">🎖️</span>
+        <span id="dossierRankTitle">Cadet</span>
+        <span style="opacity:0.35;">|</span>
+        <span style="color:#ffb703;">🔥 <span id="streakCount">1</span></span>
+      </div>
       <button class="leaderboard-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆 Ranks</button>
       <button class="user-btn" id="btnUserAccount">Sign in</button>
     </div>
   </header>
 
-  <!-- 4-Stage Quest Stepper -->
+  <!-- Mode Switch Bar: Daily Case vs Endless Survival -->
+  <div class="mode-switch-bar">
+    <button class="mode-tab active" id="tabModeDaily" onclick="switchGameMode('daily')">
+      📅 Daily Case <span class="mode-badge" id="dailyStatusBadge">ACTIVE</span>
+    </button>
+    <button class="mode-tab" id="tabModeEndless" onclick="switchGameMode('endless')">
+      ♾️ Endless Survival <span class="mode-badge" style="background:rgba(255,42,133,0.2);color:#ff2a85;border-color:rgba(255,42,133,0.4)">ARCADE</span>
+    </button>
+  </div>
+
+  <!-- 4-Stage Quest Stepper (Daily Mode) -->
   <div class="round-stepper" id="roundStepper">
     <div class="step-pill active" id="stepPill_0">
       <span class="step-num">R1</span>
@@ -1872,6 +2353,13 @@
       <span class="step-num">R4</span>
       <span class="step-label">COSTUMES</span>
     </div>
+  </div>
+
+  <!-- Endless Survival Stepper (Endless Mode) -->
+  <div class="endless-stepper" id="endlessStepper" style="display:none;">
+    <div class="endless-wave-tag">🌊 WAVE <span id="endlessWaveNum">1</span></div>
+    <div class="endless-lives" id="endlessLivesDisplay">❤️❤️❤️</div>
+    <div class="endless-score">XP: <span id="endlessXpGained">+0</span></div>
   </div>
 
   <!-- Playing View -->
@@ -1946,6 +2434,16 @@
       </button>
     </div>
 
+    <!-- Forensic Autopsy & Dossier Action Row -->
+    <div style="display:flex;gap:10px;width:100%;max-width:440px;margin:12px auto 0;">
+      <button class="btn-autopsy-action" onclick="openAutopsyModal(0)" style="flex:1;background:rgba(0,240,255,0.1);border:1.5px solid #00f0ff;color:#00f0ff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;padding:12px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        🔬 Flaw Autopsy
+      </button>
+      <button class="btn-dossier-action" onclick="openDossierModal()" style="flex:1;background:rgba(255,183,3,0.1);border:1.5px solid #ffb703;color:#ffb703;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;padding:12px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        🎖️ Career Dossier
+      </button>
+    </div>
+
     <!-- Daily Sponsor Ad Slot -->
     <div class="ad-slot" id="adBanner">
       <span>SPONSOR · Daily Partner Placement</span>
@@ -1972,6 +2470,37 @@
           </div>
           <div class="arch-lock">🔒 Unlock</div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Endless Game Over View -->
+  <section class="case-results" id="viewEndlessOver" style="display:none;">
+    <div class="endless-over-card">
+      <div style="font-size:42px;margin-bottom:8px;">💀</div>
+      <h2 class="endless-over-title">SYSTEM COMPROMISED</h2>
+      <p class="endless-over-sub">You survived <strong id="endlessFinalWaves">0</strong> waves of AI deception before losing all forensic lives.</p>
+      <div class="endless-stats-grid">
+        <div class="endless-stat-box">
+          <div class="endless-stat-val" id="endlessFinalWaveVal">0</div>
+          <div class="endless-stat-label">Waves Cleared</div>
+        </div>
+        <div class="endless-stat-box">
+          <div class="endless-stat-val" id="endlessBestWaveVal">0</div>
+          <div class="endless-stat-label">Personal Best</div>
+        </div>
+        <div class="endless-stat-box">
+          <div class="endless-stat-val" id="endlessXpEarnedVal">+0</div>
+          <div class="endless-stat-label">Career XP Earned</div>
+        </div>
+      </div>
+      <div class="share-grid">
+        <button class="btn-share" onclick="restartEndlessSurvival()">
+          <span>🔄 Play Again</span>
+        </button>
+        <button class="btn-copy" onclick="switchGameMode('daily')">
+          <span>📅 Back to Daily Case</span>
+        </button>
       </div>
     </div>
   </section>
@@ -2222,6 +2751,84 @@
   </div>
 </div>
 
+<!-- Forensic Flaw Autopsy Modal -->
+<div class="autopsy-modal" id="autopsyModal">
+  <div class="autopsy-card">
+    <div class="autopsy-close" onclick="closeAutopsyModal()">✕</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+      <span style="font-size:22px;">🔬</span>
+      <h3 style="margin:0;font-size:18px;color:#fff;font-family:'JetBrains Mono',monospace;">FORENSIC FLAW AUTOPSY</h3>
+    </div>
+    <p style="font-size:12px;color:#8b97bc;margin:0 0 10px;">Educational breakdown of generative diffusion defects vs authentic camera optics.</p>
+
+    <div class="autopsy-nav" id="autopsyNav">
+      <!-- R1, R2, R3, R4 injected dynamically -->
+    </div>
+
+    <div class="autopsy-imposter-preview" id="autopsyPreview">
+      <img id="autopsyImg" src="" alt="AI Imposter">
+      <div class="autopsy-reticle" id="autopsyReticle" title="Generative Anomaly Zone"></div>
+    </div>
+
+    <div class="autopsy-glitch-box">
+      <div class="autopsy-glitch-title">⚠️ GENERATIVE AI ANOMALY REVEALED</div>
+      <div class="autopsy-glitch-desc" id="autopsyGlitchDesc">Loading forensic defect breakdown...</div>
+    </div>
+
+    <div class="autopsy-auth-box">
+      <div class="autopsy-auth-title">📷 WHY THE OTHER 3 PHOTOS WERE AUTHENTIC</div>
+      <div class="autopsy-auth-desc" id="autopsyAuthDesc">Real optical glass physics, natural sensor noise, and authentic material construction.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Detective Career Dossier Modal -->
+<div class="dossier-modal" id="dossierModal">
+  <div class="dossier-card">
+    <div class="autopsy-close" onclick="closeDossierModal()">✕</div>
+    <div class="dossier-rank-header">
+      <div class="dossier-avatar" id="dossierAvatarIcon">🎖️</div>
+      <div class="dossier-rank-info">
+        <div class="dossier-rank-title" id="dossierModalRankTitle">Cadet</div>
+        <div class="dossier-rank-sub" id="dossierModalCallsign">AGENT PHANTOM · LEVEL 1</div>
+        <div class="xp-bar-wrap">
+          <div class="xp-label-row">
+            <span id="dossierXpLabel">XP: 0 / 150</span>
+            <span id="dossierNextRankLabel">Next: Field Investigator</span>
+          </div>
+          <div class="xp-bar-bg">
+            <div class="xp-bar-fill" id="dossierXpFill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-val" id="dossierCasesSolved">0</div>
+        <div class="stat-label">Cases Solved</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="dossierEndlessBest">0</div>
+        <div class="stat-label">Endless Waves</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="dossierCurrentStreak">0</div>
+        <div class="stat-label">Day Streak</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="dossierTotalAces">0</div>
+        <div class="stat-label">1st-Try Aces</div>
+      </div>
+    </div>
+
+    <div class="dist-title" style="margin-top:16px;">Career Forensic Medals</div>
+    <div class="badges-grid" id="dossierBadgesGrid">
+      <!-- Injected dynamically -->
+    </div>
+  </div>
+</div>
+
 <!-- Canvas for generating Story card -->
 <canvas id="storyCanvas" width="1080" height="1920" style="display:none;"></canvas>
 
@@ -2238,6 +2845,26 @@ let isCurrentRoundOver = false;
 let userProfile = null;
 let countdownInterval = null;
 let autoAdvanceTimeout = null;
+
+// Game Modes & Endless Survival
+let currentGameMode = 'daily'; // 'daily' | 'endless'
+let endlessVault = [];
+let endlessRemainingRounds = [];
+let endlessWave = 1;
+let endlessLives = 3;
+let endlessXpEarned = 0;
+let endlessCurrentRound = null;
+let endlessBestWave = parseInt(localStorage.getItem('imposter_endless_best') || '0', 10);
+
+// Career Progression & Medals
+let playerCareer = {
+  xp: 0,
+  level: 1,
+  unlockedBadges: [],
+  bestEndlessWave: 0,
+  autopsiesViewed: 0
+};
+let currentAutopsyRound = 0;
 
 // Live Speed Stopwatch
 let caseStartTime = null;
@@ -2831,12 +3458,411 @@ function updateNextCaseTimer() {
 }
 setInterval(updateNextCaseTimer, 1000);
 
+// --- Detective Career Dossier & Progression ---
+const CAREER_RANKS = [
+  { level: 1, title: "Cadet", icon: "🎖️", minXp: 0, maxXp: 150 },
+  { level: 2, title: "Field Investigator", icon: "🔍", minXp: 150, maxXp: 400 },
+  { level: 3, title: "Forensic Specialist", icon: "🔬", minXp: 400, maxXp: 800 },
+  { level: 4, title: "Senior AI Hunter", icon: "⚡", minXp: 800, maxXp: 1400 },
+  { level: 5, title: "Chief Cyber Inspector", icon: "🛡️", minXp: 1400, maxXp: 2200 },
+  { level: 6, title: "Turing Grandmaster", icon: "👑", minXp: 2200, maxXp: 999999 }
+];
+
+const ALL_BADGES = [
+  { id: "lightning_instinct", icon: "⚡", name: "Lightning Instinct", desc: "Fast forensic unmasking under 12s total" },
+  { id: "flawless_case", icon: "🎯", name: "Flawless Case", desc: "Clear a 4/4 daily case with 4 first-try aces" },
+  { id: "deep_inspector", icon: "🔬", name: "Deep Inspector", desc: "Inspect flaw autopsy on 3 rounds" },
+  { id: "streak_master", icon: "🔥", name: "Streak Master", desc: "Maintain a 3-day active daily streak" },
+  { id: "top_detective", icon: "🏆", name: "Top Detective", desc: "Score 450+ points in a single daily case" },
+  { id: "survivor", icon: "🌊", name: "Endless Survivor", desc: "Survive 5+ waves in Endless Survival" }
+];
+
+function getRankForXp(xp) {
+  for (let i = CAREER_RANKS.length - 1; i >= 0; i--) {
+    if (xp >= CAREER_RANKS[i].minXp) {
+      const next = CAREER_RANKS[i + 1] || null;
+      return {
+        ...CAREER_RANKS[i],
+        nextRank: next ? next.title : "Max Rank",
+        nextMin: next ? next.minXp : CAREER_RANKS[i].minXp
+      };
+    }
+  }
+  return { ...CAREER_RANKS[0], nextRank: CAREER_RANKS[1].title, nextMin: CAREER_RANKS[1].minXp };
+}
+
+function loadCareer() {
+  try {
+    const raw = localStorage.getItem("imposter_career");
+    if (raw) {
+      playerCareer = { ...playerCareer, ...JSON.parse(raw) };
+    }
+  } catch (_) {}
+  updateHeaderDossierPill();
+}
+
+function saveCareer() {
+  try {
+    localStorage.setItem("imposter_career", JSON.stringify(playerCareer));
+  } catch (_) {}
+  updateHeaderDossierPill();
+}
+
+function awardCareerXp(amount) {
+  const oldRank = getRankForXp(playerCareer.xp);
+  playerCareer.xp += amount;
+  const newRank = getRankForXp(playerCareer.xp);
+  saveCareer();
+
+  showToast(`⚡ +${amount} Career XP earned!`);
+
+  if (newRank.level > oldRank.level) {
+    showToast(`🎉 PROMOTION! You are now a ${newRank.title} (${newRank.icon})!`);
+    playSound("victory");
+  }
+}
+
+function updateHeaderDossierPill() {
+  const rank = getRankForXp(playerCareer.xp);
+  const iconEl = $("dossierRankIcon");
+  const titleEl = $("dossierRankTitle");
+  if (iconEl) iconEl.textContent = rank.icon;
+  if (titleEl) titleEl.textContent = rank.title;
+}
+
+function openDossierModal() {
+  playSound("tap");
+  renderDossier();
+  $("dossierModal").classList.add("open");
+}
+
+function closeDossierModal() {
+  $("dossierModal").classList.remove("open");
+}
+
+function renderDossier() {
+  const rank = getRankForXp(playerCareer.xp);
+  const callsign = (userProfile && userProfile.callsign) ? userProfile.callsign.toUpperCase() : "AGENT PHANTOM";
+
+  $("dossierAvatarIcon").textContent = rank.icon;
+  $("dossierModalRankTitle").textContent = rank.title;
+  $("dossierModalCallsign").textContent = `${callsign} · LEVEL ${rank.level}`;
+
+  const xpIntoLevel = playerCareer.xp - rank.minXp;
+  const xpNeeded = Math.max(1, rank.nextMin - rank.minXp);
+  const pct = rank.level === 6 ? 100 : Math.min(100, Math.max(0, Math.round((xpIntoLevel / xpNeeded) * 100)));
+
+  $("dossierXpLabel").textContent = `XP: ${playerCareer.xp} / ${rank.level === 6 ? 'MAX' : rank.nextMin}`;
+  $("dossierNextRankLabel").textContent = `Next: ${rank.nextRank}`;
+  $("dossierXpFill").style.width = `${pct}%`;
+
+  $("dossierCasesSolved").textContent = playerStats.won;
+  $("dossierEndlessBest").textContent = endlessBestWave;
+  $("dossierCurrentStreak").textContent = playerStats.currentStreak;
+  $("dossierTotalAces").textContent = playerStats.aces;
+
+  const grid = $("dossierBadgesGrid");
+  if (grid) {
+    grid.innerHTML = ALL_BADGES.map(b => {
+      const isUnlocked = (playerCareer.unlockedBadges || []).includes(b.id);
+      return `
+        <div class="badge-item ${isUnlocked ? 'unlocked' : ''}">
+          <div class="badge-item-icon">${b.icon}</div>
+          <div class="badge-item-name">${b.name}</div>
+          <div class="badge-item-desc">${b.desc}</div>
+        </div>
+      `;
+    }).join("");
+  }
+}
+
+function unlockBadge(badgeId) {
+  if (!playerCareer.unlockedBadges) playerCareer.unlockedBadges = [];
+  if (playerCareer.unlockedBadges.includes(badgeId)) return;
+
+  playerCareer.unlockedBadges.push(badgeId);
+  saveCareer();
+  const badge = ALL_BADGES.find(b => b.id === badgeId);
+  if (badge) {
+    showToast(`🎖️ Forensic Medal Unlocked: ${badge.name}!`);
+    playSound("victory");
+  }
+}
+
+// --- Deception Index Crowdsourcing Simulation ---
+function getDeceptionRate(cardId, isAi) {
+  let hash = 0;
+  const str = String(cardId) + (dailyCaseData ? dailyCaseData.id : "case") + (isAi ? "ai" : "real");
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 37 + str.charCodeAt(i)) >>> 0;
+  }
+  if (isAi) {
+    return 58 + (hash % 34); // 58% - 91% caught
+  } else {
+    return 14 + (hash % 28); // 14% - 41% tricked
+  }
+}
+
+// --- Forensic Flaw Autopsy Inspector ---
+function openAutopsyModal(roundIndex = 0) {
+  playSound("tap");
+  currentAutopsyRound = roundIndex;
+
+  playerCareer.autopsiesViewed = (playerCareer.autopsiesViewed || 0) + 1;
+  saveCareer();
+  if (playerCareer.autopsiesViewed >= 3) {
+    unlockBadge("deep_inspector");
+  }
+
+  renderAutopsyContent();
+  $("autopsyModal").classList.add("open");
+}
+
+function closeAutopsyModal() {
+  $("autopsyModal").classList.remove("open");
+}
+
+function renderAutopsyContent() {
+  const round = dailyCaseData.rounds[currentAutopsyRound] || dailyCaseData.rounds[0];
+  if (!round) return;
+
+  const nav = $("autopsyNav");
+  if (nav) {
+    nav.innerHTML = dailyCaseData.rounds.map((r, idx) => `
+      <button class="autopsy-nav-btn ${idx === currentAutopsyRound ? 'active' : ''}" onclick="switchAutopsyRound(${idx})">
+        R${idx + 1} · ${r.shortName || 'STAGE'}
+      </button>
+    `).join("");
+  }
+
+  const aiCard = round.cards.find(c => c.isAi) || round.cards[0];
+  const realCards = round.cards.filter(c => !c.isAi);
+
+  $("autopsyImg").src = aiCard.image;
+  $("autopsyGlitchDesc").textContent = aiCard.details;
+
+  const authSummary = realCards.map(c => `• ${c.title}: ${c.details.replace('AUTHENTIC.', '').replace('AUTHENTIC PHOTO.', '').replace('AUTHENTIC ARCHITECTURE.', '').trim()}`).join("<br><br>");
+  $("autopsyAuthDesc").innerHTML = authSummary;
+}
+
+function switchAutopsyRound(idx) {
+  playSound("tap");
+  currentAutopsyRound = idx;
+  renderAutopsyContent();
+}
+
+// --- Daily Date-Based Engine & Completion Locking ---
+function getDailyCaseForToday() {
+  if (!allCases || allCases.length === 0) return null;
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const epoch = new Date("2026-10-11").getTime();
+  const now = new Date(todayStr).getTime();
+  const dayDiff = Math.max(0, Math.floor((now - epoch) / (1000 * 60 * 60 * 24)));
+  const caseIndex = dayDiff % allCases.length;
+  return allCases[caseIndex];
+}
+
+function checkDailyStatus() {
+  try {
+    const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const badge = $("dailyStatusBadge");
+    if (records[todayStr] && badge) {
+      badge.textContent = "SOLVED ✓";
+      badge.style.background = "rgba(57, 255, 20, 0.2)";
+      badge.style.color = "#39ff14";
+      badge.style.borderColor = "rgba(57, 255, 20, 0.4)";
+    }
+  } catch (_) {}
+}
+
+// --- Endless Survival Arcade Mode ---
+function switchGameMode(mode) {
+  if (mode === currentGameMode) return;
+  currentGameMode = mode;
+  playSound("tap");
+
+  if (mode === "daily") {
+    $("tabModeDaily").classList.add("active");
+    $("tabModeEndless").classList.remove("active");
+    $("roundStepper").style.display = "flex";
+    $("endlessStepper").style.display = "none";
+    $("viewEndlessOver").style.display = "none";
+    $("viewResults").style.display = "none";
+    $("viewPlaying").style.display = "block";
+
+    loadRound(currentRoundIndex);
+    showToast("Switched to Daily Case");
+  } else if (mode === "endless") {
+    $("tabModeDaily").classList.remove("active");
+    $("tabModeEndless").classList.add("active");
+    $("roundStepper").style.display = "none";
+    $("endlessStepper").style.display = "flex";
+    $("viewResults").style.display = "none";
+    $("viewEndlessOver").style.display = "none";
+    $("viewPlaying").style.display = "block";
+
+    dismissCountdown();
+    startEndlessSurvival();
+    showToast("♾️ Endless Survival Active! 3 Lives.");
+  }
+}
+
+async function startEndlessSurvival() {
+  if (endlessVault.length === 0) {
+    try {
+      const res = await fetch("endless_vault.json");
+      endlessVault = await res.json();
+    } catch (err) {
+      console.error("Failed to load endless vault", err);
+      showToast("Failed to load Endless Vault");
+      return;
+    }
+  }
+
+  endlessWave = 1;
+  endlessLives = 3;
+  endlessXpEarned = 0;
+  endlessRemainingRounds = [...endlessVault].sort(() => Math.random() - 0.5);
+
+  $("endlessWaveNum").textContent = "1";
+  $("endlessLivesDisplay").textContent = "❤️❤️❤️";
+  $("endlessXpGained").textContent = "+0";
+
+  loadNextEndlessWave();
+}
+
+function loadNextEndlessWave() {
+  if (endlessRemainingRounds.length === 0) {
+    endlessRemainingRounds = [...endlessVault].sort(() => Math.random() - 0.5);
+  }
+
+  endlessCurrentRound = endlessRemainingRounds.pop();
+  isCurrentRoundOver = false;
+
+  // Shuffle cards so AI imposter isn't in predictable slot
+  const letters = ["A", "B", "C", "D"];
+  const shuffledCards = [...endlessCurrentRound.cards].sort(() => Math.random() - 0.5).map((card, idx) => ({
+    ...card,
+    id: letters[idx]
+  }));
+  endlessCurrentRound.cards = shuffledCards;
+
+  $("themeName").textContent = `Wave ${endlessWave} · ${endlessCurrentRound.theme}`;
+  $("themeTagline").textContent = `${endlessCurrentRound.tagline} (Arcade Survival)`;
+
+  $("liveSpeedBonus").textContent = "+50 XP";
+  $("liveTimer").textContent = `Wave ${endlessWave}`;
+
+  $("btnNextRound").classList.remove("show");
+
+  const wrap = $("gridWrap");
+  wrap.innerHTML = endlessCurrentRound.cards.map(card => `
+    <div class="imposter-card" id="card_${card.id}" onclick="selectCard('${card.id}')">
+      <div class="card-letter">${card.id}</div>
+      <div class="inspect-lens-btn" onclick="openLightbox(event, '${card.id}')">🔍 Zoom</div>
+      <div class="card-img-wrap">
+        <img src="${card.image}" alt="Card ${card.id}" loading="eager">
+      </div>
+      <div class="card-status-badge" id="badge_${card.id}">
+        <div class="badge-icon" id="badgeIcon_${card.id}">🧑</div>
+        <div class="badge-title" id="badgeTitle_${card.id}">AUTHENTIC</div>
+        <div class="badge-desc" id="badgeDesc_${card.id}">${card.details}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function handleEndlessCardSelection(id) {
+  const card = endlessCurrentRound.cards.find(c => c.id === id);
+  if (!card) return;
+  const cardEl = $(`card_${id}`);
+
+  if (card.isAi) {
+    playSound("caught");
+    isCurrentRoundOver = true;
+    cardEl.classList.add("caught");
+    $(`badgeIcon_${card.id}`).textContent = "🤖";
+    $(`badgeTitle_${card.id}`).textContent = "AI IMPOSTER CAUGHT";
+    $(`badgeDesc_${card.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(card.id, true)}% caught this AI fake</div><div style="margin-top:4px;">${card.details}</div>`;
+
+    endlessXpEarned += 50;
+    $("endlessXpGained").textContent = `+${endlessXpEarned}`;
+
+    if (endlessWave >= 5) {
+      unlockBadge("survivor");
+    }
+
+    showToast(`🎯 Wave ${endlessWave} Cleared! +50 XP`);
+    endlessWave++;
+    $("endlessWaveNum").textContent = endlessWave;
+
+    setTimeout(() => {
+      loadNextEndlessWave();
+    }, 1100);
+  } else {
+    playSound("strike");
+    endlessLives--;
+    cardEl.classList.add("eliminated");
+    $(`badgeIcon_${card.id}`).textContent = "🏛️";
+    $(`badgeTitle_${card.id}`).textContent = "100% REAL";
+    $(`badgeDesc_${card.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(card.id, false)}% fooled by this photo</div><div style="margin-top:4px;">${card.details}</div>`;
+
+    const hearts = '❤️'.repeat(Math.max(0, endlessLives)) + '🖤'.repeat(3 - Math.max(0, endlessLives));
+    $("endlessLivesDisplay").textContent = hearts;
+
+    if (endlessLives <= 0) {
+      isCurrentRoundOver = true;
+      playSound("strike");
+
+      const imposter = endlessCurrentRound.cards.find(c => c.isAi);
+      if (imposter) {
+        const impEl = $(`card_${imposter.id}`);
+        if (impEl) {
+          impEl.classList.add("caught");
+          $(`badgeIcon_${imposter.id}`).textContent = "🤖";
+          $(`badgeTitle_${imposter.id}`).textContent = "AI IMPOSTER";
+        }
+      }
+
+      const clearedWaves = endlessWave - 1;
+      if (clearedWaves > endlessBestWave) {
+        endlessBestWave = clearedWaves;
+        localStorage.setItem("imposter_endless_best", endlessBestWave);
+      }
+
+      if (endlessXpEarned > 0) {
+        awardCareerXp(endlessXpEarned);
+      }
+
+      setTimeout(() => {
+        $("viewPlaying").style.display = "none";
+        $("viewEndlessOver").style.display = "flex";
+        $("endlessFinalWaves").textContent = clearedWaves;
+        $("endlessFinalWaveVal").textContent = clearedWaves;
+        $("endlessBestWaveVal").textContent = endlessBestWave;
+        $("endlessXpEarnedVal").textContent = `+${endlessXpEarned}`;
+      }, 1200);
+    } else {
+      showToast(`Strike! That photo was real. ${endlessLives} lives left.`);
+    }
+  }
+}
+
+function restartEndlessSurvival() {
+  $("viewEndlessOver").style.display = "none";
+  $("viewPlaying").style.display = "block";
+  startEndlessSurvival();
+}
+
 // --- Initialization ---
 async function init() {
   loadStats();
+  loadCareer();
   updateSoundButton();
   $("btnSound").onclick = toggleSound;
-  $("btnStats").onclick = openStatsModal;
+  if ($("btnDossier")) $("btnDossier").onclick = openDossierModal;
+  if ($("btnStats")) $("btnStats").onclick = openStatsModal;
   if ($("btnLeaderboard")) $("btnLeaderboard").onclick = openLeaderboardModal;
 
   // Load saved profile
@@ -2853,7 +3879,8 @@ async function init() {
   try {
     const res = await fetch("cases.json");
     allCases = await res.json();
-    dailyCaseData = allCases[0];
+    dailyCaseData = getDailyCaseForToday() || allCases[0];
+    checkDailyStatus();
     
     // Check if it's a special seasonal event
     if (dailyCaseData.eventBadge) {
@@ -2876,9 +3903,14 @@ async function init() {
     console.error("Failed to load cases", err);
   }
 
+  // Pre-fetch endless vault in background
+  fetch("endless_vault.json").then(r => r.json()).then(data => {
+    endlessVault = data;
+  }).catch(() => {});
+
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.3').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=2.4').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -2972,6 +4004,11 @@ function selectCard(id) {
   const cardEl = $(`card_${id}`);
   if (cardEl.classList.contains("eliminated") || cardEl.classList.contains("caught")) return;
 
+  if (currentGameMode === "endless") {
+    handleEndlessCardSelection(id);
+    return;
+  }
+
   // Instant accusation on tap
   attemptsUsedThisRound++;
 
@@ -2985,6 +4022,7 @@ function selectCard(id) {
     cardEl.classList.add("caught");
     $(`badgeIcon_${card.id}`).textContent = "🤖";
     $(`badgeTitle_${card.id}`).textContent = "AI IMPOSTER CAUGHT";
+    $(`badgeDesc_${card.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(card.id, true)}% of detectives caught this AI fake</div><div style="margin-top:4px;">${card.details}</div>`;
 
     const solvedPip = $(`dot${attemptsUsedThisRound}`);
     if (solvedPip) {
@@ -3012,6 +4050,7 @@ function selectCard(id) {
     cardEl.classList.add("eliminated");
     $(`badgeIcon_${card.id}`).textContent = "🏛️";
     $(`badgeTitle_${card.id}`).textContent = "100% REAL";
+    $(`badgeDesc_${card.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(card.id, false)}% of detectives were tricked by this photo</div><div style="margin-top:4px;">${card.details}</div>`;
 
     const lostPip = $(`dot${attemptsUsedThisRound}`);
     if (lostPip) {
@@ -3037,6 +4076,7 @@ function selectCard(id) {
       imposterEl.classList.add("caught");
       $(`badgeIcon_${imposter.id}`).textContent = "🤖";
       $(`badgeTitle_${imposter.id}`).textContent = "AI IMPOSTER";
+      $(`badgeDesc_${imposter.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(imposter.id, true)}% of detectives caught this AI fake</div><div style="margin-top:4px;">${imposter.details}</div>`;
 
       roundResults.push({
         roundIndex: currentRoundIndex + 1,
@@ -3150,7 +4190,10 @@ function showFinalResults() {
     return `
       <div class="rb-row">
         <span class="rb-name">R${r.roundIndex} · ${r.theme}</span>
-        ${tag}
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${tag}
+          <button class="btn-autopsy-sm" onclick="openAutopsyModal(${r.roundIndex - 1})" style="background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.3);color:#00f0ff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;padding:4px 8px;border-radius:6px;cursor:pointer;">🔬 Flaw Autopsy</button>
+        </div>
       </div>
     `;
   }).join("");
@@ -3180,6 +4223,26 @@ function showFinalResults() {
   playerStats.strikes += (4 - totalWon);
   playerStats.history[dailyCaseData.id] = { won: totalWon, score: finalScore, time: finalSecs, date: new Date().toISOString() };
   saveStats();
+
+  // Award Career Progression XP & Medals
+  let earnedXp = 100; // Base daily solve XP
+  if (totalWon === 4) earnedXp += 50;
+  if (firstTryCount === 4) earnedXp += 50;
+  awardCareerXp(earnedXp);
+
+  if (firstTryCount === 4) unlockBadge("flawless_case");
+  if (finalScore >= 450) unlockBadge("top_detective");
+  if (playerStats.currentStreak >= 3) unlockBadge("streak_master");
+  if (finalSecs < 12.0 && firstTryCount >= 3) unlockBadge("lightning_instinct");
+
+  // Save official daily completion record
+  const todayStr = new Date().toISOString().slice(0, 10);
+  try {
+    const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
+    records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, date: new Date().toISOString() };
+    localStorage.setItem("imposter_daily_records", JSON.stringify(records));
+    checkDailyStatus();
+  } catch (_) {}
 
   renderArchiveList();
 }

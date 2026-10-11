@@ -1,0 +1,422 @@
+[
+  {
+    "roundId": "endless_h1",
+    "theme": "Victorian Crypts & Mausoleums",
+    "tagline": "3 historic stone cemetery crypts \u00b7 1 neural AI generation",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/h1_real_a.jpg",
+        "isAi": false,
+        "title": "Historic Granite Mausoleum",
+        "details": "AUTHENTIC. Real weathering, biological lichen growth, and carved stone relief."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/h1_real_b.jpg",
+        "isAi": false,
+        "title": "Gothic Cemetery Vault",
+        "details": "AUTHENTIC. Real iron gate hinges with oxidation and natural leaf litter."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/h1_imposter.jpg",
+        "isAi": true,
+        "title": "Neural Crypt Hallucination",
+        "details": "SYNTHETIC AI. Melting stone gargoyle contours, impossible perspective alignment on roof finials."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/h1_real_c.jpg",
+        "isAi": false,
+        "title": "Victorian Angel Monument",
+        "details": "AUTHENTIC. Physical chisel marks and natural environmental soil staining."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_h2",
+    "theme": "Autumn Pumpkin Harvest",
+    "tagline": "3 real heirloom pumpkin patches \u00b7 1 generative diffusion harvest",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/h2_real_a.jpg",
+        "isAi": false,
+        "title": "Farmstand Gourd Display",
+        "details": "AUTHENTIC. Genuine surface warts, dried fibrous stems, and soil flecks."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/h2_imposter.jpg",
+        "isAi": true,
+        "title": "Synthetic Gourd Cluster",
+        "details": "SYNTHETIC AI. Unnatural plastic specular sheen, stems merging into rind without botanical nodes."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/h2_real_b.jpg",
+        "isAi": false,
+        "title": "Field Cinderella Pumpkins",
+        "details": "AUTHENTIC. Real irregular ribbing and ground blight."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/h2_real_c.jpg",
+        "isAi": false,
+        "title": "Farm Wooden Bin",
+        "details": "AUTHENTIC. Real weathered wood grain with splintered crate slats."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_h3",
+    "theme": "Black Felines in Low Light",
+    "tagline": "3 authentic black cats \u00b7 1 synthetic feline portrait",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/h3_real_a.jpg",
+        "isAi": false,
+        "title": "Domestic Shorthair in Shade",
+        "details": "AUTHENTIC. Individual whisker follicles with realistic optical bokeh."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/h3_real_b.jpg",
+        "isAi": false,
+        "title": "Bombay Cat on Porch",
+        "details": "AUTHENTIC. Realistic iris contraction and ear cartilage blood vessels."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/h3_real_c.jpg",
+        "isAi": false,
+        "title": "Cat in Autumn Leaves",
+        "details": "AUTHENTIC. Natural fur clumping and organic ground texture."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/h3_imposter.jpg",
+        "isAi": true,
+        "title": "Diffusion Black Cat",
+        "details": "SYNTHETIC AI. Eyeball reflections don't match room lighting; whisker ends dissolve into mid-air."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_h4",
+    "theme": "Handmade Masquerade & Costumes",
+    "tagline": "3 authentic textile costumes \u00b7 1 synthetic synthetic outfit",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/h4_imposter.jpg",
+        "isAi": true,
+        "title": "Neural Fabric Generator",
+        "details": "SYNTHETIC AI. Seam threads dissolve into skin, asymmetry in lace weave."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/h4_real_a.jpg",
+        "isAi": false,
+        "title": "Velvet & Brocade Mask",
+        "details": "AUTHENTIC. Genuine textile fraying and physical stitching tension."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/h4_real_b.jpg",
+        "isAi": false,
+        "title": "Victorian Masker",
+        "details": "AUTHENTIC. Real human skin micro-creases beneath edge of mask."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/h4_real_c.jpg",
+        "isAi": false,
+        "title": "Hand-Sewn Cape & Cowl",
+        "details": "AUTHENTIC. Natural fabric drape obeying gravitational physics."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_spooky1",
+    "theme": "Gothic Architecture & Turrets",
+    "tagline": "3 historic stone structures \u00b7 1 mathematical illusion",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/spooky_r1_a.jpg",
+        "isAi": false,
+        "title": "Castle Turret & Parapet",
+        "details": "AUTHENTIC. Irregular stone cutting and real structural mortar lines."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/spooky_r1_imposter.jpg",
+        "isAi": true,
+        "title": "Generative Turret Spire",
+        "details": "SYNTHETIC AI. Roof tiles change scale impossibly, windows with non-coplanar arches."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/spooky_r1_b.jpg",
+        "isAi": false,
+        "title": "Cathedral Buttress",
+        "details": "AUTHENTIC. Realistic weather erosion and architectural load distribution."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/spooky_r1_c.jpg",
+        "isAi": false,
+        "title": "Historic Manor Wing",
+        "details": "AUTHENTIC. Real leaded glass diamond panes."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_spooky2",
+    "theme": "Candlelit Jack-o'-Lanterns",
+    "tagline": "3 real glowing pumpkins \u00b7 1 neural rendering",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/spooky_r2_a.jpg",
+        "isAi": false,
+        "title": "Porch Jack-o'-Lantern",
+        "details": "AUTHENTIC. Scorched pumpkin flesh from candle flame."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/spooky_r2_b.jpg",
+        "isAi": false,
+        "title": "Glow in Twilight",
+        "details": "AUTHENTIC. True inverse-square law light falloff."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/spooky_r2_imposter.jpg",
+        "isAi": true,
+        "title": "Diffusion Glow Render",
+        "details": "SYNTHETIC AI. Inner cavity hollow geometry lacks flesh depth; light source floating unattached."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/spooky_r2_c.jpg",
+        "isAi": false,
+        "title": "Carved Trio on Steps",
+        "details": "AUTHENTIC. Realistic cut rind edge bevels."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_spooky3",
+    "theme": "Nocturnal Animals & Shadows",
+    "tagline": "3 real nighttime animals \u00b7 1 generative imposter",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/spooky_r3_imposter.jpg",
+        "isAi": true,
+        "title": "Neural Night Creature",
+        "details": "SYNTHETIC AI. Whisker roots floating outside cheek boundary; unnatural fur sheen."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/spooky_r3_a.jpg",
+        "isAi": false,
+        "title": "Cat in Moonlit Garden",
+        "details": "AUTHENTIC. Natural camera sensor noise at high ISO."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/spooky_r3_b.jpg",
+        "isAi": false,
+        "title": "Feline on Stone Wall",
+        "details": "AUTHENTIC. Real paw pad anatomy and claw sheaths."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/spooky_r3_c.jpg",
+        "isAi": false,
+        "title": "Nocturnal Silhouette",
+        "details": "AUTHENTIC. Physically accurate light diffraction around fur edge."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_spooky4",
+    "theme": "Theatrical Makeup & Masks",
+    "tagline": "3 authentic face paint jobs \u00b7 1 neural portrait",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/spooky_r4_a.jpg",
+        "isAi": false,
+        "title": "Calavera Greasepaint",
+        "details": "AUTHENTIC. Genuine brushstrokes with drying cracked paint texture."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/spooky_r4_b.jpg",
+        "isAi": false,
+        "title": "Stage Costume Makeup",
+        "details": "AUTHENTIC. Skin pores visible beneath makeup layer."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/spooky_r4_c.jpg",
+        "isAi": false,
+        "title": "Hand-Painted Skeleton Mask",
+        "details": "AUTHENTIC. Real paint edge bleed and sweat sheen."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/spooky_r4_imposter.jpg",
+        "isAi": true,
+        "title": "Neural Face Paint",
+        "details": "SYNTHETIC AI. Symmetrical perfection impossible by hand, eye lashes blending directly into eyelids."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_s1",
+    "theme": "Ancient Stone Manors",
+    "tagline": "3 authentic historic manors \u00b7 1 neural estate",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/s1_real_a.jpg",
+        "isAi": false,
+        "title": "Historic Manor Front",
+        "details": "AUTHENTIC. Genuine Victorian masonry and real park trees."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/stage1_imposter_mansion.jpg",
+        "isAi": true,
+        "title": "AI Manor Hallucination",
+        "details": "SYNTHETIC AI. Rooflines that lead nowhere, chimney stacks without flu openings."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/s1_real_b.jpg",
+        "isAi": false,
+        "title": "Stone Portico & Archway",
+        "details": "AUTHENTIC. Real iron railings and stone steps."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/s1_real_c.jpg",
+        "isAi": false,
+        "title": "Gothic Estate Wing",
+        "details": "AUTHENTIC. Real architectural framing and authentic sky lighting."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_s2",
+    "theme": "Artisan Jack-o'-Lanterns",
+    "tagline": "3 human-carved pumpkins \u00b7 1 algorithmic fake",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/s2_real_a.jpg",
+        "isAi": false,
+        "title": "Carved Smile on Steps",
+        "details": "AUTHENTIC. Natural pumpkin pulp strings and real knife notches."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/s2_real_b.jpg",
+        "isAi": false,
+        "title": "Spooky Porch Pumpkin",
+        "details": "AUTHENTIC. Candle smoke residue inside top lid."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/s2_real_c.jpg",
+        "isAi": false,
+        "title": "Trio on Hay Bale",
+        "details": "AUTHENTIC. Real hay fiber textures."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/stage2_imposter_pumpkin.jpg",
+        "isAi": true,
+        "title": "Diffusion Carved Pumpkin",
+        "details": "SYNTHETIC AI. Teeth floating inside mouth without rind attachment."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_s3",
+    "theme": "Black Cats on Prowl",
+    "tagline": "3 real cats \u00b7 1 synthetic imposter",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/stage3_imposter_cat.jpg",
+        "isAi": true,
+        "title": "Diffusion Black Feline",
+        "details": "SYNTHETIC AI. Ear tufts with unnatural hair merging; specular highlights on eyes don't match background."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/s3_real_a.jpg",
+        "isAi": false,
+        "title": "Cat on Fence",
+        "details": "AUTHENTIC. Real wooden fence grain and organic fur texture."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/s3_real_b.jpg",
+        "isAi": false,
+        "title": "Stray in Alley",
+        "details": "AUTHENTIC. Real street gravel and shadow perspective."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/s3_real_c.jpg",
+        "isAi": false,
+        "title": "Cat in Grass",
+        "details": "AUTHENTIC. True depth of field and authentic blades of grass."
+      }
+    ]
+  },
+  {
+    "roundId": "endless_s4",
+    "theme": "Dia de los Muertos Artistry",
+    "tagline": "3 real skull facepaint artists \u00b7 1 synthetic portrait",
+    "cards": [
+      {
+        "id": "A",
+        "image": "assets/cases/halloween/s4_real_a.jpg",
+        "isAi": false,
+        "title": "Traditional Calavera Makeup",
+        "details": "AUTHENTIC. Real cosmetic greasepaint and genuine skin texture."
+      },
+      {
+        "id": "B",
+        "image": "assets/cases/halloween/s4_real_b.jpg",
+        "isAi": false,
+        "title": "Festival Portrait",
+        "details": "AUTHENTIC. Real flower crown with individual petals and stems."
+      },
+      {
+        "id": "C",
+        "image": "assets/cases/halloween/stage4_imposter_costume.jpg",
+        "isAi": true,
+        "title": "Neural Calavera Model",
+        "details": "SYNTHETIC AI. Flower petals seamlessly morphing into hair strands, unnatural skin gloss."
+      },
+      {
+        "id": "D",
+        "image": "assets/cases/halloween/s4_real_c.jpg",
+        "isAi": false,
+        "title": "Day of the Dead Costuming",
+        "details": "AUTHENTIC. Natural fabric folds and organic lighting."
+      }
+    ]
+  }
+]
