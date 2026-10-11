@@ -392,6 +392,7 @@
     flex-shrink: 0;
   }
   .speed-box {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -401,6 +402,30 @@
     padding: 5px 12px;
     border-radius: 8px;
     min-width: 105px;
+  }
+  .time-penalty-badge {
+    position: absolute;
+    top: -14px;
+    right: -4px;
+    background: #ff2a85;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 999px;
+    border: 1px solid #fff;
+    box-shadow: 0 0 14px rgba(255, 42, 133, 0.9);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+    white-space: nowrap;
+  }
+  .time-penalty-badge.show {
+    opacity: 1;
+    transform: translateY(0);
   }
   .speed-label {
     display: flex;
@@ -2321,7 +2346,7 @@
         <span style="color:#ffb703;">🔥 <span id="streakCount">1</span></span>
       </div>
       <button class="leaderboard-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆 Ranks</button>
-      <button class="user-btn" id="btnUserAccount">Sign in</button>
+      <button class="user-btn" id="btnUserAccount" onclick="promptChangeName()" title="Edit Detective Call-Sign">🕵️ Callsign</button>
     </div>
   </header>
 
@@ -2376,6 +2401,7 @@
       </div>
       <div class="mission-meta-group">
         <div class="speed-box">
+          <div class="time-penalty-badge" id="timePenaltyBadge">+3.0s TIME PENALTY ⚠️</div>
           <div class="speed-label">TIME · <span class="speed-bonus-val" id="liveSpeedBonus">+100 PTS</span></div>
           <div class="speed-timer" id="liveTimer">00:00.0</div>
         </div>
@@ -2594,7 +2620,7 @@
   </div>
 </div>
 
-<!-- Leaderboard Modal (Sign-In Gated) -->
+<!-- Leaderboard Modal (Open to All Players) -->
 <div class="leaderboard-modal" id="leaderboardModal">
   <div class="leaderboard-card">
     <div class="leaderboard-close" onclick="closeLeaderboardModal()">✕</div>
@@ -2604,29 +2630,25 @@
       <span class="lb-badge">🎃 HALLOWEEN SPECIAL</span>
     </div>
     
-    <!-- If NOT signed in: Gated Lock Callout -->
-    <div class="lb-gate-banner" id="lbGateBanner">
-      <div class="lb-gate-icon">🔒</div>
-      <div class="lb-gate-info">
-        <h4>Sign In to Submit Score & View Full Board</h4>
-        <p>Rankings are scored on forensics accuracy + live speed. Join top detectives worldwide!</p>
-      </div>
-      <button class="btn-lb-signin" onclick="openAuthModal('Leaderboard')">Sign In to Join Board</button>
-    </div>
-
-    <!-- If signed in: Detective Identity Card -->
-    <div class="lb-user-banner" id="lbUserBanner" style="display:none;">
+    <!-- Detective Identity Card (Always Active) -->
+    <div class="lb-user-banner" id="lbUserBanner">
       <div class="lb-user-avatar">🕵️</div>
       <div class="lb-user-info">
         <div class="lb-user-name" id="lbUserName">Agent Phantom</div>
         <div class="lb-user-stat" id="lbUserStat">Today: 485 PTS (24.2s) · Rank #7</div>
       </div>
-      <button class="lb-edit-btn" onclick="promptChangeName()">Edit Call-Sign</button>
+      <button class="lb-edit-btn" onclick="promptChangeName()">Edit Call-Sign ✏️</button>
     </div>
 
     <!-- Leaderboard Table -->
     <div class="lb-list" id="lbList">
       <!-- Populated dynamically -->
+    </div>
+
+    <!-- Cloud Sync Prompt -->
+    <div class="lb-cloud-footer" style="margin-top:14px;padding:10px 14px;background:#141b33;border:1px solid #283658;border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <span style="font-size:11px;color:#8b97bc;">☁️ Sync ranks & medals across devices:</span>
+      <button onclick="openAuthModal('Leaderboard')" style="background:transparent;border:1px solid var(--neon-cyan);color:var(--neon-cyan);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;">Sign In</button>
     </div>
   </div>
 </div>
@@ -2662,11 +2684,11 @@
       <h4>Accuracy & Live Speed Bonus (500 PTS Max)</h4>
       <div class="how-score-grid">
         <div class="score-pill"><span>1st Try</span><strong>+100 PTS</strong></div>
-        <div class="score-pill"><span>2nd Try</span><strong>+65 PTS</strong></div>
-        <div class="score-pill"><span>3rd Try</span><strong>+35 PTS</strong></div>
+        <div class="score-pill"><span>2nd Try</span><strong>+45 PTS</strong></div>
+        <div class="score-pill"><span>3rd Try</span><strong>+15 PTS</strong></div>
         <div class="score-pill highlight"><span>Speed Bonus</span><strong>+100 PTS</strong></div>
       </div>
-      <p class="score-note">⚡ <strong>Speed Bonus Decays in 60s:</strong> The timer begins ticking down after 3s and drops to 0 at 60s. High speed scores require fast <strong>1st-try accusations</strong> (wrong guesses penalize speed bonus).</p>
+      <p class="score-note">⚠️ <strong>False Accusation Penalty:</strong> Accusing a real photo adds an immediate <strong>+3.0s time penalty</strong> to your clock and slashes stage points. Spamming wrong cards destroys your score!</p>
     </div>
 
     <button class="how-play-btn" onclick="closeHowModal()">Got it, Let's Play!</button>
@@ -3148,82 +3170,82 @@ function closeLeaderboardModal() {
   $("leaderboardModal").classList.remove("open");
 }
 
+function getDetectiveCallsign() {
+  let saved = localStorage.getItem("imposter_callsign");
+  if (!saved) {
+    if (userProfile && userProfile.callsign) {
+      saved = userProfile.callsign;
+    } else {
+      saved = `Agent-${Math.floor(1000 + Math.random() * 9000)}`;
+    }
+    localStorage.setItem("imposter_callsign", saved);
+  }
+  return saved;
+}
+
+function setDetectiveCallsign(name) {
+  if (!name || !name.trim()) return;
+  const clean = name.trim().slice(0, 16);
+  localStorage.setItem("imposter_callsign", clean);
+  if (userProfile) {
+    userProfile.callsign = clean;
+    localStorage.setItem("imposter_user", JSON.stringify(userProfile));
+  }
+  const btn = $("btnUserAccount");
+  if (btn) btn.textContent = `🕵️ ${clean}`;
+
+  const lb = getLeaderboard();
+  const entry = lb.find(e => e.isUser);
+  if (entry) {
+    entry.name = clean;
+    saveLeaderboard(lb);
+  }
+  if ($("leaderboardModal").classList.contains("open")) {
+    renderLeaderboard();
+  }
+  showToast(`Call-sign set to "${clean}"`);
+}
+
 function promptChangeName() {
-  if (!userProfile) return;
-  const curName = userProfile.callsign || (userProfile.email ? userProfile.email.split("@")[0] : "Agent");
+  const curName = getDetectiveCallsign();
   const newName = prompt("Enter your Detective Call-Sign:", curName);
   if (newName && newName.trim()) {
-    userProfile.callsign = newName.trim().slice(0, 16);
-    localStorage.setItem("imposter_user", JSON.stringify(userProfile));
-    $("btnUserAccount").textContent = userProfile.callsign;
-    
-    const lb = getLeaderboard();
-    const entry = lb.find(e => e.isUser);
-    if (entry) {
-      entry.name = userProfile.callsign;
-      saveLeaderboard(lb);
-    }
-    renderLeaderboard();
-    showToast(`Call-sign updated to "${userProfile.callsign}"`);
+    setDetectiveCallsign(newName);
   }
 }
 
 function renderLeaderboard() {
   const lb = getLeaderboard();
   const listEl = $("lbList");
-  const gateBanner = $("lbGateBanner");
   const userBanner = $("lbUserBanner");
 
-  if (!userProfile) {
-    gateBanner.style.display = "flex";
-    userBanner.style.display = "none";
-    
-    const previewList = lb.slice(0, 5);
-    listEl.innerHTML = previewList.map((entry, idx) => `
-      <div class="lb-row">
-        <span class="lb-rank">${entry.badge || `#${idx + 1}`}</span>
-        <span class="lb-name">${entry.name}</span>
-        <div class="lb-meta">
-          <div class="lb-score">${entry.score} PTS</div>
-          <div class="lb-time">${entry.time.toFixed(1)}s · ${entry.accuracy}</div>
-        </div>
-      </div>
-    `).join("") + `
-      <div style="text-align:center;padding:12px 8px;color:#8b97bc;font-size:11px;font-family:'JetBrains Mono',monospace;">
-        🔒 Positions #6–50 locked. Sign in to join board & submit today's score!
-      </div>
-    `;
+  if (userBanner) userBanner.style.display = "flex";
+
+  const callsign = getDetectiveCallsign();
+  if ($("lbUserName")) $("lbUserName").textContent = callsign;
+
+  const userEntry = lb.find(e => e.isUser);
+  if (userEntry) {
+    $("lbUserStat").textContent = `Today: ${userEntry.score} PTS (${userEntry.time.toFixed(1)}s) · Rank #${userEntry.rank}`;
   } else {
-    gateBanner.style.display = "none";
-    userBanner.style.display = "flex";
-
-    const callsign = userProfile.callsign || (userProfile.email ? userProfile.email.split("@")[0] : "Agent");
-    $("lbUserName").textContent = callsign;
-
-    const userEntry = lb.find(e => e.isUser);
-    if (userEntry) {
-      $("lbUserStat").textContent = `Today: ${userEntry.score} PTS (${userEntry.time.toFixed(1)}s) · Rank #${userEntry.rank}`;
-    } else {
-      $("lbUserStat").textContent = `Case #${dailyCaseData.caseNumber}: Solve case to post your rank!`;
-    }
-
-    listEl.innerHTML = lb.map((entry) => `
-      <div class="lb-row ${entry.isUser ? 'highlight-user' : ''}">
-        <span class="lb-rank">${entry.rank <= 3 ? entry.badge : `#${entry.rank}`}</span>
-        <span class="lb-name">${entry.name} ${entry.isUser ? '<span style="font-size:10px;color:#39ff14;margin-left:4px;">(YOU)</span>' : ''}</span>
-        <div class="lb-meta">
-          <div class="lb-score">${entry.score} PTS</div>
-          <div class="lb-time">${entry.time.toFixed(1)}s · ${entry.accuracy}</div>
-        </div>
-      </div>
-    `).join("");
+    $("lbUserStat").textContent = `Case #${dailyCaseData ? dailyCaseData.caseNumber : '66'}: Solve today's case to claim your rank!`;
   }
+
+  listEl.innerHTML = lb.map((entry) => `
+    <div class="lb-row ${entry.isUser ? 'highlight-user' : ''}">
+      <span class="lb-rank">${entry.rank <= 3 ? entry.badge : `#${entry.rank}`}</span>
+      <span class="lb-name">${entry.name} ${entry.isUser ? '<span style="font-size:10px;color:#39ff14;margin-left:4px;">(YOU)</span>' : ''}</span>
+      <div class="lb-meta">
+        <div class="lb-score">${entry.score} PTS</div>
+        <div class="lb-time">${entry.time.toFixed(1)}s · ${entry.accuracy}</div>
+      </div>
+    </div>
+  `).join("");
 }
 
 function submitScoreToLeaderboard(finalScore, elapsedSecs, firstTryCount, totalWon) {
-  if (!userProfile) return null;
   const lb = getLeaderboard().filter(e => !e.isUser);
-  const callsign = userProfile.callsign || (userProfile.email ? userProfile.email.split("@")[0] : "Detective");
+  const callsign = getDetectiveCallsign();
 
   let accStr = `${totalWon}/4`;
   if (firstTryCount === 4) accStr = "4/4 (1st try)";
@@ -3254,6 +3276,27 @@ function submitScoreToLeaderboard(finalScore, elapsedSecs, firstTryCount, totalW
   saveLeaderboard(lb);
   const myRank = lb.find(e => e.isUser)?.rank || 1;
   return myRank;
+}
+
+function applyFalseAccusationPenalty() {
+  if (caseStartTime) {
+    caseStartTime -= 3000; // Adds 3.0s directly to live stopwatch
+    elapsedSeconds = (Date.now() - caseStartTime) / 1000;
+    updateLiveTimerUI(elapsedSeconds);
+  } else {
+    elapsedSeconds += 3.0;
+  }
+
+  const badge = $("timePenaltyBadge");
+  if (badge) {
+    badge.textContent = "+3.0s TIME PENALTY ⚠️";
+    badge.classList.remove("show");
+    void badge.offsetWidth;
+    badge.classList.add("show");
+    setTimeout(() => {
+      badge.classList.remove("show");
+    }, 1100);
+  }
 }
 
 const $ = id => document.getElementById(id);
@@ -3865,15 +3908,15 @@ async function init() {
   if ($("btnStats")) $("btnStats").onclick = openStatsModal;
   if ($("btnLeaderboard")) $("btnLeaderboard").onclick = openLeaderboardModal;
 
-  // Load saved profile
+  // Load saved profile or initialize active callsign
   try {
     const saved = localStorage.getItem("imposter_user");
     if (saved) {
       userProfile = JSON.parse(saved);
-      const callsign = userProfile.callsign || (userProfile.email ? userProfile.email.split("@")[0] : "Account");
-      $("btnUserAccount").textContent = callsign;
     }
   } catch (_) {}
+  const activeCallsign = getDetectiveCallsign();
+  if ($("btnUserAccount")) $("btnUserAccount").textContent = `🕵️ ${activeCallsign}`;
 
   // Fetch 4-round cases
   try {
@@ -4047,6 +4090,7 @@ function selectCard(id) {
   } else {
     // Wrong guess: Eliminated authentic card
     playSound("strike");
+    applyFalseAccusationPenalty();
     cardEl.classList.add("eliminated");
     $(`badgeIcon_${card.id}`).textContent = "🏛️";
     $(`badgeTitle_${card.id}`).textContent = "100% REAL";
@@ -4059,9 +4103,9 @@ function selectCard(id) {
     }
 
     if (attemptsUsedThisRound === 1) {
-      showToast(`Card ${card.id} is real! 2 attempts left.`);
+      showToast(`Card ${card.id} is authentic! +3.0s Penalty. 2 attempts left.`);
     } else if (attemptsUsedThisRound === 2) {
-      showToast(`Card ${card.id} is real! 1 attempt left.`);
+      showToast(`Card ${card.id} is authentic! +3.0s Penalty. 1 attempt left.`);
     } else {
       // 3 attempts used and still wrong: Failed round
       isCurrentRoundOver = true;
@@ -4136,8 +4180,8 @@ function showFinalResults() {
   const secondTryCount = roundResults.filter(r => r.solved && r.attempts === 2).length;
   const thirdTryCount = roundResults.filter(r => r.solved && r.attempts === 3).length;
 
-  // Base forensic score: 1st try = 100pts, 2nd try = 65pts, 3rd try = 35pts, fail = 0pts (Max 400pts)
-  const baseScore = (firstTryCount * 100) + (secondTryCount * 65) + (thirdTryCount * 35);
+  // Base forensic score: 1st try = 100pts, 2nd try = 45pts, 3rd try = 15pts, fail = 0pts (Max 400pts)
+  const baseScore = (firstTryCount * 100) + (secondTryCount * 45) + (thirdTryCount * 15);
   // Speed bonus: up to 100 bonus pts based on solve time, weighted by accuracy
   const speedBonus = calculateSpeedBonus(finalSecs, roundResults);
   const finalScore = baseScore + speedBonus; // Max 500 PTS
@@ -4198,12 +4242,10 @@ function showFinalResults() {
     `;
   }).join("");
 
-  // Submit to Leaderboard if signed in
-  if (userProfile) {
-    const myRank = submitScoreToLeaderboard(finalScore, finalSecs, firstTryCount, totalWon);
-    if (myRank) {
-      showToast(`🏆 Score submitted! You are Rank #${myRank} on the Daily Leaderboard!`);
-    }
+  // Submit to Leaderboard (Zero-friction for all detectives)
+  const myRank = submitScoreToLeaderboard(finalScore, finalSecs, firstTryCount, totalWon);
+  if (myRank) {
+    showToast(`🏆 Score submitted! You are Rank #${myRank} on the Daily Leaderboard!`);
   }
 
   // Update & Save Player Stats
@@ -4304,7 +4346,7 @@ $("lightboxStage").onclick = () => {
 function getDailyShareText() {
   const totalWon = roundResults.filter(r => r.solved).length;
   const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
-  const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 65) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 35);
+  const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
   const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
   const finalScore = baseScore + speedBonus;
 
@@ -4364,7 +4406,7 @@ $("btnShareStory").onclick = async () => {
 
   const totalWon = roundResults.filter(r => r.solved).length;
   const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
-  const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 65) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 35);
+  const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
   const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
   const finalScore = baseScore + speedBonus;
 
@@ -4496,7 +4538,7 @@ function simulateAuth(provider) {
     const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
     const secondTryCount = roundResults.filter(r => r.solved && r.attempts === 2).length;
     const thirdTryCount = roundResults.filter(r => r.solved && r.attempts === 3).length;
-    const baseScore = (firstTryCount * 100) + (secondTryCount * 65) + (thirdTryCount * 35);
+    const baseScore = (firstTryCount * 100) + (secondTryCount * 45) + (thirdTryCount * 15);
     const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
     const myRank = submitScoreToLeaderboard(baseScore + speedBonus, elapsedSeconds, firstTryCount, totalWon);
     if (myRank) {
