@@ -111,12 +111,25 @@
     gap: 10px;
     flex-wrap: wrap;
   }
+  .brand-titles {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
   .logo-text {
     font-family: 'JetBrains Mono', monospace;
-    font-weight: 800;
+    font-weight: 900;
     font-size: 17px;
     letter-spacing: -0.01em;
     color: #ffffff;
+    text-transform: uppercase;
+  }
+  .logo-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
   .event-pill {
@@ -173,6 +186,25 @@
   }
   .sound-btn:hover { background: #252c48; border-color: var(--neon-cyan); }
   .sound-btn:active { transform: translateY(1px); }
+  .help-btn {
+    all: unset;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #8b97bc;
+    background: #181d2f;
+    border: 1px solid #3d476c;
+    padding: 5px 9px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.1s;
+    user-select: none;
+  }
+  .help-btn:hover { background: #262e49; color: #fff; border-color: var(--neon-cyan); transform: translateY(-1px); }
+  .help-btn:active { transform: translateY(1px); }
   .leaderboard-btn {
     all: unset;
     cursor: pointer;
@@ -1455,29 +1487,112 @@
     from { transform: rotate(360deg); }
     to { transform: rotate(0deg); }
   }
-  .cd-center-body {
-    position: relative;
-    z-index: 2;
+  .cd-briefing {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 680px;
+    width: 92%;
+    z-index: 2;
+    padding: 16px 20px;
+    animation: fadeIn 0.3s ease-out;
+  }
+  .cd-hero-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(34px, 6vw, 48px);
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    margin: 8px 0 2px;
+    text-shadow: 0 0 35px rgba(0, 240, 255, 0.65);
+  }
+  .cd-hero-tagline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(11px, 2.2vw, 13px);
+    font-weight: 800;
+    color: var(--neon-cyan);
+    letter-spacing: 0.18em;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+  }
+  .cd-hook-box {
+    background: rgba(18, 24, 42, 0.75);
+    border: 1.5px solid rgba(0, 240, 255, 0.35);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.06);
+    width: 100%;
+  }
+  .cd-hook-heading {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(19px, 3.8vw, 25px);
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .cd-hook-sub {
+    font-size: clamp(12px, 2.4vw, 14px);
+    color: #a4b3d6;
+    line-height: 1.45;
+  }
+  .cd-rules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 22px;
+  }
+  @media (max-width: 600px) {
+    .cd-rules-grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+  .cd-rule-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #0d1222;
+    border: 1px solid #222b45;
+    border-radius: 10px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .cd-rule-icon {
+    font-size: 26px;
+    margin-bottom: 6px;
+  }
+  .cd-rule-info strong {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .cd-rule-info p {
+    font-size: 11px;
+    color: #8b97bc;
+    line-height: 1.35;
+    margin: 0;
+  }
+  .cd-action-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .cd-active-stage {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-  }
-  .cd-ready-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-  }
-  .cd-ready-icon {
-    font-size: 42px;
-    color: #ffaa00;
-    filter: drop-shadow(0 0 15px rgba(255, 170, 0, 0.7));
-    animation: floatUpDown 2s ease-in-out infinite alternate;
-  }
-  @keyframes floatUpDown {
-    from { transform: translateY(-3px); }
-    to { transform: translateY(3px); }
+    z-index: 2;
   }
   .cd-start-btn {
     background: linear-gradient(135deg, #00f0ff 0%, #0077ff 100%);
@@ -1534,14 +1649,14 @@
   }
   .cd-badge {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
     color: #ffaa00;
     background: rgba(255, 170, 0, 0.14);
     border: 1.5px solid rgba(255, 170, 0, 0.5);
-    padding: 8px 20px;
+    padding: 7px 18px;
     border-radius: 999px;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-shadow: 0 0 10px rgba(255, 170, 0, 0.6);
     margin-bottom: 8px;
     box-shadow: 0 0 20px rgba(255, 170, 0, 0.25);
@@ -1575,6 +1690,128 @@
     letter-spacing: 0.02em;
   }
 
+  /* How to Play Modal */
+  .how-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 12, 20, 0.94);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .how-modal.open { display: flex; }
+  .how-card {
+    background: #101424;
+    border: 2px solid #2e3756;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  }
+  .how-close {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    color: #8b97bc;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .how-close:hover { color: #fff; }
+  .how-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .how-icon { font-size: 26px; }
+  .how-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 19px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+  }
+  .how-section {
+    background: #151a2e;
+    border: 1px solid #263152;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .how-sec-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .how-section h4 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 6px;
+  }
+  .how-section p {
+    font-size: 12px;
+    color: #9cb0d8;
+    line-height: 1.45;
+    margin: 0;
+  }
+  .how-tips-list {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    font-size: 12px;
+    color: #9cb0d8;
+    line-height: 1.45;
+  }
+  .how-tips-list li { margin-bottom: 6px; }
+  .how-tips-list strong { color: #fff; }
+  .how-score-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 10px 0 8px;
+  }
+  .score-pill {
+    background: #1c223a;
+    border: 1px solid #364269;
+    border-radius: 6px;
+    padding: 6px 4px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .score-pill span { display: block; font-size: 10px; color: #8b97bc; margin-bottom: 2px; }
+  .score-pill strong { font-size: 12px; color: #fff; }
+  .score-pill.highlight { border-color: var(--neon-cyan); background: rgba(0, 240, 255, 0.08); }
+  .score-pill.highlight strong { color: var(--neon-cyan); }
+  .score-note { font-size: 11px !important; color: #788ab4 !important; }
+  .how-play-btn {
+    width: 100%;
+    margin-top: 6px;
+    background: linear-gradient(135deg, #00f0ff 0%, #0077ff 100%);
+    color: #030611;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 800;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    transition: transform 0.1s;
+  }
+  .how-play-btn:hover { transform: translateY(-1px); }
+
   /* Toast */
   .toast {
     position: fixed;
@@ -1602,10 +1839,14 @@
 <div class="app">
   <header class="app-header">
     <div class="header-brand">
-      <span class="logo-text">IMPOSTER</span>
+      <div class="brand-titles">
+        <span class="logo-text">IMPOSTER</span>
+        <span class="logo-sub">SPOT THE AI FAKE</span>
+      </div>
       <span class="event-pill" id="caseTag">🎃 HALLOWEEN SPECIAL</span>
     </div>
     <div class="header-actions">
+      <button class="help-btn" id="btnHelp" onclick="openHowModal()" title="How to Play">❓ How to Play</button>
       <button class="sound-btn" id="btnSound" title="Toggle Sound">🔊</button>
       <div class="streak-pill" id="btnStats" title="View Detective Stats">🔥 <span id="streakCount">1</span></div>
       <button class="leaderboard-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆 Ranks</button>
@@ -1663,8 +1904,8 @@
     <div class="countdown-banner" id="countdownBanner">⚡ SPEED RUN STARTS IN: 3...</div>
 
     <div class="forensic-hint">
-      <span>👆 <strong>Tap a card</strong> to accuse imposter</span>
-      <span>🔍 <strong>Inspect</strong> for zoom</span>
+      <span>🎯 <strong>OBJECTIVE:</strong> 3 real photos · 1 AI fake. Tap the imposter!</span>
+      <span>🔍 <strong>Zoom:</strong> Inspect forensic details</span>
     </div>
 
     <!-- 2x2 Grid -->
@@ -1861,41 +2102,124 @@
   </div>
 </div>
 
+<!-- How to Play / Rules Modal -->
+<div class="how-modal" id="howModal">
+  <div class="how-card">
+    <div class="how-close" onclick="closeHowModal()">✕</div>
+    <div class="how-header">
+      <span class="how-icon">🕵️</span>
+      <h3 class="how-title">How to Play Imposter</h3>
+    </div>
+    
+    <div class="how-section">
+      <div class="how-sec-badge">THE PREMISE</div>
+      <h4>3 Real Photos · 1 Synthetic AI Imposter</h4>
+      <p>Every day, a new case is released featuring 4 rounds of photographic evidence. In each round, 3 pictures were taken by real cameras in the physical world, and 1 picture was hallucinated by generative AI (Midjourney, Flux, Stable Diffusion). Your job is to spot and accuse the imposter!</p>
+    </div>
+
+    <div class="how-section">
+      <div class="how-sec-badge">FORENSIC TIPS</div>
+      <h4>How to Spot AI-Generated Images</h4>
+      <ul class="how-tips-list">
+        <li>🔍 <strong>Use the Zoom Button:</strong> Tap any photo or the Zoom button to inspect micro-textures at 2.2x magnification.</li>
+        <li>✋ <strong>Anatomy & Fine Details:</strong> Check hands, fingernails, teeth, jewelry, and hair strands. AI often blends fingers or smooths skin unnaturally.</li>
+        <li>💡 <strong>Lighting & Reflections:</strong> Check eye catchlights, glass reflections, and shadow angles. Real photos obey optical physics.</li>
+        <li>🔤 <strong>Backgrounds & Text:</strong> AI frequently garbles background signs, leaves repetitive repeating textures, or turns far-off objects into melting geometry.</li>
+      </ul>
+    </div>
+
+    <div class="how-section">
+      <div class="how-sec-badge">SCORING</div>
+      <h4>Accuracy & Live Speed Bonus (500 PTS Max)</h4>
+      <div class="how-score-grid">
+        <div class="score-pill"><span>1st Try</span><strong>+100 PTS</strong></div>
+        <div class="score-pill"><span>2nd Try</span><strong>+65 PTS</strong></div>
+        <div class="score-pill"><span>3rd Try</span><strong>+35 PTS</strong></div>
+        <div class="score-pill highlight"><span>Speed Bonus</span><strong>+100 PTS</strong></div>
+      </div>
+      <p class="score-note">Complete all 4 rounds quickly to maximize your speed bonus and claim a spot on the Daily Leaderboard!</p>
+    </div>
+
+    <button class="how-play-btn" onclick="closeHowModal()">Got it, Let's Play!</button>
+  </div>
+</div>
+
 <!-- HTML5 Big Cyber Countdown Overlay -->
 <div class="countdown-overlay open" id="countdownOverlay" onclick="handleOverlayClick(event)">
   <div class="cd-laser-sweep"></div>
-  <button class="cd-skip-btn" onclick="dismissCountdown(event)">Skip Intro ✕</button>
-  
-  <div class="cd-badge" id="cdBadge">🎃 HALLOWEEN SPEED CASE #66</div>
-  <div class="cd-title" id="cdTitle">HAUNTED LEGACY · 4 ROUNDS</div>
-  
-  <div class="cd-ring-wrap">
-    <!-- Outer segmented SVG HUD ring (460x460) -->
-    <svg class="cd-svg-ring" viewBox="0 0 460 460">
-      <circle cx="230" cy="230" r="220" fill="none" stroke="rgba(0, 240, 255, 0.18)" stroke-width="2" />
-      <circle cx="230" cy="230" r="220" fill="none" stroke="#00f0ff" stroke-width="5" stroke-dasharray="45 85 70 60" stroke-linecap="round" />
-      <circle cx="230" cy="230" r="202" fill="none" stroke="rgba(255, 42, 133, 0.45)" stroke-width="2.5" stroke-dasharray="20 28" />
-      <circle cx="230" cy="230" r="182" fill="none" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1.5" stroke-dasharray="6 14" />
-    </svg>
-    <!-- Inner reverse rotating ring (400x400) -->
-    <svg class="cd-svg-ring-reverse" viewBox="0 0 400 400">
-      <circle cx="200" cy="200" r="185" fill="none" stroke="rgba(0, 240, 255, 0.4)" stroke-width="3" stroke-dasharray="80 50 40 60" stroke-linecap="round" />
-      <circle cx="200" cy="200" r="160" fill="none" stroke="rgba(57, 255, 20, 0.35)" stroke-width="1.5" stroke-dasharray="14 14" />
-    </svg>
+  <button class="cd-skip-btn" onclick="dismissCountdown(event)">Skip to Game ✕</button>
+
+  <!-- Mission Onboarding / Explainer (Visible in Ready State) -->
+  <div class="cd-briefing" id="cdBriefing">
+    <div class="cd-badge" id="cdBadge">🎃 DAILY FORENSIC CASE #66 · HALLOWEEN SPECIAL</div>
+    <h1 class="cd-hero-title">IMPOSTER</h1>
+    <div class="cd-hero-tagline">THE DAILY AI DETECTIVE GAME</div>
     
-    <!-- Center State: Ready Prompt OR Giant Countdown Number -->
-    <div class="cd-center-body" id="cdCenterBody">
-      <div class="cd-ready-container" id="cdReadyBox">
-        <div class="cd-ready-icon">⚡</div>
-        <button class="cd-start-btn" id="cdStartBtn" onclick="triggerCyberCountdown(event)">START SPEED RUN</button>
-        <div class="cd-ready-hint">Tap button or press SPACE</div>
+    <div class="cd-hook-box">
+      <div class="cd-hook-heading">3 Real Photos · 1 AI Fake</div>
+      <div class="cd-hook-sub">Can you spot the synthetic AI imposter hidden among authentic photographs?</div>
+    </div>
+
+    <!-- 3 Simple Rules -->
+    <div class="cd-rules-grid">
+      <div class="cd-rule-card">
+        <span class="cd-rule-icon">📸</span>
+        <div class="cd-rule-info">
+          <strong>1. Four Photos</strong>
+          <p>3 authentic photos from reality. 1 hallucinated by AI.</p>
+        </div>
       </div>
-      <div class="cd-number pulsing" id="cdNumber" style="display:none;">3</div>
+      <div class="cd-rule-card">
+        <span class="cd-rule-icon">🔍</span>
+        <div class="cd-rule-info">
+          <strong>2. Spot Artifacts</strong>
+          <p>Zoom in to catch strange textures, lighting errors & warped geometry.</p>
+        </div>
+      </div>
+      <div class="cd-rule-card">
+        <span class="cd-rule-icon">⚡</span>
+        <div class="cd-rule-info">
+          <strong>3. Tap to Accuse</strong>
+          <p>4 rounds daily. Speed bonus awards up to 500 PTS!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Launch -->
+    <div class="cd-action-box">
+      <button class="cd-start-btn" id="cdStartBtn" onclick="triggerCyberCountdown(event)">
+        🕵️ START TODAY'S CASE
+      </button>
+      <div class="cd-ready-hint">Press SPACE or click button to start 3-2-1 countdown</div>
     </div>
   </div>
 
-  <div class="cd-label" id="cdLabel">CALIBRATING FORENSIC MATRIX</div>
-  <div class="cd-hint" id="cdHint">Max +100 Speed Bonus · Rapid Unmasking Unlocks Hall of Fame</div>
+  <!-- Countdown Stage (Visible during 3... 2... 1... GO!) -->
+  <div class="cd-active-stage" id="cdActiveStage" style="display:none;">
+    <div class="cd-badge" id="cdActiveBadge">🎃 HALLOWEEN SPEED CASE #66</div>
+    <div class="cd-title" id="cdActiveTitle">HAUNTED LEGACY · 4 ROUNDS</div>
+
+    <div class="cd-ring-wrap">
+      <!-- Outer segmented SVG HUD ring (460x460) -->
+      <svg class="cd-svg-ring" viewBox="0 0 460 460">
+        <circle cx="230" cy="230" r="220" fill="none" stroke="rgba(0, 240, 255, 0.18)" stroke-width="2" />
+        <circle cx="230" cy="230" r="220" fill="none" stroke="#00f0ff" stroke-width="5" stroke-dasharray="45 85 70 60" stroke-linecap="round" />
+        <circle cx="230" cy="230" r="202" fill="none" stroke="rgba(255, 42, 133, 0.45)" stroke-width="2.5" stroke-dasharray="20 28" />
+        <circle cx="230" cy="230" r="182" fill="none" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1.5" stroke-dasharray="6 14" />
+      </svg>
+      <!-- Inner reverse rotating ring (400x400) -->
+      <svg class="cd-svg-ring-reverse" viewBox="0 0 400 400">
+        <circle cx="200" cy="200" r="185" fill="none" stroke="rgba(0, 240, 255, 0.4)" stroke-width="3" stroke-dasharray="80 50 40 60" stroke-linecap="round" />
+        <circle cx="200" cy="200" r="160" fill="none" stroke="rgba(57, 255, 20, 0.35)" stroke-width="1.5" stroke-dasharray="14 14" />
+      </svg>
+      
+      <!-- Giant Glowing HTML5 Number -->
+      <div class="cd-number pulsing" id="cdNumber">3</div>
+    </div>
+
+    <div class="cd-label" id="cdLabel">CALIBRATING FORENSIC MATRIX</div>
+    <div class="cd-hint" id="cdHint">Max +100 Speed Bonus · Rapid Unmasking Unlocks Hall of Fame</div>
+  </div>
 </div>
 
 <!-- Canvas for generating Story card -->
@@ -1937,24 +2261,23 @@ function showCountdownReadyState() {
   isCountingDown = false;
 
   const overlay = $("countdownOverlay");
-  const readyBox = $("cdReadyBox");
-  const numEl = $("cdNumber");
+  const briefing = $("cdBriefing");
+  const activeStage = $("cdActiveStage");
   const badgeEl = $("cdBadge");
-  const titleEl = $("cdTitle");
-  const labelEl = $("cdLabel");
+  const activeBadge = $("cdActiveBadge");
+  const activeTitle = $("cdActiveTitle");
 
   if (dailyCaseData) {
-    if (dailyCaseData.eventBadge) {
-      if (badgeEl) badgeEl.textContent = `${dailyCaseData.eventBadge} · CASE #${dailyCaseData.caseNumber}`;
-    } else {
-      if (badgeEl) badgeEl.textContent = `CASE #${dailyCaseData.caseNumber} · SPEED RUN`;
-    }
-    if (titleEl) titleEl.textContent = `${dailyCaseData.title.toUpperCase()} · 4 ROUNDS`;
+    const badgeText = dailyCaseData.eventBadge 
+      ? `${dailyCaseData.eventBadge} · CASE #${dailyCaseData.caseNumber}`
+      : `CASE #${dailyCaseData.caseNumber} · DAILY SPECIAL`;
+    if (badgeEl) badgeEl.textContent = badgeText;
+    if (activeBadge) activeBadge.textContent = badgeText;
+    if (activeTitle) activeTitle.textContent = `${dailyCaseData.title.toUpperCase()} · 4 ROUNDS`;
   }
 
-  if (readyBox) readyBox.style.display = "flex";
-  if (numEl) numEl.style.display = "none";
-  if (labelEl) labelEl.textContent = "CALIBRATING FORENSIC MATRIX";
+  if (briefing) briefing.style.display = "flex";
+  if (activeStage) activeStage.style.display = "none";
 
   if (overlay) {
     overlay.classList.remove("closing");
@@ -1970,13 +2293,14 @@ function triggerCyberCountdown(e) {
   if (isCountingDown) return;
   isCountingDown = true;
 
-  const readyBox = $("cdReadyBox");
+  const briefing = $("cdBriefing");
+  const activeStage = $("cdActiveStage");
   const numEl = $("cdNumber");
   const labelEl = $("cdLabel");
 
-  if (readyBox) readyBox.style.display = "none";
+  if (briefing) briefing.style.display = "none";
+  if (activeStage) activeStage.style.display = "flex";
   if (numEl) {
-    numEl.style.display = "block";
     numEl.className = "cd-number pulsing";
     numEl.textContent = "3";
   }
@@ -2019,10 +2343,21 @@ function triggerCyberCountdown(e) {
   }, 700);
 }
 
+function openHowModal() {
+  playSound("tap");
+  $("howModal").classList.add("open");
+}
+function closeHowModal() {
+  $("howModal").classList.remove("open");
+}
+
 function handleOverlayClick(e) {
   if (e.target && e.target.classList.contains("cd-skip-btn")) return;
+  // If user clicked inside the briefing box or its buttons, don't trigger unless clicking outside or button
   if (!isCountingDown) {
-    triggerCyberCountdown(e);
+    if (e.target && (e.target.closest(".cd-start-btn") || e.target === $("countdownOverlay"))) {
+      triggerCyberCountdown(e);
+    }
   } else {
     dismissCountdown(e);
   }
@@ -2509,7 +2844,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.1').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=2.2').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
