@@ -2291,9 +2291,8 @@
           <button class="share-ico" data-net="reddit" aria-label="Share on Reddit" title="Reddit"><svg viewBox="0 0 24 24"><path d="M22 12.1a2.2 2.2 0 0 0-3.73-1.57 10.8 10.8 0 0 0-5.79-1.83l.99-4.65 3.23.68a1.57 1.57 0 1 0 .16-.76l-3.6-.76a.39.39 0 0 0-.46.3l-1.1 5.19a10.8 10.8 0 0 0-5.87 1.83A2.2 2.2 0 1 0 3.4 14.1a4.3 4.3 0 0 0-.05.66c0 3.37 3.92 6.1 8.75 6.1s8.75-2.73 8.75-6.1c0-.22-.02-.44-.05-.65A2.2 2.2 0 0 0 22 12.1zM7 13.67a1.57 1.57 0 1 1 3.14 0 1.57 1.57 0 0 1-3.14 0zm8.77 4.15a5.76 5.76 0 0 1-3.7 1.15 5.76 5.76 0 0 1-3.7-1.15.41.41 0 0 1 .58-.58 4.94 4.94 0 0 0 3.12.92 4.94 4.94 0 0 0 3.12-.92.41.41 0 1 1 .58.58zm-.29-2.58a1.57 1.57 0 1 1 0-3.14 1.57 1.57 0 0 1 0 3.14z"/></svg></button>
           <button class="share-ico" id="btnCopyGrid" data-net="copy" aria-label="Copy result" title="Copy"><svg viewBox="0 0 24 24"><path d="M16 1H6a2 2 0 0 0-2 2v12h2V3h10V1zm3 4H10a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H10V7h9v14z"/></svg></button>
         </div>
-        <div class="share-secondary">
+        <div class="share-secondary" style="grid-template-columns:1fr">
           <button class="btn-copy" id="btnShareStory"><span>📸 Result card</span></button>
-          <button class="btn-replay" id="btnReplayDaily" onclick="resetDailyChallenge()"><span>🔄 Play again</span></button>
         </div>
       </div>
 
@@ -3940,7 +3939,7 @@ function renderResultsExtras(score, time) {
   const streakEl = $("resultsStreak");
   if (streakEl) {
     const n = playerStats.currentStreak || 0;
-    streakEl.textContent = n >= 1 ? `🔥 ${n} day streak` : "";
+    streakEl.textContent = n >= 2 ? `🔥 ${n} day streak` : "";
     streakEl.hidden = n < 1;
   }
   const cmp = $("challengeResult");
