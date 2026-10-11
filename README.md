@@ -1,6 +1,6 @@
 # Imposter 🕵️‍♂️ (Daily AI Detective Game)
 
-> **4 Rounds · 4 Photos Each · Exactly 1 Synthetic AI Imposter per Round.**  
+> **6 Rounds · 4 Photos Each · Exactly 1 Synthetic AI Imposter per Round.**  
 > Can you spot the machine?
 
 Imposter is a fast-paced, viral daily forensic deduction game built with a **$0 cost architecture**. Players inspect authentic high-resolution photography alongside state-of-the-art AI diffusion generations to deduce which photo was created by algorithms.
@@ -28,7 +28,7 @@ Imposter is a fast-paced, viral daily forensic deduction game built with a **$0 
   - Live countdown timer to the next daily drop.
 - **Viral Social Story Share Card**:
   - 1-click generation of a 1080x1920 Instagram/TikTok Story card via HTML5 Canvas.
-  - Distinctly highlights **FLAWLESS 4/4 Aces (400 / 400 pts)** vs multi-guess clears.
+  - Distinctly highlights **FLAWLESS 6/6 Aces** vs multi-guess clears.
   - No smushed text, no Wordle grid clichés—clean, high-contrast, modern cyber-retro aesthetic.
 - **PWA & Offline Capable**:
   - Web App Manifest (`manifest.json`) for Home Screen installation on iOS & Android.
