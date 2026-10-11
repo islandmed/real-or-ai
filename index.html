@@ -2305,12 +2305,12 @@
   <div class="game-status-bar" id="gameStatusBar">
     <div class="status-left">
       <span class="round-badge" id="roundCountLabel">ROUND 1/6</span>
-      <span class="round-theme" id="themeName">Haunted Mansions</span>
+      <span class="round-theme" id="themeName"></span>
     </div>
     <div class="status-right">
       <div class="timer-badge">
         <span class="penalty-toast" id="timePenaltyBadge">+3.0s ⚠️</span>
-        <span class="live-timer" id="liveTimer">00:00.0</span>
+        <span class="live-timer" id="liveTimer">0.0s</span>
       </div>
       <div class="lives-hearts" id="livesDisplay">
         <span class="heart-pip" id="dot1">❤️</span>
@@ -3532,6 +3532,7 @@ function startMidnightCountdown() {
 function showAlreadyCompletedToday(record) {
   $("viewPlaying").style.display = "none";
   $("viewResults").style.display = "flex";
+  if ($("gameStatusBar")) $("gameStatusBar").style.display = "none";
   const overlay = $("countdownOverlay");
   if (overlay) overlay.classList.remove("open");
 
@@ -3543,12 +3544,12 @@ function showAlreadyCompletedToday(record) {
   if ($("statScoreVal")) $("statScoreVal").textContent = `${score}`;
   if ($("statCaughtVal")) $("statCaughtVal").textContent = `${won}/${totalRounds}`;
   if ($("summaryTimeVal")) $("summaryTimeVal").textContent = `${time.toFixed(1)}s`;
-  if ($("summarySpeedBonusVal")) $("summarySpeedBonusVal").textContent = `+${Math.max(0, score - (won * 100))}`;
+  if ($("summarySpeedBonusVal")) $("summarySpeedBonusVal").textContent = typeof record.speedBonus === "number" ? `+${record.speedBonus}` : "–";
 
   $("summaryScoreBadge").textContent = `CASE #${dailyCaseData?.caseNumber || '66'} COMPLETE · ${score} PTS`;
   $("summaryScoreBadge").className = "summary-score-badge";
-  $("starsRow").textContent = "⭐⭐⭐⭐";
-  $("resultTitle").textContent = "Today's Case Complete! 🕵️";
+  $("starsRow").textContent = record.stars || "";
+  $("resultTitle").textContent = record.title || "Today's Case Complete! 🕵️";
   $("resultDesc").textContent = "You already cracked today's case. A new one drops at midnight!";
   renderResultsExtras(score, time);
   startMidnightCountdown();
@@ -3631,7 +3632,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.8').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.10').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3880,6 +3881,7 @@ function showFinalResults() {
 
   $("viewPlaying").style.display = "none";
   $("viewResults").style.display = "flex";
+  if ($("gameStatusBar")) $("gameStatusBar").style.display = "none";
 
   const totalRounds = dailyCaseData.rounds.length;
   const maxScore = (totalRounds * 100) + 100;
@@ -3966,7 +3968,7 @@ function showFinalResults() {
     const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
     const prior = records[todayStr];
     // First result stands: a finished day is never overwritten
-    if (!(prior && prior.solved && prior.caseNumber === dailyCaseData.caseNumber)) records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, date: new Date().toISOString() };
+    if (!(prior && prior.solved && prior.caseNumber === dailyCaseData.caseNumber)) records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, speedBonus, stars, title, date: new Date().toISOString() };
     localStorage.setItem("imposter_daily_records", JSON.stringify(records));
     checkDailyStatus();
   } catch (_) {}
