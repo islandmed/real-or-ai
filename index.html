@@ -363,27 +363,46 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    background: #0d0f18;
-    border: 1px solid #2e3756;
-    padding: 3px 8px;
-    border-radius: 6px;
+    background: #080d1a;
+    border: 1.5px solid var(--neon-cyan);
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.3), inset 0 0 8px rgba(0, 240, 255, 0.08);
+    padding: 4px 10px;
+    border-radius: 8px;
   }
   .speed-label {
-    font-size: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 800;
     color: #8b97bc;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     line-height: 1;
     margin-bottom: 2px;
   }
+  .speed-label::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--neon-cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--neon-cyan);
+    animation: speedLiveDot 1s infinite alternate;
+  }
+  @keyframes speedLiveDot {
+    from { opacity: 0.3; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1.2); }
+  }
   .speed-timer {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 800;
+    font-size: 16px;
+    font-weight: 900;
     color: var(--neon-cyan);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     line-height: 1;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
   }
   .speed-summary-row {
     display: flex;
@@ -1338,6 +1357,116 @@
     text-align: center;
   }
 
+  /* HTML5 Big Cyber Countdown Overlay */
+  .countdown-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(12, 17, 33, 0.88) 0%, rgba(5, 7, 14, 0.96) 100%);
+    backdrop-filter: blur(12px);
+    z-index: 998;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+  .countdown-overlay.open {
+    display: flex;
+    opacity: 1;
+  }
+  .countdown-overlay.closing {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .cd-ring-wrap {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cd-svg-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    animation: cdHudRotate 10s linear infinite;
+  }
+  @keyframes cdHudRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .cd-svg-ring-reverse {
+    position: absolute;
+    inset: 20px;
+    width: 240px;
+    height: 240px;
+    animation: cdHudRotateRev 7s linear infinite;
+  }
+  @keyframes cdHudRotateRev {
+    from { transform: rotate(360deg); }
+    to { transform: rotate(0deg); }
+  }
+  .cd-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 120px;
+    font-weight: 900;
+    color: var(--neon-cyan);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(0, 240, 255, 0.8), 0 0 60px rgba(0, 240, 255, 0.4);
+    z-index: 2;
+    transform: scale(1);
+    transition: transform 0.15s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  }
+  .cd-number.go {
+    font-size: 80px;
+    color: #39ff14;
+    text-shadow: 0 0 35px rgba(57, 255, 20, 0.9), 0 0 70px rgba(57, 255, 20, 0.5);
+    letter-spacing: -0.02em;
+  }
+  .cd-number.pulsing {
+    animation: cdNumPop 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes cdNumPop {
+    0% { transform: scale(0.4); opacity: 0; filter: blur(10px); }
+    50% { transform: scale(1.2); opacity: 1; filter: blur(0px); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .cd-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 800;
+    color: #ffaa00;
+    background: rgba(255, 170, 0, 0.12);
+    border: 1px solid rgba(255, 170, 0, 0.4);
+    padding: 6px 14px;
+    border-radius: 999px;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 8px rgba(255, 170, 0, 0.5);
+    margin-bottom: 24px;
+    box-shadow: 0 0 15px rgba(255, 170, 0, 0.2);
+  }
+  .cd-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    color: #b3c5ee;
+    letter-spacing: 0.12em;
+    margin-top: 24px;
+    text-transform: uppercase;
+  }
+  .cd-hint {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    color: #8b97bc;
+    margin-top: 10px;
+    opacity: 0.85;
+  }
+
   /* Toast */
   .toast {
     position: fixed;
@@ -1621,6 +1750,29 @@
       <!-- Populated dynamically -->
     </div>
   </div>
+<!-- HTML5 Big Cyber Countdown Overlay -->
+<div class="countdown-overlay" id="countdownOverlay" onclick="dismissCountdown(event)">
+  <div class="cd-badge" id="cdBadge">🎃 HALLOWEEN SPEED CASE</div>
+  
+  <div class="cd-ring-wrap">
+    <!-- Outer segmented SVG HUD ring -->
+    <svg class="cd-svg-ring" viewBox="0 0 280 280">
+      <circle cx="140" cy="140" r="130" fill="none" stroke="rgba(0, 240, 255, 0.2)" stroke-width="2" />
+      <circle cx="140" cy="140" r="130" fill="none" stroke="#00f0ff" stroke-width="4" stroke-dasharray="25 60 40 30" stroke-linecap="round" />
+      <circle cx="140" cy="140" r="120" fill="none" stroke="rgba(255, 42, 133, 0.4)" stroke-width="1.5" stroke-dasharray="10 20" />
+    </svg>
+    <!-- Inner reverse rotating ring -->
+    <svg class="cd-svg-ring-reverse" viewBox="0 0 240 240">
+      <circle cx="120" cy="120" r="110" fill="none" stroke="rgba(0, 240, 255, 0.3)" stroke-width="2" stroke-dasharray="60 30 15 30" />
+      <circle cx="120" cy="120" r="95" fill="none" stroke="rgba(57, 255, 20, 0.25)" stroke-width="1" stroke-dasharray="8 8" />
+    </svg>
+    
+    <!-- Giant Glowing HTML5 Number -->
+    <div class="cd-number pulsing" id="cdNumber">3</div>
+  </div>
+
+  <div class="cd-label" id="cdLabel">CALIBRATING FORENSIC SCANNER</div>
+  <div class="cd-hint">Tap anywhere to launch immediately · Max +100 speed bonus</div>
 </div>
 
 <!-- Canvas for generating Story card -->
@@ -1652,33 +1804,76 @@ function startSpeedCountdown() {
   caseStartTime = null;
   elapsedSeconds = 0;
 
-  const timerEl = $("liveTimer");
-  const banner = $("countdownBanner");
-  if (banner) {
-    banner.style.display = "flex";
-    banner.textContent = "⚡ SPEED RUN COMMENCING: 3...";
+  const overlay = $("countdownOverlay");
+  const numEl = $("cdNumber");
+  const labelEl = $("cdLabel");
+  const badgeEl = $("cdBadge");
+
+  if (dailyCaseData && dailyCaseData.eventBadge) {
+    badgeEl.textContent = `${dailyCaseData.eventBadge} · SPEED RUN`;
+  } else if (dailyCaseData) {
+    badgeEl.textContent = `CASE #${dailyCaseData.caseNumber} · SPEED RUN`;
   }
-  if (timerEl) timerEl.textContent = "3...";
+
+  if (overlay) {
+    overlay.classList.remove("closing");
+    overlay.classList.add("open");
+  }
+
+  if (numEl) {
+    numEl.className = "cd-number pulsing";
+    numEl.textContent = "3";
+  }
+  if (labelEl) labelEl.textContent = "CALIBRATING FORENSIC SCANNER";
   playSound("count");
 
   let count = 3;
   countdownInterval = setInterval(() => {
     count--;
     if (count > 0) {
-      if (banner) banner.textContent = `⚡ SPEED RUN COMMENCING: ${count}...`;
-      if (timerEl) timerEl.textContent = `${count}...`;
+      if (numEl) {
+        numEl.className = "cd-number";
+        void numEl.offsetWidth;
+        numEl.className = "cd-number pulsing";
+        numEl.textContent = count;
+      }
+      if (labelEl) {
+        labelEl.textContent = count === 2 ? "MATCHING LIGHTING & PERSPECTIVES" : "SPOTTING DIFFUSION ARTIFACTS";
+      }
       playSound("count");
     } else if (count === 0) {
-      if (banner) banner.textContent = "🚀 GO! UNMASK THE AI IMPOSTER";
-      if (timerEl) timerEl.textContent = "GO!";
+      if (numEl) {
+        numEl.className = "cd-number go pulsing";
+        numEl.textContent = "GO!";
+      }
+      if (labelEl) labelEl.textContent = "🚀 UNMASK THE AI IMPOSTER!";
       playSound("go");
     } else {
       clearInterval(countdownInterval);
       countdownInterval = null;
-      if (banner) banner.style.display = "none";
+      if (overlay) {
+        overlay.classList.add("closing");
+        setTimeout(() => overlay.classList.remove("open", "closing"), 220);
+      }
       startSpeedTimer();
     }
   }, 650);
+}
+
+function dismissCountdown(e) {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+  const overlay = $("countdownOverlay");
+  if (overlay && overlay.classList.contains("open")) {
+    overlay.classList.add("closing");
+    setTimeout(() => overlay.classList.remove("open", "closing"), 200);
+  }
+  if (!caseStartTime) {
+    startSpeedTimer();
+    playSound("go");
+  }
 }
 
 function startSpeedTimer() {
@@ -2211,14 +2406,8 @@ function loadRound(rIndex) {
 function selectCard(id) {
   if (isCurrentRoundOver) return;
 
-  // If user clicks a card while countdown is running, instantly trigger GO and start timer!
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
-    const banner = $("countdownBanner");
-    if (banner) banner.style.display = "none";
-    if (!caseStartTime) startSpeedTimer();
-  }
+  // If user clicks a card while countdown is running, dismiss countdown instantly and start timer!
+  dismissCountdown();
 
   const cardEl = $(`card_${id}`);
   if (cardEl.classList.contains("eliminated") || cardEl.classList.contains("caught")) return;
