@@ -124,13 +124,13 @@
     box-sizing: border-box;
   }
   .icon-btn:hover { background: #222b46; border-color: var(--neon-cyan); }
-  .header-brand-right {
+  .header-brand {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: center;
     gap: 2px;
-    text-align: right;
+    text-align: left;
   }
   .logo-text {
     font-family: 'JetBrains Mono', monospace;
@@ -159,7 +159,7 @@
     line-height: 1.2;
   }
   @media (min-width: 600px) {
-    .header-brand-right {
+    .header-brand {
       flex-direction: row;
       align-items: center;
       gap: 10px;
@@ -2332,16 +2332,16 @@
 
 <div class="app">
   <header class="app-header">
+    <div class="header-brand">
+      <div class="logo-text">IMPOSTER GAME</div>
+      <div class="halloween-badge" id="caseTag">🎃 HALLOWEEN SPECIAL</div>
+    </div>
     <div class="header-actions">
       <button class="icon-btn" onclick="openHowModal()" title="How to Play">❓</button>
       <button class="icon-btn" onclick="openInviteModal()" title="Challenge a Friend">👥</button>
       <button class="icon-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆</button>
       <button class="icon-btn" id="btnUserAccount" onclick="openDossierModal()" title="Detective Career Dossier">🕵️</button>
       <button class="icon-btn" id="btnSound" title="Toggle Sound">🔊</button>
-    </div>
-    <div class="header-brand-right">
-      <div class="logo-text">IMPOSTER GAME</div>
-      <div class="halloween-badge" id="caseTag">🎃 HALLOWEEN SPECIAL</div>
     </div>
   </header>
 
@@ -3776,7 +3776,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.5').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.6').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
