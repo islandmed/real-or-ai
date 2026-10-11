@@ -1576,15 +1576,63 @@
     margin-bottom: 22px;
   }
   @media (max-width: 600px) {
+    .cd-briefing {
+      padding: 12px 14px;
+    }
+    .cd-hero-title {
+      font-size: 28px;
+      margin: 4px 0 2px;
+    }
+    .cd-hero-tagline {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+    }
+    .cd-hook-box {
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .cd-hook-heading {
+      font-size: 16px;
+    }
+    .cd-hook-sub {
+      font-size: 11px;
+    }
     .cd-rules-grid {
-      grid-template-columns: 1fr;
-      gap: 8px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .cd-rule-card {
+      padding: 8px 6px;
+      border-radius: 8px;
+    }
+    .cd-rule-icon {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    .cd-rule-info strong {
+      font-size: 9.5px;
+      margin-bottom: 2px;
+    }
+    .cd-rule-info p {
+      font-size: 9px;
+      line-height: 1.25;
+    }
+    .cd-start-btn {
+      font-size: 15px;
+      padding: 12px 24px;
+    }
+    .cd-ready-hint {
+      font-size: 10px;
     }
   }
   .cd-rule-card {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
+    height: 100%;
     background: #0d1222;
     border: 1px solid #222b45;
     border-radius: 10px;
@@ -2725,21 +2773,21 @@
         <span class="cd-rule-icon">📸</span>
         <div class="cd-rule-info">
           <strong>1. Four Photos</strong>
-          <p>3 authentic photos from reality. 1 hallucinated by AI.</p>
+          <p>3 authentic photos. 1 synthetic AI fake.</p>
         </div>
       </div>
       <div class="cd-rule-card">
         <span class="cd-rule-icon">🔍</span>
         <div class="cd-rule-info">
           <strong>2. Spot Artifacts</strong>
-          <p>Zoom in to catch strange textures, lighting errors & warped geometry.</p>
+          <p>Inspect weird textures, hands & flawed details.</p>
         </div>
       </div>
       <div class="cd-rule-card">
         <span class="cd-rule-icon">⚡</span>
         <div class="cd-rule-info">
           <strong>3. Tap to Accuse</strong>
-          <p>4 rounds daily. +100 speed bonus decays in 60s!</p>
+          <p>4 daily rounds. Quick solves earn bonus points!</p>
         </div>
       </div>
     </div>
@@ -4039,7 +4087,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.5').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=2.6').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
