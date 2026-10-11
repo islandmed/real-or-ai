@@ -328,31 +328,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   }
 
-  .inspect-lens-btn {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    background: rgba(10, 13, 22, 0.92);
-    backdrop-filter: blur(4px);
-    color: #ffffff;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 11px;
-    padding: 4px 8px;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    border: 1px solid #3d4a6e;
-    border-radius: 6px;
-    transition: all 0.15s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  .inspect-lens-btn:hover {
-    background: var(--neon-cyan);
-    color: #000;
-    border-color: #fff;
-  }
 
   .card-img-wrap {
     width: 100%;
@@ -1740,134 +1715,18 @@
     border-color: rgba(255, 222, 89, 0.35);
   }
 
-  /* Forensic Autopsy Modal */
-  .autopsy-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(8, 10, 18, 0.96);
-    backdrop-filter: blur(12px);
-    z-index: 10001;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-  .autopsy-modal.open { display: flex; }
-  .autopsy-card {
-    background: #0f1426;
-    border: 2px solid var(--neon-cyan);
-    box-shadow: 0 0 35px rgba(0, 240, 255, 0.35);
-    border-radius: 14px;
-    width: 100%;
-    max-width: 680px;
-    max-height: 92vh;
-    overflow-y: auto;
-    padding: 22px;
-    position: relative;
-  }
-  .autopsy-close {
+  .modal-close-x {
     position: absolute;
     top: 16px;
     right: 18px;
     color: #8b97bc;
     font-size: 20px;
     cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+    transition: color 0.15s;
   }
-  .autopsy-close:hover { color: #fff; }
-  .autopsy-nav {
-    display: flex;
-    gap: 6px;
-    margin: 12px 0 16px;
-    overflow-x: auto;
-  }
-  .autopsy-nav-btn {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 800;
-    background: #171d34;
-    border: 1px solid #2e3b63;
-    color: #8b97bc;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .autopsy-nav-btn.active {
-    background: #00f0ff;
-    color: #000;
-    border-color: #fff;
-  }
-  .autopsy-imposter-preview {
-    position: relative;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid #ff2a85;
-    background: #05070e;
-    margin-bottom: 14px;
-    max-height: 320px;
-    display: flex;
-    justify-content: center;
-  }
-  .autopsy-imposter-preview img {
-    max-height: 320px;
-    width: auto;
-    max-width: 100%;
-    object-fit: contain;
-  }
-  .autopsy-reticle {
-    position: absolute;
-    top: 35%;
-    left: 45%;
-    width: 80px;
-    height: 80px;
-    border: 2px dashed #00f0ff;
-    border-radius: 50%;
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
-    animation: reticlePulse 2s infinite alternate;
-    pointer-events: none;
-  }
-  @keyframes reticlePulse {
-    from { transform: scale(0.9); opacity: 0.7; }
-    to { transform: scale(1.15); opacity: 1; }
-  }
-  .autopsy-glitch-box {
-    background: rgba(255, 42, 133, 0.1);
-    border: 1.5px solid #ff2a85;
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 12px;
-  }
-  .autopsy-glitch-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    font-weight: 900;
-    color: #ff2a85;
-    margin-bottom: 6px;
-    letter-spacing: 0.05em;
-  }
-  .autopsy-glitch-desc {
-    font-size: 13px;
-    color: #e2e8f8;
-    line-height: 1.45;
-  }
-  .autopsy-auth-box {
-    background: rgba(57, 255, 20, 0.08);
-    border: 1px solid rgba(57, 255, 20, 0.35);
-    border-radius: 10px;
-    padding: 12px;
-  }
-  .autopsy-auth-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 900;
-    color: #39ff14;
-    margin-bottom: 4px;
-  }
-  .autopsy-auth-desc {
-    font-size: 12px;
-    color: #a4b3d6;
-    line-height: 1.4;
-  }
+  .modal-close-x:hover { color: #fff; }
 
   /* Detective Dossier Modal */
   .dossier-modal {
@@ -2318,7 +2177,7 @@
       <div class="how-sec-badge">FORENSIC TIPS</div>
       <h4>How to Spot AI-Generated Images</h4>
       <ul class="how-tips-list">
-        <li>🔍 <strong>Use the Zoom Button:</strong> Tap any photo or the Zoom button to inspect micro-textures at 2.2x magnification.</li>
+        <li>🔍 <strong>Look for Micro-Textures:</strong> Examine skin pores, thread weaves, and fine focal depth. Real photos obey optical physics.</li>
         <li>✋ <strong>Anatomy & Fine Details:</strong> Check hands, fingernails, teeth, jewelry, and hair strands. AI often blends fingers or smooths skin unnaturally.</li>
         <li>💡 <strong>Lighting & Reflections:</strong> Check eye catchlights, glass reflections, and shadow angles. Real photos obey optical physics.</li>
         <li>🔤 <strong>Backgrounds & Text:</strong> AI frequently garbles background signs, leaves repetitive repeating textures, or turns far-off objects into melting geometry.</li>
@@ -2394,41 +2253,10 @@
   </div>
 </div>
 
-<!-- Forensic Flaw Autopsy Modal -->
-<div class="autopsy-modal" id="autopsyModal">
-  <div class="autopsy-card">
-    <div class="autopsy-close" onclick="closeAutopsyModal()">✕</div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-      <span style="font-size:22px;">🔬</span>
-      <h3 style="margin:0;font-size:18px;color:#fff;font-family:'JetBrains Mono',monospace;">FORENSIC FLAW AUTOPSY</h3>
-    </div>
-    <p style="font-size:12px;color:#8b97bc;margin:0 0 10px;">Educational breakdown of generative diffusion defects vs authentic camera optics.</p>
-
-    <div class="autopsy-nav" id="autopsyNav">
-      <!-- R1, R2, R3, R4 injected dynamically -->
-    </div>
-
-    <div class="autopsy-imposter-preview" id="autopsyPreview">
-      <img id="autopsyImg" src="" alt="AI Imposter">
-      <div class="autopsy-reticle" id="autopsyReticle" title="Generative Anomaly Zone"></div>
-    </div>
-
-    <div class="autopsy-glitch-box">
-      <div class="autopsy-glitch-title">⚠️ GENERATIVE AI ANOMALY REVEALED</div>
-      <div class="autopsy-glitch-desc" id="autopsyGlitchDesc">Loading forensic defect breakdown...</div>
-    </div>
-
-    <div class="autopsy-auth-box">
-      <div class="autopsy-auth-title">📷 WHY THE OTHER 3 PHOTOS WERE AUTHENTIC</div>
-      <div class="autopsy-auth-desc" id="autopsyAuthDesc">Real optical glass physics, natural sensor noise, and authentic material construction.</div>
-    </div>
-  </div>
-</div>
-
 <!-- Detective Career Dossier Modal -->
 <div class="dossier-modal" id="dossierModal">
   <div class="dossier-card">
-    <div class="autopsy-close" onclick="closeDossierModal()">✕</div>
+    <div class="modal-close-x" onclick="closeDossierModal()">✕</div>
     <div class="dossier-rank-header">
       <div class="dossier-avatar" id="dossierAvatarIcon">🎖️</div>
       <div class="dossier-rank-info">
@@ -2494,10 +2322,8 @@ let playerCareer = {
   xp: 0,
   level: 1,
   unlockedBadges: [],
-  casesCompleted: 0,
-  autopsiesViewed: 0
+  casesCompleted: 0
 };
-let currentAutopsyRound = 0;
 
 // Live Speed Stopwatch
 let caseStartTime = null;
@@ -3203,10 +3029,10 @@ const CAREER_RANKS = [
 const ALL_BADGES = [
   { id: "lightning_instinct", icon: "⚡", name: "Lightning Instinct", desc: "Fast forensic unmasking under 12s total" },
   { id: "flawless_case", icon: "🎯", name: "Flawless Case", desc: "Clear a 4/4 daily case with 4 first-try aces" },
-  { id: "deep_inspector", icon: "🔬", name: "Deep Inspector", desc: "Inspect flaw autopsy on 3 rounds" },
+  { id: "eagle_eye", icon: "🦅", name: "Eagle Eye", desc: "Flawless unmasking with 100% first-guess accuracy" },
   { id: "streak_master", icon: "🔥", name: "Streak Master", desc: "Maintain a 3-day active daily streak" },
   { id: "top_detective", icon: "🏆", name: "Top Detective", desc: "Score 450+ points in a single daily case" },
-  { id: "survivor", icon: "🌊", name: "Endless Survivor", desc: "Survive 5+ waves in Endless Survival" }
+  { id: "case_veteran", icon: "🎖️", name: "Case Veteran", desc: "Solve 7 daily mystery cases" }
 ];
 
 function getRankForXp(xp) {
@@ -3337,53 +3163,7 @@ function getDeceptionRate(cardId, isAi) {
   }
 }
 
-// --- Forensic Flaw Autopsy Inspector ---
-function openAutopsyModal(roundIndex = 0) {
-  playSound("tap");
-  currentAutopsyRound = roundIndex;
 
-  playerCareer.autopsiesViewed = (playerCareer.autopsiesViewed || 0) + 1;
-  saveCareer();
-  if (playerCareer.autopsiesViewed >= 3) {
-    unlockBadge("deep_inspector");
-  }
-
-  renderAutopsyContent();
-  $("autopsyModal").classList.add("open");
-}
-
-function closeAutopsyModal() {
-  $("autopsyModal").classList.remove("open");
-}
-
-function renderAutopsyContent() {
-  const round = dailyCaseData.rounds[currentAutopsyRound] || dailyCaseData.rounds[0];
-  if (!round) return;
-
-  const nav = $("autopsyNav");
-  if (nav) {
-    nav.innerHTML = dailyCaseData.rounds.map((r, idx) => `
-      <button class="autopsy-nav-btn ${idx === currentAutopsyRound ? 'active' : ''}" onclick="switchAutopsyRound(${idx})">
-        R${idx + 1} · ${r.shortName || 'STAGE'}
-      </button>
-    `).join("");
-  }
-
-  const aiCard = round.cards.find(c => c.isAi) || round.cards[0];
-  const realCards = round.cards.filter(c => !c.isAi);
-
-  $("autopsyImg").src = aiCard.image;
-  $("autopsyGlitchDesc").textContent = aiCard.details;
-
-  const authSummary = realCards.map(c => `• ${c.title}: ${c.details.replace('AUTHENTIC.', '').replace('AUTHENTIC PHOTO.', '').replace('AUTHENTIC ARCHITECTURE.', '').trim()}`).join("<br><br>");
-  $("autopsyAuthDesc").innerHTML = authSummary;
-}
-
-function switchAutopsyRound(idx) {
-  playSound("tap");
-  currentAutopsyRound = idx;
-  renderAutopsyContent();
-}
 
 // --- Daily Date-Based Engine & Completion Locking ---
 function getDailyCaseForToday() {
@@ -3493,7 +3273,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.7').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=2.8').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3542,7 +3322,6 @@ function loadRound(rIndex) {
   wrap.innerHTML = round.cards.map(card => `
     <div class="imposter-card" id="card_${card.id}" onclick="selectCard('${card.id}')">
       <div class="card-letter">${card.id}</div>
-      <div class="inspect-lens-btn" onclick="openLightbox(event, '${card.id}')">🔍 Zoom</div>
       <div class="card-img-wrap">
         <img src="${card.image}" alt="Photo ${card.id}" loading="eager" onerror="this.style.opacity='0'; this.parentElement.classList.add('img-load-fail');">
       </div>
@@ -3738,10 +3517,7 @@ function showFinalResults() {
     return `
       <div class="rb-row">
         <span class="rb-name">R${r.roundIndex} · ${r.theme}</span>
-        <div style="display:flex;align-items:center;gap:6px;">
-          ${tag}
-          <button class="btn-autopsy-sm" onclick="openAutopsyModal(${r.roundIndex - 1})" style="background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.3);color:#00f0ff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;padding:4px 8px;border-radius:6px;cursor:pointer;">🔬 Flaw Autopsy</button>
-        </div>
+        ${tag}
       </div>
     `;
   }).join("");
@@ -3776,9 +3552,13 @@ function showFinalResults() {
   if (firstTryCount === 4) earnedXp += 50;
   awardCareerXp(earnedXp);
 
-  if (firstTryCount === 4) unlockBadge("flawless_case");
+  if (firstTryCount === 4) {
+    unlockBadge("flawless_case");
+    unlockBadge("eagle_eye");
+  }
   if (finalScore >= 450) unlockBadge("top_detective");
   if (playerStats.currentStreak >= 3) unlockBadge("streak_master");
+  if (playerStats.won >= 7) unlockBadge("case_veteran");
   if (finalSecs < 12.0 && firstTryCount >= 3) unlockBadge("lightning_instinct");
 
   // Save official daily completion record
