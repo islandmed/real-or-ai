@@ -101,31 +101,6 @@
     margin-bottom: 8px;
     flex-shrink: 0;
   }
-  .header-brand {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .logo-text {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 900;
-    font-size: 18px;
-    letter-spacing: -0.01em;
-    color: #ffffff;
-    text-transform: uppercase;
-  }
-  .case-badge {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 800;
-    color: var(--neon-cyan);
-    background: rgba(0, 240, 255, 0.12);
-    border: 1px solid rgba(0, 240, 255, 0.3);
-    padding: 3px 8px;
-    border-radius: 6px;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-  }
   .header-actions {
     display: flex;
     align-items: center;
@@ -135,39 +110,66 @@
     all: unset;
     cursor: pointer;
     font-size: 14px;
-    padding: 6px 8px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: #171d30;
     border: 1px solid #283350;
     border-radius: 6px;
     transition: all 0.1s;
     user-select: none;
     line-height: 1;
+    box-sizing: border-box;
   }
   .icon-btn:hover { background: #222b46; border-color: var(--neon-cyan); }
-  .user-pill-btn {
-    all: unset;
-    cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 11px;
-    color: #ffffff;
-    padding: 6px 10px;
-    background: #1a223a;
-    border: 1px solid #324068;
-    border-radius: 6px;
-    transition: all 0.1s;
-    white-space: nowrap;
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
+  .header-brand-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
+    text-align: right;
   }
-  .user-pill-btn:hover { background: var(--neon-cyan); color: #000; border-color: #fff; }
-
+  .logo-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+  .halloween-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 800;
+    color: #ff9d00;
+    background: rgba(255, 119, 0, 0.15);
+    border: 1px solid rgba(255, 157, 0, 0.45);
+    padding: 2px 6px;
+    border-radius: 5px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    text-shadow: 0 0 10px rgba(255, 157, 0, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    line-height: 1.2;
+  }
+  @media (min-width: 600px) {
+    .header-brand-right {
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-text { font-size: 18px; }
+    .halloween-badge { font-size: 11px; padding: 3px 8px; }
+  }
   @media (max-width: 420px) {
     .header-actions { gap: 4px; }
-    .icon-btn { padding: 5px 6px; font-size: 13px; }
-    .user-pill-btn { max-width: 105px; padding: 5px 7px; font-size: 10px; }
+    .icon-btn { width: 28px; height: 28px; font-size: 13px; }
   }
 
   /* Clean, Spacious Game Status Bar (Replaces all stacked clutter) */
@@ -2236,16 +2238,16 @@
 
 <div class="app">
   <header class="app-header">
-    <div class="header-brand">
-      <span class="logo-text">IMPOSTER</span>
-      <span class="case-badge" id="caseTag">CASE #66</span>
-    </div>
     <div class="header-actions">
       <button class="icon-btn" onclick="openHowModal()" title="How to Play">❓</button>
-      <button class="icon-btn" onclick="openInviteModal()" title="Invite a Friend">👥</button>
-      <button class="icon-btn" id="btnSound" title="Toggle Sound">🔊</button>
+      <button class="icon-btn" onclick="openInviteModal()" title="Challenge a Friend">👥</button>
       <button class="icon-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆</button>
-      <button class="user-pill-btn" id="btnUserAccount" onclick="openDossierModal()" title="Detective Career & Dossier">🕵️ Callsign</button>
+      <button class="icon-btn" id="btnUserAccount" onclick="openDossierModal()" title="Detective Career Dossier">🕵️</button>
+      <button class="icon-btn" id="btnSound" title="Toggle Sound">🔊</button>
+    </div>
+    <div class="header-brand-right">
+      <div class="logo-text">IMPOSTER GAME</div>
+      <div class="halloween-badge" id="caseTag">🎃 HALLOWEEN SPECIAL</div>
     </div>
   </header>
 
@@ -3041,7 +3043,10 @@ function setDetectiveCallsign(name) {
     localStorage.setItem("imposter_user", JSON.stringify(userProfile));
   }
   const btn = $("btnUserAccount");
-  if (btn) btn.textContent = `🕵️ ${clean}`;
+  if (btn) {
+    btn.textContent = "🕵️";
+    btn.title = `Detective Dossier: ${clean}`;
+  }
 
   const lb = getLeaderboard();
   const entry = lb.find(e => e.isUser);
@@ -3612,7 +3617,10 @@ async function init() {
     }
   } catch (_) {}
   const activeCallsign = getDetectiveCallsign();
-  if ($("btnUserAccount")) $("btnUserAccount").textContent = `🕵️ ${activeCallsign}`;
+  if ($("btnUserAccount")) {
+    $("btnUserAccount").textContent = "🕵️";
+    $("btnUserAccount").title = `Detective Dossier: ${activeCallsign}`;
+  }
 
   // Fetch 4-round cases
   try {
@@ -3620,7 +3628,9 @@ async function init() {
     allCases = await res.json();
     dailyCaseData = getDailyCaseForToday() || allCases[0];
 
-    $("caseTag").textContent = `CASE #${dailyCaseData.caseNumber}`;
+    if ($("caseTag")) {
+      $("caseTag").textContent = dailyCaseData.eventBadge || `CASE #${dailyCaseData.caseNumber}`;
+    }
     const badgeEl = $("cdBadge");
     if (badgeEl) {
       badgeEl.textContent = dailyCaseData.eventBadge || `DAILY CASE #${dailyCaseData.caseNumber}`;
@@ -3641,7 +3651,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.3').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.4').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4359,7 +4369,8 @@ function simulateAuth(provider) {
   const callsign = email.split("@")[0];
   userProfile = { email, provider, callsign, streak: 3, casesSolved: 14 };
   localStorage.setItem("imposter_user", JSON.stringify(userProfile));
-  $("btnUserAccount").textContent = callsign;
+  $("btnUserAccount").textContent = "🕵️";
+  $("btnUserAccount").title = `Detective Dossier: ${callsign}`;
   closeAuthModal();
   showToast(`Signed in as ${callsign}! Full leaderboard & archives unlocked.`);
 
