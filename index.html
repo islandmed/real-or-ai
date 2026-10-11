@@ -13,12 +13,18 @@
 <meta property="og:title" content="Imposter Game · Daily AI Detective Mystery">
 <meta property="og:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://playimposter.pages.dev">
-<meta property="og:image" content="assets/icons/icon-512.png">
+<meta property="og:url" content="https://playimposter.pages.dev/">
+<meta property="og:image" content="https://playimposter.pages.dev/og-image.png">
+<meta property="og:image:secure_url" content="https://playimposter.pages.dev/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Imposter Game: four Halloween mansion photos. Three are real, one is AI. Can you spot the fake?">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Imposter Game · Daily AI Detective Mystery">
 <meta name="twitter:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
-<meta name="twitter:image" content="assets/icons/icon-512.png">
+<meta name="twitter:image" content="https://playimposter.pages.dev/og-image.png">
+<meta name="twitter:image:alt" content="Imposter Game: four Halloween mansion photos. Three are real, one is AI. Can you spot the fake?">
 <meta name="theme-color" content="#0d0f18">
 <script type="application/ld+json">
 {
@@ -3121,32 +3127,29 @@ function generateFunnyCallsign() {
   }
 }
 
+// One board per daily case. The old single key never reset, so a board
+// saved under older scoring rules (or yesterday's case) kept ranking you.
+function leaderboardKey() {
+  const caseNo = dailyCaseData ? dailyCaseData.caseNumber : "0";
+  return `imposter_leaderboard_v2_${caseNo}`;
+}
+
 function getLeaderboard() {
   try {
-    const raw = localStorage.getItem("imposter_leaderboard");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      // Migrate legacy leaderboard if old placeholder names are present
-      if (parsed.some(e => e.name === "CipherWolf")) {
-        const userEntry = parsed.find(e => e.isUser);
-        const updated = JSON.parse(JSON.stringify(DEFAULT_LEADERBOARD));
-        if (userEntry) {
-          updated.push(userEntry);
-          updated.sort((a, b) => b.score - a.score || a.time - b.time);
-          updated.forEach((e, idx) => { e.rank = idx + 1; });
-        }
-        localStorage.setItem("imposter_leaderboard", JSON.stringify(updated.slice(0, 11)));
-        return updated.slice(0, 11);
-      }
-      return parsed;
-    }
+    localStorage.removeItem("imposter_leaderboard");
+    const raw = localStorage.getItem(leaderboardKey());
+    if (raw) return JSON.parse(raw);
   } catch (_) {}
   return JSON.parse(JSON.stringify(DEFAULT_LEADERBOARD));
 }
 
 function saveLeaderboard(lb) {
   try {
-    localStorage.setItem("imposter_leaderboard", JSON.stringify(lb));
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith("imposter_leaderboard_v2_") && k !== leaderboardKey()) localStorage.removeItem(k);
+    }
+    localStorage.setItem(leaderboardKey(), JSON.stringify(lb));
   } catch (_) {}
 }
 
@@ -3798,7 +3801,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.7').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.8').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
