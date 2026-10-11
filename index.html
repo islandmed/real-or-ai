@@ -1361,8 +1361,8 @@
   .countdown-overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at center, rgba(12, 17, 33, 0.88) 0%, rgba(5, 7, 14, 0.96) 100%);
-    backdrop-filter: blur(12px);
+    background: radial-gradient(circle at center, rgba(10, 16, 32, 0.92) 0%, rgba(4, 6, 12, 0.98) 100%);
+    backdrop-filter: blur(14px);
     z-index: 998;
     display: none;
     align-items: center;
@@ -1372,6 +1372,7 @@
     transition: opacity 0.25s ease;
     cursor: pointer;
     user-select: none;
+    overflow: hidden;
   }
   .countdown-overlay.open {
     display: flex;
@@ -1381,10 +1382,25 @@
     opacity: 0;
     pointer-events: none;
   }
+  .cd-laser-sweep {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #00f0ff, transparent);
+    box-shadow: 0 0 20px #00f0ff;
+    animation: cdLaser 2.2s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes cdLaser {
+    0% { top: 15%; opacity: 0.2; }
+    50% { opacity: 0.95; }
+    100% { top: 85%; opacity: 0.2; }
+  }
   .cd-ring-wrap {
     position: relative;
-    width: 280px;
-    height: 280px;
+    width: min(85vw, 440px);
+    height: min(85vw, 440px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1402,9 +1418,9 @@
   }
   .cd-svg-ring-reverse {
     position: absolute;
-    inset: 20px;
-    width: 240px;
-    height: 240px;
+    inset: 30px;
+    width: calc(100% - 60px);
+    height: calc(100% - 60px);
     animation: cdHudRotateRev 7s linear infinite;
   }
   @keyframes cdHudRotateRev {
@@ -1413,58 +1429,61 @@
   }
   .cd-number {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 120px;
+    font-size: min(36vw, 180px);
     font-weight: 900;
     color: var(--neon-cyan);
     line-height: 1;
-    text-shadow: 0 0 30px rgba(0, 240, 255, 0.8), 0 0 60px rgba(0, 240, 255, 0.4);
+    text-shadow: 0 0 35px rgba(0, 240, 255, 0.9), 0 0 70px rgba(0, 240, 255, 0.6), 0 0 120px rgba(0, 240, 255, 0.35);
     z-index: 2;
     transform: scale(1);
     transition: transform 0.15s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   }
   .cd-number.go {
-    font-size: 80px;
+    font-size: min(28vw, 130px);
     color: #39ff14;
-    text-shadow: 0 0 35px rgba(57, 255, 20, 0.9), 0 0 70px rgba(57, 255, 20, 0.5);
+    text-shadow: 0 0 40px rgba(57, 255, 20, 0.95), 0 0 80px rgba(57, 255, 20, 0.6);
     letter-spacing: -0.02em;
   }
   .cd-number.pulsing {
     animation: cdNumPop 0.55s cubic-bezier(0.16, 1, 0.3, 1);
   }
   @keyframes cdNumPop {
-    0% { transform: scale(0.4); opacity: 0; filter: blur(10px); }
+    0% { transform: scale(0.35); opacity: 0; filter: blur(14px); }
     50% { transform: scale(1.2); opacity: 1; filter: blur(0px); }
     100% { transform: scale(1); opacity: 1; }
   }
   .cd-badge {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
     color: #ffaa00;
-    background: rgba(255, 170, 0, 0.12);
-    border: 1px solid rgba(255, 170, 0, 0.4);
-    padding: 6px 14px;
+    background: rgba(255, 170, 0, 0.14);
+    border: 1.5px solid rgba(255, 170, 0, 0.5);
+    padding: 8px 18px;
     border-radius: 999px;
-    letter-spacing: 0.08em;
-    text-shadow: 0 0 8px rgba(255, 170, 0, 0.5);
-    margin-bottom: 24px;
-    box-shadow: 0 0 15px rgba(255, 170, 0, 0.2);
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 10px rgba(255, 170, 0, 0.6);
+    margin-bottom: 28px;
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.25);
   }
   .cd-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 800;
-    color: #b3c5ee;
-    letter-spacing: 0.12em;
-    margin-top: 24px;
+    color: #d1dffb;
+    letter-spacing: 0.15em;
+    margin-top: 28px;
     text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
   }
   .cd-hint {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 600;
     color: #8b97bc;
-    margin-top: 10px;
-    opacity: 0.85;
+    margin-top: 12px;
+    opacity: 0.9;
+    letter-spacing: 0.02em;
   }
 
   /* Toast */
@@ -1752,19 +1771,21 @@
   </div>
 <!-- HTML5 Big Cyber Countdown Overlay -->
 <div class="countdown-overlay" id="countdownOverlay" onclick="dismissCountdown(event)">
+  <div class="cd-laser-sweep"></div>
   <div class="cd-badge" id="cdBadge">🎃 HALLOWEEN SPEED CASE</div>
   
   <div class="cd-ring-wrap">
-    <!-- Outer segmented SVG HUD ring -->
-    <svg class="cd-svg-ring" viewBox="0 0 280 280">
-      <circle cx="140" cy="140" r="130" fill="none" stroke="rgba(0, 240, 255, 0.2)" stroke-width="2" />
-      <circle cx="140" cy="140" r="130" fill="none" stroke="#00f0ff" stroke-width="4" stroke-dasharray="25 60 40 30" stroke-linecap="round" />
-      <circle cx="140" cy="140" r="120" fill="none" stroke="rgba(255, 42, 133, 0.4)" stroke-width="1.5" stroke-dasharray="10 20" />
+    <!-- Outer segmented SVG HUD ring (440x440) -->
+    <svg class="cd-svg-ring" viewBox="0 0 440 440">
+      <circle cx="220" cy="220" r="210" fill="none" stroke="rgba(0, 240, 255, 0.18)" stroke-width="2" />
+      <circle cx="220" cy="220" r="210" fill="none" stroke="#00f0ff" stroke-width="5" stroke-dasharray="40 90 60 50" stroke-linecap="round" />
+      <circle cx="220" cy="220" r="195" fill="none" stroke="rgba(255, 42, 133, 0.45)" stroke-width="2" stroke-dasharray="16 30" />
+      <circle cx="220" cy="220" r="175" fill="none" stroke="rgba(0, 240, 255, 0.15)" stroke-width="1" stroke-dasharray="6 12" />
     </svg>
-    <!-- Inner reverse rotating ring -->
-    <svg class="cd-svg-ring-reverse" viewBox="0 0 240 240">
-      <circle cx="120" cy="120" r="110" fill="none" stroke="rgba(0, 240, 255, 0.3)" stroke-width="2" stroke-dasharray="60 30 15 30" />
-      <circle cx="120" cy="120" r="95" fill="none" stroke="rgba(57, 255, 20, 0.25)" stroke-width="1" stroke-dasharray="8 8" />
+    <!-- Inner reverse rotating ring (380x380) -->
+    <svg class="cd-svg-ring-reverse" viewBox="0 0 380 380">
+      <circle cx="190" cy="190" r="175" fill="none" stroke="rgba(0, 240, 255, 0.35)" stroke-width="3" stroke-dasharray="90 45 30 50" stroke-linecap="round" />
+      <circle cx="190" cy="190" r="150" fill="none" stroke="rgba(57, 255, 20, 0.3)" stroke-width="1.5" stroke-dasharray="12 12" />
     </svg>
     
     <!-- Giant Glowing HTML5 Number -->
@@ -2318,9 +2339,11 @@ async function init() {
     console.error("Failed to load cases", err);
   }
 
-  // Register PWA Service Worker
+  // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW reg error:', err));
+    navigator.serviceWorker.register('./sw.js?v=2.0').then(reg => {
+      reg.update();
+    }).catch(err => console.log('SW reg error:', err));
   }
 }
 

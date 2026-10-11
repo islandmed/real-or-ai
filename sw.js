@@ -1,7 +1,5 @@
-const CACHE_NAME = 'imposter-v1.1';
+const CACHE_NAME = 'imposter-v2.0';
 const PRECACHE_ASSETS = [
-  './',
-  './index.html',
   './manifest.json',
   './favicon.svg',
   './assets/icons/icon-192.png',
@@ -10,16 +8,13 @@ const PRECACHE_ASSETS = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_ASSETS))
-  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(keys.map(k => caches.delete(k))) // Clear ALL old caches on activate
     )
   );
   self.clients.claim();
@@ -28,8 +23,8 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Network-first for cases.json so new daily cases appear immediately
-  if (url.pathname.endsWith('cases.json')) {
+  // Network-first for HTML pages, navigation, and cases.json so updates are immediate
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('cases.json')) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
