@@ -2375,18 +2375,8 @@
       <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
       <div class="next-case-sub">A brand new forensic case with 6 unique themes drops every day at midnight.</div>
     </div>
-    <!-- Daily reminder (remind branch): calendar everywhere, web push where supported -->
     <div class="remind-box" id="remindBox">
-      <button class="remind-btn" id="remindBtn" type="button" aria-expanded="false" aria-controls="remindPop" onclick="toggleRemindPop(event)">🔔 Remind me daily</button>
       <button class="remind-btn" id="installBtn" type="button" onclick="installApp()" hidden>📲 Install app</button>
-      <div class="remind-pop" id="remindPop" role="dialog" aria-label="Daily reminder" hidden>
-        <div class="remind-row"><label for="remindHour">Remind me at</label><select id="remindHour" onchange="remindHourChanged()"></select></div>
-        <div class="remind-actions">
-          <button class="remind-act primary js-remind-push" type="button" onclick="remindPushToggle()">🔔 Turn on notifications</button>
-          <button class="remind-act" type="button" onclick="remindCalendar()">📅 Add to calendar</button>
-        </div>
-        <div class="remind-hint js-remind-hint"></div>
-      </div>
     </div>
 
     <!-- Display ad (see ADS config). Hidden = zero space, nothing loaded. -->
@@ -2609,16 +2599,6 @@
         <div class="score-pill highlight"><span>Speed Bonus</span><strong>+100 PTS</strong></div>
       </div>
       <p class="score-note">⚠️ <strong>False Accusation Penalty:</strong> Accusing a real photo adds an immediate <strong>+3.0s time penalty</strong> to your clock and slashes stage points. Spamming wrong cards destroys your score!</p>
-    </div>
-
-    <div class="how-section">
-      <div class="how-sec-badge">DAILY REMINDER</div>
-      <p>A new case drops every day. Get a nudge at a time that suits you, either as a notification or as a repeating event in your calendar. Pick the time from the 🔔 button under the countdown.</p>
-      <div class="how-remind-actions">
-        <button class="remind-act primary js-remind-push" type="button" onclick="remindPushToggle()">🔔 Turn on notifications</button>
-        <button class="remind-act" type="button" onclick="remindCalendar()">📅 Add to calendar</button>
-      </div>
-      <div class="remind-hint js-remind-hint"></div>
     </div>
 
     <button class="how-play-btn" onclick="closeHowModal()">Got it, Let's Play!</button>
@@ -3651,7 +3631,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.6').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.7').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4544,191 +4524,10 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove("show"), 2800);
 }
 
-/* ===== DAILY REMINDER (remind branch) =====
-   Calendar: a local .ics with a daily RRULE, works everywhere, no server.
-   Push: subscription goes to the imposter-push Worker (push-worker/), which
-   sends an empty push at the chosen hour; sw.js shows the notification.
-   Never prompts for permission on its own: only on a click. */
-const REMIND_API = 'https://imposter-push.human-number.workers.dev';
-const REMIND_VAPID = 'BD7PbiC_PAJysOwmqJVyikrzsLK2wdBy5NtE4C4IFlJmJhYm7WBRXaAd0LrX7wvZV_C1tFVVnDjtYadnn10SK0A';
-const REMIND_LS = 'imposterRemind';
-const REMIND_URL = 'https://play-imposter.lol';
+// Platform checks used by the Install app button
 const remindIsIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const remindStandalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
-const remindPushOK = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 
-function remindState() { try { return JSON.parse(localStorage.getItem(REMIND_LS)) || {}; } catch (e) { return {}; } }
-function remindSave(patch) { const s = Object.assign(remindState(), patch); try { localStorage.setItem(REMIND_LS, JSON.stringify(s)); } catch (e) {} return s; }
-function remindHour() { const h = remindState().hour; return Number.isInteger(h) && h >= 0 && h < 24 ? h : 8; }
-function remindHourLabel(h) { const d = new Date(2000, 0, 1, h); return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
-
-const remindIsAndroid = /Android/i.test(navigator.userAgent);
-// The browser never asks twice: once blocked, only the user can undo it in settings.
-function remindBlockedHelp() {
-  if (remindIsIOS) return 'Notifications are off for Imposter. Open iPhone Settings → Notifications → Imposter → Allow Notifications, then come back.';
-  if (remindIsAndroid) return 'Notifications are blocked for this site. Tap the icon left of the address bar (or ⋮ → ⓘ) → Permissions → Notifications → Allow, then tap Turn on again.';
-  return 'Notifications are blocked for this site. Click the icon left of the address bar → Notifications → Allow, then tap Turn on again.';
-}
-
-function remindRender() {
-  const s = remindState(), on = !!s.push, h = remindHour();
-  const btn = $('remindBtn');
-  if (btn) { btn.classList.toggle('on', on); btn.textContent = on ? '🔔 Daily at ' + remindHourLabel(h) : '🔔 Remind me daily'; }
-  let hint = '';
-  const pushAvail = remindPushOK && (!remindIsIOS || remindStandalone);
-  if (remindIsIOS && !remindStandalone) hint = 'iPhone only allows notifications from home screen apps: tap Share ⬆️, then "Add to Home Screen", open Imposter from there and turn them on.';
-  else if (!remindPushOK) hint = 'This browser cannot send notifications (in-app browsers like X or Instagram cannot). Open play-imposter.lol in Safari or Chrome, or use the calendar.';
-  else if (Notification.permission === 'denied' && !on) hint = remindBlockedHelp();
-  document.querySelectorAll('.js-remind-push').forEach(b => {
-    b.hidden = !pushAvail;
-    b.textContent = on ? '🔕 Turn off notifications' : '🔔 Turn on notifications';
-    b.classList.toggle('primary', !on);
-  });
-  document.querySelectorAll('.js-remind-hint').forEach(el => { el.textContent = hint; });
-}
-
-function remindInit() {
-  const sel = $('remindHour');
-  if (sel && !sel.options.length) {
-    for (let h = 0; h < 24; h++) sel.add(new Option(remindHourLabel(h), h));
-  }
-  if (sel) sel.value = String(remindHour());
-  // If the browser dropped the subscription or permission, show it as off.
-  if (remindState().push && remindPushOK) {
-    if (Notification.permission !== 'granted') remindSave({ push: false });
-    else navigator.serviceWorker.getRegistration().then(reg => reg && reg.pushManager.getSubscription())
-      .then(sub => { if (sub === null) { remindSave({ push: false }); remindRender(); } }).catch(() => {});
-  }
-  remindRender();
-}
-
-function toggleRemindPop(ev) {
-  if (ev) ev.stopPropagation();
-  const pop = $('remindPop'), btn = $('remindBtn');
-  const open = pop.hidden;
-  pop.hidden = !open;
-  btn.setAttribute('aria-expanded', String(open));
-  if (open) remindRender();
-}
-document.addEventListener('click', e => {
-  const pop = $('remindPop');
-  if (pop && !pop.hidden && !$('remindBox').contains(e.target)) { pop.hidden = true; $('remindBtn').setAttribute('aria-expanded', 'false'); }
-});
-document.addEventListener('keydown', e => {
-  const pop = $('remindPop');
-  if (e.key === 'Escape' && pop && !pop.hidden) { pop.hidden = true; $('remindBtn').setAttribute('aria-expanded', 'false'); $('remindBtn').focus(); }
-});
-
-function remindHourChanged() {
-  const h = parseInt($('remindHour').value, 10);
-  remindSave({ hour: h });
-  remindRender();
-  if (remindState().push) remindSubscribe(true);
-}
-
-function remindCalendar() {
-  const h = remindHour(), now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, 0, 0);
-  if (start <= now) start.setDate(start.getDate() + 1);
-  const p = n => String(n).padStart(2, '0');
-  const local = d => `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
-  const utc = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-  const ics = [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Imposter Game//Daily Reminder//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
-    'BEGIN:VEVENT',
-    'UID:daily-case-' + Date.now() + '@play-imposter.lol',
-    'DTSTAMP:' + utc(now),
-    'DTSTART:' + local(start),   // floating time: the device's own time zone
-    'DURATION:PT10M',
-    'RRULE:FREQ=DAILY',
-    'SUMMARY:🕵️ Imposter Game: new case is live',
-    'DESCRIPTION:Can AI fool you today? Play at ' + REMIND_URL,
-    'URL:' + REMIND_URL,
-    'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:New Imposter Game case', 'TRIGGER:PT0M', 'END:VALARM',
-    'END:VEVENT', 'END:VCALENDAR', ''
-  ].join('\r\n');
-  const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
-  const a = document.createElement('a');
-  a.href = url; a.download = 'imposter-game-daily.ics';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
-  showToast('📅 Calendar event downloaded. Open it to add.');
-}
-
-function remindKey(b64) {
-  const pad = '='.repeat((4 - b64.length % 4) % 4);
-  const raw = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
-  return Uint8Array.from(raw, c => c.charCodeAt(0));
-}
-function remindReg() {
-  return Promise.race([navigator.serviceWorker.ready,
-    new Promise((_, rej) => setTimeout(() => rej(new Error('sw timeout')), 8000))]);
-}
-
-function remindReport(stage, err) {
-  try {
-    fetch(REMIND_API + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true,
-      body: JSON.stringify({ stage, err: String((err && (err.name + ': ' + err.message)) || err || ''),
-        perm: ('Notification' in window) ? Notification.permission : 'none', sa: remindStandalone }) });
-  } catch (e) {}
-}
-
-async function remindSubscribe(quiet) {
-  let stage = 'permission';
-  try {
-    if (Notification.permission === 'denied') { remindReport('already-denied', ''); remindSave({ push: false }); remindRender(); showToast('Blocked in settings: see the steps below the button.'); return; }
-    const perm = await Notification.requestPermission();
-    if (perm === 'denied') { remindReport('denied', ''); remindSave({ push: false }); remindRender(); showToast('Blocked: see the steps below the button to allow.'); return; }
-    if (perm !== 'granted') {
-      remindReport('perm-' + perm, ''); remindSave({ push: false }); remindRender();
-      showToast(remindIsAndroid ? 'No prompt? Tap the 🔔 in the address bar, then Allow.' : 'Tap Allow when asked to turn on reminders.');
-      return;
-    }
-    stage = 'sw-ready';
-    const reg = await remindReg();
-    stage = 'push-subscribe';
-    const sub = (await reg.pushManager.getSubscription()) ||
-      await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: remindKey(REMIND_VAPID) });
-    stage = 'server';
-    const res = await fetch(REMIND_API + '/subscribe', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subscription: sub.toJSON(), hour: remindHour(), tzOffsetMinutes: new Date().getTimezoneOffset() })
-    });
-    if (!res.ok) throw new Error('subscribe ' + res.status);
-    remindSave({ push: true, endpoint: sub.endpoint });
-    remindRender();
-    showToast(quiet ? '🔔 Reminder moved to ' + remindHourLabel(remindHour()) : '🔔 You will get a nudge daily at ' + remindHourLabel(remindHour()));
-  } catch (err) {
-    console.log('remind subscribe error', stage, err);
-    remindReport(stage, err);
-    const why = String((err && (err.name + ': ' + err.message)) || err);
-    let help = 'Could not turn on notifications (' + why.slice(0, 120) + '). The calendar works everywhere.';
-    if (/sw timeout/.test(why)) help = 'The app is still installing. Close and reopen the page, then try again.';
-    else if (/AbortError|push service|Registration failed/i.test(why)) help = navigator.brave
-      ? 'Brave blocks push by default: Settings → Privacy and security → turn on "Use Google services for push messaging", then try again.'
-      : 'Your browser\'s push service refused (' + why.slice(0, 80) + '). Try Chrome or Safari, or use the calendar.';
-    document.querySelectorAll('.js-remind-hint').forEach(el => { el.textContent = help; });
-    showToast('Could not turn on notifications: see the note below.');
-  }
-}
-
-async function remindUnsubscribe() {
-  const endpoint = remindState().endpoint;
-  remindSave({ push: false });
-  remindRender();
-  try {
-    const reg = await navigator.serviceWorker.getRegistration();
-    const sub = reg && await reg.pushManager.getSubscription();
-    const ep = (sub && sub.endpoint) || endpoint;
-    if (sub) await sub.unsubscribe();
-    if (ep) await fetch(REMIND_API + '/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: ep }) });
-  } catch (err) { console.log('remind unsubscribe error', err); }
-  showToast('🔕 Daily notifications off');
-}
-
-function remindPushToggle() { return remindState().push ? remindUnsubscribe() : remindSubscribe(false); }
-
-remindInit();
 
 // --- Install app: Chrome/Edge/Samsung get the one-tap prompt, iPhone gets the Share steps ---
 let installPrompt = null;
@@ -4747,7 +4546,7 @@ async function installApp() {
     return;
   }
   const steps = remindIsIOS
-    ? ['Tap the <b>Share</b> button ⬆️ at the bottom of Safari.', 'Scroll down and tap <b>Add to Home Screen</b>.', 'Open Imposter from your Home Screen, then turn on reminders 🔔.']
+    ? ['Tap the <b>Share</b> button ⬆️ at the bottom of Safari.', 'Scroll down and tap <b>Add to Home Screen</b>.', 'Open Imposter from your Home Screen any time.']
     : ['Open your browser menu <b>⋮</b>.', 'Tap <b>Install app</b> or <b>Add to Home screen</b>.'];
   $('installSteps').innerHTML = steps.map(t => '<li>' + t + '</li>').join('');
   $('installSheet').hidden = false;

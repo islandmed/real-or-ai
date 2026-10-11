@@ -7,8 +7,8 @@ workers_dev = true
 binding = "PUSH_KV"
 id = "0ec81c20f72440c38b0bdb23c6261c99"
 
-[triggers]
-crons = ["0 * * * *"]
+[triggers]  # reminders removed 2026-10-11: no hourly sends
+crons = []
 
 [vars]
 VAPID_PUBLIC_KEY = "BD7PbiC_PAJysOwmqJVyikrzsLK2wdBy5NtE4C4IFlJmJhYm7WBRXaAd0LrX7wvZV_C1tFVVnDjtYadnn10SK0A"
