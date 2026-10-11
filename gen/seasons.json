@@ -1,5 +1,5 @@
 {
- "_doc": "Date-ranged seasons. start/end are MM-DD (inclusive) and repeat every year. Each theme: key, name, short, queries (Wikimedia Commons search terms), match (regex that a photo's title, categories or description must hit), prompts (scene ideas for the AI imposter). Add a season or a theme here; nothing else needs to change.",
+ "_doc": "Date-ranged seasons. start/end are MM-DD (inclusive) and repeat every year. Each theme: key, name, short, queries (Wikimedia Commons search terms), match (regex that a photo's title, categories or description must hit), prompts (scene ideas for the AI imposter). Add a season or a theme here; nothing else needs to change. Optional vision: what the automatic photo check must see (defaults to the name plus the prompts).",
  "seasons": [
   {
    "id": "halloween",
@@ -31,7 +31,8 @@
       "Mansions",
       "Victorian architecture in the United States",
       "Gothic Revival houses"
-     ]
+     ],
+     "vision": "a large old house or mansion (Victorian, Gothic or Queen Anne style), standing and intact with its roof. Not a ruin, not a modern house, not a church or castle."
     },
     {
      "key": "jackolanterns",
@@ -97,7 +98,8 @@
       "Gravestones",
       "Churchyards",
       "Cemeteries"
-     ]
+     ],
+     "vision": "an old cemetery or churchyard with weathered gravestones, tombs or mausoleums. Any inscription with a readable personal name makes it unsafe."
     },
     {
      "key": "costumes",
@@ -118,7 +120,8 @@
      "cats": [
       "Halloween costumes",
       "Halloween parades"
-     ]
+     ],
+     "vision": "people wearing Halloween costumes (witches, zombies, monsters, superheroes) at a party, parade or trick-or-treating. Not ordinary clothes, not historical reenactment, not a stage play."
     },
     {
      "key": "foggyforest",
@@ -184,7 +187,8 @@
       "Skulls in ossuaries",
       "Ossuaries",
       "Catacombs"
-     ]
+     ],
+     "vision": "skulls as the main subject: old human skulls and bones displayed in an ossuary, catacomb, crypt or museum, or decorative skulls (sugar skulls, carvings). Old bones on display count as safe; fresh remains, blood or bodies do not."
     },
     {
      "key": "witches",
@@ -207,7 +211,8 @@
      "cats": [
       "Witch costumes",
       "Witches in popular culture"
-     ]
+     ],
+     "vision": "a witch's pointed hat, a witch's broomstick, or a person dressed as a witch. Not a 'witches' broom' tree growth, not a plant, not a mushroom, not a statue of a saint."
     },
     {
      "key": "bats",
@@ -229,7 +234,8 @@
      "cats": [
       "Bats in flight",
       "Chiroptera"
-     ]
+     ],
+     "vision": "a real live bat (the flying mammal) clearly visible. Not a baseball bat, not a bat-shaped decoration."
     },
     {
      "key": "cornmazes",
@@ -251,7 +257,8 @@
      "cats": [
       "Maize mazes",
       "Maize fields"
-     ]
+     ],
+     "vision": "a corn maze or a field of tall standing corn plants filling the picture. Not farm machinery, not harvested stubble, not a hedge or stone labyrinth."
     },
     {
      "key": "scarecrows",
@@ -291,7 +298,8 @@
      ],
      "cats": [
       "Gargoyles"
-     ]
+     ],
+     "vision": "a carved stone gargoyle or grotesque figure on a building, close enough to see its face."
     },
     {
      "key": "pumpkinpatch",
@@ -335,7 +343,8 @@
      "cats": [
       "Abandoned buildings",
       "Abandoned houses"
-     ]
+     ],
+     "vision": "an abandoned building that is still standing with walls and most of its roof (broken windows, peeling paint, overgrown). Not an ancient or castle ruin, not rubble, not a roofless shell."
     }
    ]
   },
@@ -365,7 +374,8 @@
      "cats": [
       "Pumpkin pies",
       "Pies"
-     ]
+     ],
+     "vision": "a whole baked pie (ideally pumpkin pie) as the main subject."
     },
     {
      "key": "turkey",
@@ -491,7 +501,8 @@
      ],
      "cats": [
       "Maize fields"
-     ]
+     ],
+     "vision": "a field of corn (maize) plants or ripe corn cobs filling the picture. Not farm machinery as the main subject."
     },
     {
      "key": "haybales",
@@ -663,7 +674,8 @@
       "Macy's Thanksgiving Day Parade",
       "Thanksgiving parades",
       "Marching bands"
-     ]
+     ],
+     "vision": "a street parade: marching bands, floats or giant balloons with spectators. Not a military funeral, not a protest."
     }
    ]
   },

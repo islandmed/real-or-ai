@@ -19,6 +19,14 @@ repo is public; never move that state anywhere that gets committed.
   python3 gen/imposter_gen.py --redo-ai 2026-10-12:3
   python3 gen/imposter_gen.py --swap 2026-10-12:3:B # replace one real photo
   python3 gen/imposter_gen.py --sheets              # rebuild contact sheets
+  python3 gen/imposter_gen.py --apply-vetoes        # swap photos Tony marked bad
+  python3 gen/imposter_gen.py --upload-review       # refresh the review page
+  python3 gen/imposter_gen.py --prefetch            # fetch pools for seasons in range
+
+Real photos are approved automatically by a Workers AI vision model (through
+the gen Worker) the first time they are considered; photos a human already
+passed stay approved. --no-vision falls back to human-approved photos only.
+The nightly GitHub Action (.github/workflows/nightly.yml) runs all of this.
 """
 import argparse
 import datetime as dt
@@ -59,6 +67,19 @@ FIRST_DATE = dt.date(2026, 10, 11)
 FIRST_CASE_NUMBER = 71
 ROUNDS = 6
 GEN_URL = os.environ.get("IMPOSTER_GEN_URL", "https://imposter-gen.human-number.workers.dev")
+VISION_MODEL = os.environ.get("IMPOSTER_VISION_MODEL", "@cf/google/gemma-4-26b-a4b-it")
+# USD per million tokens (input, output), from `wrangler ai models list`.
+# Workers AI bills $0.011 per 1,000 neurons, which turns a call's token usage
+# into the neurons it took from the free daily 10,000.
+VISION_PRICES = {
+    "@cf/google/gemma-4-26b-a4b-it": (0.1, 0.3),
+    "@cf/meta/llama-4-scout-17b-16e-instruct": (0.27, 0.85),
+    "@cf/meta/llama-3.2-11b-vision-instruct": (0.0485, 0.676),
+    "@cf/mistralai/mistral-small-3.1-24b-instruct": (0.351, 0.555),
+}
+VISION_FALLBACK_NEURONS = 60   # charged when a call reports no usage
+VISION_RESERVE = 80            # do not start a vision call with less left than this
+REVIEW_AHEAD_DAYS = 46
 UA = "ImposterGame/1.0 (https://github.com/islandmed/real-or-ai; content generator)"
 COMMONS = "https://commons.wikimedia.org/w/api.php"
 POOL_MAX_AGE_DAYS = 30
@@ -105,7 +126,10 @@ def load_state():
     s.setdefault("used", [])        # Commons pageids ever used in a case
     s.setdefault("blacklist", [])   # pageids rejected by a human look
     s.setdefault("days", {})
-    s.setdefault("approved", [])    # "pool:pageid" a human looked at and passed for that theme
+    s.setdefault("approved", [])    # "pool:pageid" passed for that theme (by a human, or the vision model)
+    s.setdefault("vision_rejected", [])  # "pool:pageid" the vision model did not pass
+    s.setdefault("vision_log", {})  # "pool:pageid" -> the model's verdict, for audits
+    s.setdefault("review_hash", {})  # date -> hash of what the review page shows
     return s
 
 
@@ -113,9 +137,15 @@ def neurons_left(state):
     return DAILY_NEURON_CAP - state["neurons"].get(utc_today().isoformat(), 0)
 
 
-def charge(state):
+def charge(state, n=NEURONS_PER_IMAGE):
     k = utc_today().isoformat()
-    state["neurons"][k] = state["neurons"].get(k, 0) + NEURONS_PER_IMAGE
+    state["neurons"][k] = state["neurons"].get(k, 0) + n
+
+
+def budget_gone(state):
+    """The Worker said the free tier is used up for this UTC day: never retry."""
+    state["neurons"][utc_today().isoformat()] = DAILY_NEURON_CAP + 1000
+    save_json(STATE_PATH, state)
 
 
 # ---------------------------------------------------------------- seasons
@@ -379,6 +409,131 @@ def gen_ai(prompt, secret, seed):
         return r.read()
 
 
+def worker_call(method, path, secret, body=None, timeout=90):
+    data = None if body is None else json.dumps(body, ensure_ascii=False).encode()
+    req = urllib.request.Request(GEN_URL + path, data=data, method=method,
+                                 headers={"content-type": "application/json", "x-gen-secret": secret, "User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read() or b"null")
+
+
+# ---------------------------------------------------------------- vision approval
+# A real photo is used only when it (a) clearly shows the theme, (b) is not a
+# mushroom, ruin or tree growth standing in for it (the past failures), (c) is
+# safe for a family audience and (d) is a photograph. Any doubt, any parse
+# failure and any unexpected answer is a rejection.
+
+VISION_ON = True
+
+VISION_SYSTEM = ("You are a strict photo editor for a family-friendly daily photo quiz. You look at one image and "
+                 "answer only with the requested JSON. If you are unsure about anything, set confident to false.")
+
+VISION_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "subject": {"type": "string"},
+        "is_photograph": {"type": "boolean"},
+        "shows_theme": {"type": "boolean"},
+        "stand_in": {"type": "boolean"},
+        "unsafe": {"type": "boolean"},
+        "confident": {"type": "boolean"},
+    },
+    "required": ["subject", "is_photograph", "shows_theme", "stand_in", "unsafe", "confident"],
+}
+
+# Words in the model's own description of the subject that reject a photo
+# whatever the booleans say.
+VISION_DENY = re.compile(r"mushroom|fung|toadstool|\bruin|rubble|\bburl|\bgall\b|growth on|tree growth|\bblood|corpse|"
+                         r"carcass|\bnude|naked|\bdead\b|injur|\bwound|drawing|painting|illustration|render", re.I)
+
+
+def theme_brief(theme):
+    if theme.get("vision"):
+        return f"{theme['name']}: {theme['vision']}"
+    return f"{theme['name']}. Typical on-theme pictures: " + "; ".join(theme["prompts"][:4]) + "."
+
+
+def vision_prompt(theme):
+    return f"""Quiz round theme: {theme_brief(theme)}
+
+Look only at what is actually visible in the picture and fill in:
+- subject: the main subject, in at most 10 words.
+- is_photograph: true only for a color camera photograph. False for a painting, drawing, illustration, 3D render, screenshot, scan of a print or postcard, collage, or an image with added text or a watermark.
+- shows_theme: true only if anyone glancing at it would immediately say it shows the theme, with the theme as the main subject, large and clear. False if the theme is small, hidden, cut off, only implied, or only matches by name or pun.
+- stand_in: true if the main subject is a mushroom or other fungus; a ruin, rubble, or roofless or collapsed walls; a tree growth, burl, gall, bark or plant disease; or anything else that only shares a name with the theme instead of really being it.
+- unsafe: true if it shows blood, wounds, gore, a dead body or dead animal, nudity or underwear, a person or animal in pain, fear or distress, a gravestone, memorial or plaque with a readable personal name, or anything else unsuitable for children.
+- confident: true only if you are sure of every answer above."""
+
+
+def vision_jpeg_b64(im):
+    import base64
+    small = crop_43(im).resize((640, 480), Image.LANCZOS)
+    buf = io.BytesIO()
+    small.save(buf, "JPEG", quality=82)
+    return base64.b64encode(buf.getvalue()).decode()
+
+
+def parse_verdict(resp):
+    v = resp
+    if isinstance(v, str):
+        m = re.search(r"\{.*\}", v, re.S)
+        if not m:
+            return None
+        try:
+            v = json.loads(m.group(0))
+        except ValueError:
+            return None
+    if not isinstance(v, dict):
+        return None
+    return v
+
+
+def verdict_ok(v):
+    if not v:
+        return False
+    return (v.get("is_photograph") is True and v.get("shows_theme") is True and v.get("stand_in") is False
+            and v.get("unsafe") is False and v.get("confident") is True
+            and not VISION_DENY.search(str(v.get("subject", ""))))
+
+
+def vision_neurons(usage):
+    try:
+        pin, pout = VISION_PRICES[VISION_MODEL]
+        usd = usage["prompt_tokens"] * pin / 1e6 + usage["completion_tokens"] * pout / 1e6
+        return max(1, int(usd / 0.011 * 1000 + 0.999))
+    except Exception:
+        return VISION_FALLBACK_NEURONS
+
+
+def vision_check(im, theme, secret, state):
+    """(True|False, verdict) for an approved/rejected image, ("budget", None)
+    when the free tier is used up, (None, None) on an error worth retrying
+    another night."""
+    if neurons_left(state) < VISION_RESERVE:
+        return "budget", None
+    body = {"model": VISION_MODEL, "system": VISION_SYSTEM, "prompt": vision_prompt(theme),
+            "image_b64": vision_jpeg_b64(im), "max_tokens": 160, "schema": VISION_SCHEMA}
+    for attempt in range(2):
+        try:
+            out = worker_call("POST", "/vision", secret, body)
+        except urllib.error.HTTPError as e:
+            msg = e.read().decode("utf-8", "replace")[:300]
+            if "4006" in msg or "daily free allocation" in msg:
+                budget_gone(state)
+                return "budget", None
+            log(f"    vision call failed: {e.code} {msg[:160]}")
+            time.sleep(3)
+            continue
+        except Exception as e:
+            log(f"    vision call failed: {e}")
+            time.sleep(3)
+            continue
+        charge(state, vision_neurons(out.get("usage")))
+        v = parse_verdict(out.get("response"))
+        return verdict_ok(v), (v or {"unparsed": str(out.get("response"))[:200]})
+    return None, None
+
+
 # ---------------------------------------------------------------- rounds
 
 def raw_real(c):
@@ -390,14 +545,34 @@ def raw_real(c):
     return p
 
 
-def pick_reals(theme, state, n, avoid, rng, date):
+def credit_for(c):
+    return {"artist": c["artist"], "license": c["license"], "licenseUrl": c["licenseUrl"],
+            "source": c["page"], "title": re.sub(r"^File:|\.[a-z]{3,4}$", "", c["title"], flags=re.I)}
+
+
+def candidates(theme, state, avoid=()):
+    """Unused photos for a theme: human or vision approved ones, plus (with the
+    vision filter on) strong matches the model has not judged yet."""
     pool = get_pool(theme)
     used = set(state["used"]) | set(state["blacklist"]) | set(avoid)
-    # Pageids taken by unfinished rounds of this run count as used too.
+    ok, rej = set(state["approved"]), set(state["vision_rejected"])
+    out = []
+    for c in pool:
+        k = f"{theme['pool']}:{c['pageid']}"
+        if c["pageid"] in used:
+            continue
+        if k in ok or (VISION_ON and k not in rej and strong(c, theme)):
+            out.append(c)
+    return out
+
+
+def pick_reals(theme, state, n, avoid, rng, date, secret=None, max_bytes=MAX_REAL_BYTES):
+    """n (candidate, image) pairs, None when the theme has too few, or
+    "budget" when the free tier ran out while judging photos."""
     ok = set(state["approved"])
-    q = [c for c in pool if c["pageid"] not in used and f"{theme['pool']}:{c['pageid']}" in ok]
+    q = candidates(theme, state, avoid)
     rng.shuffle(q)
-    q.sort(key=lambda c: (not strong(c, theme), not c["quality"]))
+    q.sort(key=lambda c: (f"{theme['pool']}:{c['pageid']}" not in ok, not strong(c, theme), not c["quality"]))
     picked, artists = [], set()
     for c in q:
         if len(picked) == n:
@@ -405,25 +580,82 @@ def pick_reals(theme, state, n, avoid, rng, date):
         a = c["artist"].lower()
         if a in artists:
             continue
+        k = f"{theme['pool']}:{c['pageid']}"
         try:
             im = open_image(raw_real(c).read_bytes())
         except Exception as e:
-            log(f"    skip {c['pageid']}: {e}")
+            log(f"    skip a photo: {e}")
             state["blacklist"].append(c["pageid"])
             continue
-        if not image_ok(im) or len(encode_card(im)) > MAX_REAL_BYTES:
+        size = len(encode_card(im))
+        if not image_ok(im) or size > MAX_REAL_BYTES:
             state["blacklist"].append(c["pageid"])
             continue
+        if size > max_bytes:
+            continue
+        if k not in ok:
+            if not secret:
+                continue
+            res, verdict = vision_check(im, theme, secret, state)
+            if res == "budget":
+                save_json(STATE_PATH, state)
+                return "budget"
+            if res is None:
+                continue
+            state["vision_log"][k] = {"ok": res, "model": VISION_MODEL, "at": utc_today().isoformat(), **(verdict or {})}
+            if res:
+                state["approved"].append(k)
+                ok.add(k)
+            else:
+                state["vision_rejected"].append(k)
+                save_json(STATE_PATH, state)
+                continue
+            save_json(STATE_PATH, state)
         picked.append((c, im))
         artists.add(a)
     return picked if len(picked) == n else None
 
 
 def available(theme, state):
-    pool = get_pool(theme)
-    used = set(state["used"]) | set(state["blacklist"])
-    ok = set(state["approved"])
-    return sum(1 for c in pool if c["pageid"] not in used and f"{theme['pool']}:{c['pageid']}" in ok)
+    return len(candidates(theme, state))
+
+
+def make_ai(prompt, theme, state, secret, rng):
+    """A new AI image on disk (Path), "budget", or None after three failures.
+    With the vision filter on, an AI image that does not clearly show the
+    theme (or is unsafe) is thrown away and redrawn."""
+    for attempt in range(3):
+        if neurons_left(state) < NEURONS_PER_IMAGE:
+            return "budget"
+        charge(state)
+        save_json(STATE_PATH, state)
+        try:
+            data = gen_ai(prompt, secret, rng.randrange(1, 2**31))
+            Image.open(io.BytesIO(data)).verify()
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", "replace")[:300]
+            if "4006" in body or "daily free allocation" in body:
+                budget_gone(state)
+                return "budget"
+            log(f"    AI attempt {attempt + 1} failed: {e} {body}")
+            time.sleep(4)
+            continue
+        except Exception as e:
+            log(f"    AI attempt {attempt + 1} failed: {e}")
+            time.sleep(4)
+            continue
+        if VISION_ON:
+            res, _ = vision_check(open_image(data), theme, secret, state)
+            if res == "budget":
+                return "budget"
+            if res is not True:
+                log(f"    AI attempt {attempt + 1}: not clearly on theme, redrawing")
+                continue
+        RAW.mkdir(parents=True, exist_ok=True)
+        path = RAW / f"ai_{secrets.token_hex(8)}.jpg"
+        path.write_bytes(data)
+        return path
+    return None
 
 
 def build_round(date, slot, theme, state, secret, rng, keep_reals=None, keep_ai=None):
@@ -434,44 +666,31 @@ def build_round(date, slot, theme, state, secret, rng, keep_reals=None, keep_ai=
     if keep_reals is not None:
         reals = [(c, open_image(raw_real(c).read_bytes())) for c in keep_reals]
         if len(reals) < 3:
-            extra = pick_reals(theme, state, 3 - len(reals), [c["pageid"] for c in keep_reals], rng, date)
+            extra = pick_reals(theme, state, 3 - len(reals), [c["pageid"] for c in keep_reals], rng, date, secret)
+            if extra == "budget":
+                return "budget"
             if not extra:
                 return None
             reals += extra
     else:
-        reals = pick_reals(theme, state, 3, [], rng, date)
+        reals = pick_reals(theme, state, 3, [], rng, date, secret)
+        if reals == "budget":
+            return "budget"
         if not reals:
             return None
+    # Every real photo must itself be approved for this theme, so the AI card
+    # can never be the only clearly on-theme card in the round.
+    ok = set(state["approved"])
+    if sum(f"{theme['pool']}:{c['pageid']}" in ok for c, _ in reals) < 3:
+        log("    round rejected: not every real photo is approved for the theme")
+        return None
     if keep_ai is not None:
         ai_path, prompt = ROOT / keep_ai["src"], keep_ai["prompt"]
     else:
         prompt = build_prompt(theme, [c for c, _ in reals], [im for _, im in reals], rng)
-        ai_path = None
-        for attempt in range(3):
-            if neurons_left(state) < NEURONS_PER_IMAGE:
-                return "budget"
-            charge(state)
-            save_json(STATE_PATH, state)
-            try:
-                data = gen_ai(prompt, secret, rng.randrange(1, 2**31))
-                Image.open(io.BytesIO(data)).verify()
-            except urllib.error.HTTPError as e:
-                body = e.read().decode("utf-8", "replace")[:300]
-                if "4006" in body or "daily free allocation" in body:
-                    # The free tier is exhausted for this UTC day: stop, never retry.
-                    state["neurons"][utc_today().isoformat()] = DAILY_NEURON_CAP + 1000
-                    save_json(STATE_PATH, state)
-                    return "budget"
-                log(f"    AI attempt {attempt + 1} failed: {e} {body}")
-                time.sleep(4)
-                continue
-            except Exception as e:
-                log(f"    AI attempt {attempt + 1} failed: {e}")
-                time.sleep(4)
-                continue
-            ai_path = RAW / f"ai_{secrets.token_hex(8)}.jpg"
-            ai_path.write_bytes(data)
-            break
+        ai_path = make_ai(prompt, theme, state, secret, rng)
+        if ai_path == "budget":
+            return "budget"
         if ai_path is None:
             return None
     srcs = [{"real": c, "im": im} for c, im in reals] + [{"ai": True, "im": open_image(ai_path.read_bytes())}]
@@ -488,8 +707,7 @@ def build_round(date, slot, theme, state, secret, rng, keep_reals=None, keep_ai=
         else:
             c = s["real"]
             cards.append({"id": letter, "file": name, "ai": False, "pageid": c["pageid"], "cand": c,
-                          "credit": {"artist": c["artist"], "license": c["license"], "licenseUrl": c["licenseUrl"],
-                                     "source": c["page"], "title": re.sub(r"^File:|\.[a-z]{3,4}$", "", c["title"], flags=re.I)}})
+                          "credit": credit_for(c)})
     return {"theme": theme["key"], "cards": cards}
 
 
@@ -540,7 +758,7 @@ def seed_day(date, state, seasons, secret):
         while res is None:
             theme = choose_theme(date, slot, season, state, day, tried)
             if not theme:
-                log(f"{key} R{slot + 1}: no theme has approved photos left (run --review)")
+                log(f"{key} R{slot + 1}: no theme has usable photos left")
                 save_json(STATE_PATH, state)
                 return "stuck"
             res = build_round(date, slot, theme, state, secret, rng)
@@ -700,6 +918,213 @@ def decide(state, pool_key, bad):
     log(f"{pool_key}: {len(ids) - len(bad)} approved, {len(bad)} rejected")
 
 
+# ---------------------------------------------------------------- vetoes
+# Tony marks photos "bad" on the review page (gen Worker, KV). The nightly run
+# swaps each one before its day goes live: same letter, same byte size, new
+# file name, so a player who loaded the round keeps a consistent board. When a
+# swap cannot be made in place the round is rebuilt. Only today (UTC) and later
+# change. Logs never say which letter was real or AI: Action logs are public.
+
+def place_card(rnd, card, im, meta):
+    target = (IMG / card["file"]).stat().st_size
+    data = pad_webp(encode_card(im), target)
+    if len(data) != target:
+        return False
+    name = secrets.token_hex(10) + ".webp"
+    (IMG / name).write_bytes(data)
+    old = card["file"]
+    letter = card["id"]
+    card.clear()
+    card.update({"id": letter, "file": name, **meta})
+    try:
+        (IMG / old).unlink()
+    except OSError:
+        pass
+    return True
+
+
+def rebuild_slot(date, slot, state, season, secret, rng, avoid_theme):
+    """A whole new round for this slot, on another theme if this one has no
+    photos left. Returns True, False or "budget"."""
+    key = date.isoformat()
+    day = state["days"][key]
+    old = day["rounds"][slot]
+    tried = {avoid_theme} if avoid_theme else set()
+    while True:
+        theme = choose_theme(date, slot, season, state, day, tried)
+        if not theme:
+            return False
+        res = build_round(date, slot, theme, state, secret, rng)
+        if res == "budget":
+            return "budget"
+        if isinstance(res, dict):
+            drop_round_files(old)
+            day["rounds"][slot] = res
+            state["used"].extend(c["pageid"] for c in res["cards"] if not c["ai"])
+            save_json(STATE_PATH, state)
+            return True
+        tried.add(theme["key"])
+
+
+def veto_card(state, seasons, secret, d, slot, letter):
+    date = dt.date.fromisoformat(d)
+    day = state["days"][d]
+    rnd = day["rounds"][slot]
+    season = next(x for x in seasons if x["id"] == day["season"])
+    theme = themes_by_key(season)[rnd["theme"]]
+    card = next((c for c in rnd["cards"] if c["id"] == letter), None)
+    if not card:
+        return True
+    rng = random.Random(secrets.randbits(64))
+    reals = [c for c in rnd["cards"] if not c["ai"]]
+    ai = next(c for c in rnd["cards"] if c["ai"])
+    if not card["ai"]:
+        k = f"{theme['pool']}:{card['pageid']}"
+        state["blacklist"].append(card["pageid"])
+        state["approved"] = [a for a in state["approved"] if a != k]
+        # Prefer a photo small enough to take the old one's place byte for byte.
+        fit = (IMG / card["file"]).stat().st_size - 64
+        got = pick_reals(theme, state, 1, [c["pageid"] for c in reals], rng, date, secret, max_bytes=fit)
+        if got is None:
+            got = pick_reals(theme, state, 1, [c["pageid"] for c in reals], rng, date, secret)
+        if got == "budget":
+            return "budget"
+        if got:
+            c, im = got[0]
+            meta = {"ai": False, "pageid": c["pageid"], "cand": c, "credit": credit_for(c)}
+            if place_card(rnd, card, im, meta):
+                state["used"].append(c["pageid"])
+                save_json(STATE_PATH, state)
+                return True
+            keep = [x["cand"] for x in reals if x is not card] + [c]
+            res = build_round(date, slot, theme, state, secret, rng, keep_reals=keep, keep_ai=ai)
+            if isinstance(res, dict):
+                drop_round_files(rnd)
+                day["rounds"][slot] = res
+                state["used"].append(c["pageid"])
+                save_json(STATE_PATH, state)
+                return True
+            if res == "budget":
+                return "budget"
+        return rebuild_slot(date, slot, state, season, secret, rng, theme["key"])
+    path = make_ai(ai["prompt"], theme, state, secret, rng)
+    if path == "budget":
+        return "budget"
+    if path is None:
+        return rebuild_slot(date, slot, state, season, secret, rng, None)
+    meta = {"ai": True, "src": str(path.relative_to(ROOT)), "prompt": ai["prompt"]}
+    if place_card(rnd, card, open_image(path.read_bytes()), meta):
+        save_json(STATE_PATH, state)
+        return True
+    res = build_round(date, slot, theme, state, secret, rng, keep_reals=[x["cand"] for x in reals], keep_ai=meta)
+    if isinstance(res, dict):
+        drop_round_files(rnd)
+        day["rounds"][slot] = res
+        save_json(STATE_PATH, state)
+        return True
+    return res if res == "budget" else False
+
+
+def apply_vetoes(state, seasons, secret):
+    try:
+        vetoes = worker_call("GET", "/review/vetoes", secret)
+    except Exception as e:
+        log(f"vetoes: could not read them ({e}); nothing changed")
+        return
+    today = utc_today().isoformat()
+    clear, changed, left = [], set(), 0
+    for v in sorted(vetoes, key=lambda v: (v["date"], v["round"], v["card"])):
+        d, slot = v["date"], v["round"]
+        day = state["days"].get(d)
+        if d < today or not day or not (0 <= slot < ROUNDS) or not day["rounds"][slot]:
+            clear.append(v)
+            continue
+        try:
+            res = veto_card(state, seasons, secret, d, slot, v["card"])
+        except Exception as e:
+            log(f"{d}: a veto failed ({e!r}); kept for the next run")
+            res = False
+        if res == "budget":
+            left += 1
+            log("vetoes: daily neuron budget reached; the rest wait for the next run")
+            break
+        if res is True:
+            clear.append(v)
+            changed.add(d)
+        else:
+            left += 1
+            log(f"{d}: a veto could not be applied yet")
+    save_json(STATE_PATH, state)
+    for d in changed:
+        contact_sheet(d, state["days"][d], seasons)
+    if clear:
+        try:
+            worker_call("POST", "/review/vetoes/clear", secret, clear)
+        except Exception as e:
+            log(f"vetoes: applied but not cleared ({e}); they will be re-applied next run")
+    log(f"vetoes: {len(vetoes)} read, {len(changed)} day(s) changed, {len(clear)} cleared, "
+        f"{len(vetoes) - len(clear)} left")
+
+
+# ---------------------------------------------------------------- review page
+
+def review_hash(day):
+    h = hashlib.sha256(json.dumps([[r["theme"]] + [[c["file"], c["ai"]] for c in r["cards"]] for r in day["rounds"]]).encode())
+    return h.hexdigest()[:20]
+
+
+def review_payload(key, day, seasons):
+    import base64
+    s = next(x for x in seasons if x["id"] == day["season"])
+    tk = themes_by_key(s)
+    rounds = []
+    for rnd in day["rounds"]:
+        cards = []
+        for c in rnd["cards"]:
+            im = Image.open(IMG / c["file"]).convert("RGB")
+            im.thumbnail((400, 300))
+            buf = io.BytesIO()
+            im.save(buf, "WEBP", quality=60)
+            cards.append({"id": c["id"], "ai": c["ai"], "thumb": base64.b64encode(buf.getvalue()).decode(),
+                          "title": "" if c["ai"] else c["credit"]["title"][:90]})
+        rounds.append({"name": tk[rnd["theme"]]["name"], "cards": cards})
+    return {"date": key, "caseNumber": day["caseNumber"], "rounds": rounds}
+
+
+def upload_review(state, seasons, secret):
+    today = utc_today()
+    window = {(today + dt.timedelta(days=i)).isoformat() for i in range(REVIEW_AHEAD_DAYS + 1)}
+    show = sorted(k for k in window if day_done(state["days"].get(k)))
+    put = gone = 0
+    try:
+        for k in show:
+            h = review_hash(state["days"][k])
+            if state["review_hash"].get(k) != h:
+                worker_call("PUT", f"/review/day/{k}", secret, review_payload(k, state["days"][k], seasons))
+                state["review_hash"][k] = h
+                put += 1
+        for k in list(state["review_hash"]):
+            if k not in show:
+                worker_call("DELETE", f"/review/day/{k}", secret)
+                del state["review_hash"][k]
+                gone += 1
+        worker_call("PUT", "/review/index", secret, show)
+    except Exception as e:
+        log(f"review: upload stopped ({e})")
+    save_json(STATE_PATH, state)
+    log(f"review: {len(show)} upcoming day(s) listed, {put} uploaded, {gone} removed")
+
+
+def prefetch(seasons, dates):
+    """Fetch (or refresh) the Commons pools of every season the dates touch,
+    e.g. Christmas once December is inside the window."""
+    for s in seasons:
+        if any(season_for(d, seasons) is s for d in dates):
+            for t in s["themes"]:
+                n = len(get_pool(t))
+                log(f"pool {t['pool']}: {n} matching candidates")
+
+
 # ---------------------------------------------------------------- main
 
 def main():
@@ -715,7 +1140,13 @@ def main():
     ap.add_argument("--review-n", type=int, default=36)
     ap.add_argument("--decide", action="append", default=[], help="POOL:bad,idx,list (others approved)")
     ap.add_argument("--rereal", action="append", default=[], help="DATE:R keep the AI, new real photos")
+    ap.add_argument("--no-vision", action="store_true", help="only use human-approved photos")
+    ap.add_argument("--apply-vetoes", action="store_true", help="swap the photos marked bad on the review page")
+    ap.add_argument("--upload-review", action="store_true", help="refresh the review page's upcoming days")
+    ap.add_argument("--prefetch", action="store_true", help="fetch pools for every season in the date range")
     a = ap.parse_args()
+    global VISION_ON
+    VISION_ON = not a.no_vision
 
     seasons = load_seasons()
     state = load_state()
@@ -746,7 +1177,17 @@ def main():
             log(contact_sheet(k, d, seasons))
         return 0
 
-    secret = os.environ.get("IMPOSTER_GEN_SECRET") or (PRIV / "gen_secret.txt").read_text().strip()
+    if a.prefetch:
+        prefetch(seasons, dates)
+        return 0
+
+    secret = (os.environ.get("IMPOSTER_GEN_SECRET") or (PRIV / "gen_secret.txt").read_text()).strip()
+    if a.apply_vetoes:
+        apply_vetoes(state, seasons, secret)
+        return 0
+    if a.upload_review:
+        upload_review(state, seasons, secret)
+        return 0
     for mode, targets in (("redo", a.redo), ("redo-ai", a.redo_ai), ("swap", a.swap), ("rereal", a.rereal)):
         for t in targets:
             redo(state, seasons, secret, t, mode)

@@ -1,0 +1,137 @@
+# Nightly content run: the laptop can be off.
+#
+# Just after 00:00 UTC (when the Workers AI free quota resets) it pulls the
+# encrypted generator state, swaps any photos Tony marked bad on the review
+# page, generates missing days up to ~45 days ahead within the free neuron
+# budget, pushes the state back (encrypted), builds and deploys dist/ to both
+# Pages projects, checks the live API carries no answers, and refreshes the
+# review page. Logs are public: nothing here prints which card is AI.
+#
+# Secrets: STATE_KEY, IMPOSTER_GEN_SECRET, CLOUDFLARE_ACCOUNT_ID,
+# CLOUDFLARE_API_TOKEN (Pages Edit). Until all four exist the job does nothing.
+
+name: Nightly content
+
+on:
+  schedule:
+    - cron: "17 0 * * *"
+  workflow_dispatch:
+    inputs:
+      generate:
+        description: "Generate new days (off = vetoes, build and deploy only)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write   # the encrypted state lives on the ci-state release
+  actions: write    # re-enable this schedule so GitHub's 60-day idle rule never pauses it
+
+concurrency:
+  group: nightly-content
+  cancel-in-progress: false
+
+jobs:
+  nightly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    env:
+      STATE_KEY: ${{ secrets.STATE_KEY }}
+      IMPOSTER_GEN_SECRET: ${{ secrets.IMPOSTER_GEN_SECRET }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GH_TOKEN: ${{ github.token }}
+      WRANGLER: wrangler@4.149.0
+    steps:
+      - name: Check secrets
+        id: gate
+        run: |
+          missing=""
+          for v in STATE_KEY IMPOSTER_GEN_SECRET CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            [ -n "${!v}" ] || missing="$missing $v"
+          done
+          if [ -n "$missing" ]; then
+            echo "::notice::Skipping: missing secrets:$missing"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.ok == 'true'
+
+      - name: Keep the schedule alive
+        if: steps.gate.outputs.ok == 'true'
+        continue-on-error: true
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/nightly.yml/enable"
+
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.ok == 'true'
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.ok == 'true'
+        with:
+          node-version: "22"
+
+      - name: Install
+        if: steps.gate.outputs.ok == 'true'
+        run: pip install --quiet "pillow==11.3.0"
+
+      - name: Pull encrypted state
+        id: pull
+        if: steps.gate.outputs.ok == 'true'
+        run: python3 gen/state_sync.py pull
+
+      - name: Apply Tony's vetoes
+        if: steps.pull.outcome == 'success'
+        run: python3 gen/imposter_gen.py --apply-vetoes
+
+      - name: Fetch pools for seasons in range (Christmas when it is near)
+        if: steps.pull.outcome == 'success' && (github.event_name == 'schedule' || inputs.generate)
+        run: python3 gen/imposter_gen.py --prefetch
+
+      - name: Generate missing days
+        if: steps.pull.outcome == 'success' && (github.event_name == 'schedule' || inputs.generate)
+        run: python3 gen/imposter_gen.py
+
+      - name: Push encrypted state
+        if: always() && steps.pull.outcome == 'success'
+        run: python3 gen/state_sync.py push
+
+      - name: Build
+        id: build
+        if: steps.pull.outcome == 'success'
+        run: python3 gen/build.py
+
+      - name: Deploy playimposter
+        if: steps.build.outcome == 'success'
+        run: npx --yes "$WRANGLER" pages deploy dist --project-name=playimposter --branch=main --commit-dirty=true
+
+      - name: Deploy imposter-game
+        if: steps.build.outcome == 'success'
+        run: npx --yes "$WRANGLER" pages deploy dist --project-name=imposter-game --branch=main --commit-dirty=true
+
+      - name: Check the live API serves no answers
+        if: steps.build.outcome == 'success'
+        run: |
+          sleep 20
+          for d in $(date -u +%F) $(date -u -d tomorrow +%F); do
+            for h in playimposter.pages.dev imposter-game-c73.pages.dev; do
+              body=$(curl -sf --compressed "https://$h/api/case?date=$d")
+              echo "$h $d: $(echo "$body" | python3 -c 'import json,sys; c=json.load(sys.stdin); print(c["title"], sum(len(r["cards"]) for r in c["rounds"]), "cards")')"
+              if echo "$body" | grep -qE '"(ai|credit|prompt|pageid|src)"'; then
+                echo "::error::$h /api/case for $d exposes answer fields"; exit 1
+              fi
+              img=$(echo "$body" | python3 -c 'import json,sys; print(json.load(sys.stdin)["rounds"][0]["cards"][0]["image"])')
+              curl -sfI "https://$h/$img" > /dev/null || { echo "::error::$h $d image missing"; exit 1; }
+            done
+          done
+
+      - name: Refresh the review page
+        if: steps.pull.outcome == 'success'
+        run: python3 gen/imposter_gen.py --upload-review
+
+      - name: Push encrypted state (review bookkeeping)
+        if: steps.pull.outcome == 'success'
+        run: python3 gen/state_sync.py push

@@ -3,12 +3,14 @@
 functions/_data/cases.json (gitignored). Deploy from the repo root so
 ./functions is bundled:
 
-  python3 gen/build.py
+  python3 gen/build.py            # days up to UTC today + AHEAD_DAYS
   npx wrangler pages deploy dist --project-name=playimposter --branch=main
   npx wrangler pages deploy dist --project-name=imposter-game --branch=main
 """
+import argparse
 import datetime as dt
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -20,6 +22,12 @@ ROOT = g.ROOT
 DIST = ROOT / "dist"
 DATA = ROOT / "functions" / "_data" / "cases.json"
 
+# Days later than UTC today + AHEAD_DAYS are left out of the deploy entirely
+# (no images, no answers), so nothing about them is on the public site ahead
+# of time. The API serves up to today + 1; 3 days covers two missed nightly
+# runs, and a date past that replays an earlier case instead of breaking.
+AHEAD_DAYS = int(os.environ.get("IMPOSTER_AHEAD_DAYS", "3"))
+
 # The only files players get. Everything else (README, server.py, gen/,
 # private/, old case data) is never served.
 PUBLIC = ["index.html", "sw.js", "manifest.json", "favicon.svg", "og-image.png", "og-thanksgiving.png",
@@ -29,6 +37,9 @@ PUBLIC = ["index.html", "sw.js", "manifest.json", "favicon.svg", "og-image.png",
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--ahead", type=int, default=AHEAD_DAYS, help="days past UTC today to include")
+    a = ap.parse_args()
     seasons = g.load_seasons()
     state = g.load_state()
     if DIST.exists():
@@ -49,8 +60,9 @@ def main():
     (DIST / "index.html").write_text(page)
 
     cases, n_img = {}, 0
+    last = (today + dt.timedelta(days=a.ahead)).isoformat()
     for key, day in sorted(state["days"].items()):
-        if not g.day_done(day):
+        if not g.day_done(day) or key > last:
             continue
         date = dt.date.fromisoformat(key)
         s = next(x for x in seasons if x["id"] == day["season"])
@@ -72,7 +84,7 @@ def main():
                       "eventBadge": s["badge"], "season": s["id"], "rounds": rounds}
     DATA.parent.mkdir(parents=True, exist_ok=True)
     DATA.write_text(json.dumps(cases, ensure_ascii=False, separators=(",", ":")))
-    print(f"dist/: {len(PUBLIC)} site files, {n_img} images; {len(cases)} cases -> {DATA.relative_to(ROOT)}")
+    print(f"dist/: {len(PUBLIC)} site files, {n_img} images; {len(cases)} cases up to {last} -> {DATA.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

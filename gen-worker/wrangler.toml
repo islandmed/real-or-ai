@@ -5,3 +5,11 @@ workers_dev = true
 
 [ai]
 binding = "AI"
+
+# Upcoming days for the review page and Tony's vetoes. Never read by players.
+[[kv_namespaces]]
+binding = "REVIEW"
+id = "96b69c3ac28c4dd8aa84c889194bc548"
+
+# Secrets (wrangler secret put): GEN_SECRET (the generator and the nightly
+# Action), REVIEW_KEY (the review page link, Tony only).

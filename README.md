@@ -72,24 +72,64 @@ python3 gen/imposter_gen.py --redo-ai 2026-10-12:3   # new AI only
 python3 gen/imposter_gen.py --swap 2026-10-12:3:B    # replace one real photo
 ```
 
-Real photos are only used after a human passes them: `--review all` writes
-numbered sheets to `private/review/`, then `--decide POOL:3,7,12` rejects
-those numbers and approves the rest. A day is never built from unreviewed
-photos. Contact sheets for checking a finished day land in `private/sheets/`.
+Real photos are approved automatically: the first time a strong Commons match
+is considered, a Workers AI vision model (`IMPOSTER_VISION_MODEL`, through the
+gen Worker's `/vision`) looks at the cropped card and passes it only if it is a
+photograph, clearly shows the theme, is not a mushroom, ruin or tree growth
+standing in for it, and is safe (no gore, nudity, distress or readable names on
+graves). Any doubt or unparseable answer is a rejection, verdicts are kept in
+`state.json` (`approved`, `vision_rejected`, `vision_log`), and the AI image
+must pass the same theme and safety check, so the AI card is never the only
+on-theme card. Photos a human passed earlier stay approved. Themes can carry a
+`vision` brief in `seasons.json` saying exactly what must be visible.
+`--no-vision` falls back to human-approved photos only; `--review` and
+`--decide` still work for hand review. Contact sheets for checking a finished
+day land in `private/sheets/`.
 
-Note: the answers (`private/state.json`) exist only on the machine that ran the
-generator, so builds and deploys must run there, or the state must be handed
-to CI as an encrypted secret.
+## Nightly run (laptop off)
+
+`.github/workflows/nightly.yml` runs at 00:17 UTC (just after the Workers AI
+free quota resets) and on demand (Actions, "Nightly content", Run workflow):
+
+1. pulls the encrypted state, 2. swaps photos Tony marked bad, 3. fetches
+pools for every season within 45 days (Christmas from mid October),
+4. generates missing days within the neuron budget, 5. pushes the state back,
+6. builds and deploys `dist/` to both Pages projects, 7. checks the live
+`/api/case` has no answer fields, 8. refreshes the review page.
+
+**State.** `gen/state_sync.py` packs `private/state.json`, the pools, the card
+images and the AI sources of days not yet live into one tar.gz, encrypts it
+(AES-256, PBKDF2, key `STATE_KEY`) and keeps the newest 7 as assets on the
+`ci-state` release. Only ciphertext is public. The key is a GitHub secret and
+`private/state_key.txt`. Before generating on a laptop run
+`python3 gen/state_sync.py pull`, and `push` afterwards, or the copies drift.
+
+**Ahead of time.** `gen/build.py` deploys only days up to UTC today + 3, so
+images and answers for later days are not on the public site at all.
+
+**Review page and vetoes.** The gen Worker serves a review page of upcoming
+days (6 rounds of 4, AI card marked) at `/review?k=<REVIEW_KEY>`; without the
+key every request gets 403. Tapping "bad" stores a veto in KV; the next
+nightly run swaps that photo in place (same letter and byte size) or rebuilds
+the round. Only today (UTC) and later can change. Action logs are public, so
+the pipeline never logs which letter is real or AI.
+
+**Secrets.** GitHub: `STATE_KEY`, `IMPOSTER_GEN_SECRET`, `CLOUDFLARE_ACCOUNT_ID`,
+`CLOUDFLARE_API_TOKEN` (Cloudflare Pages: Edit). The job does nothing until
+all four exist. Worker: `GEN_SECRET`, `REVIEW_KEY`.
 
 ## Build and deploy (free tier only)
 
 Run from the repo root so wrangler picks up `./functions`:
 
 ```bash
-python3 gen/build.py
+python3 gen/build.py          # days up to UTC today + 3
 npx wrangler pages deploy dist --project-name=playimposter --branch=main
 npx wrangler pages deploy dist --project-name=imposter-game --branch=main
 ```
+
+The nightly Action does this every night; deploy by hand only after a
+`state_sync.py pull`, or a hand deploy can roll the site back.
 
 Local: `npx wrangler pages dev dist` (Functions included).
 ## 🔔 Daily Reminder (calendar + Web Push)
