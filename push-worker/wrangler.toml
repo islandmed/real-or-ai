@@ -1,0 +1,16 @@
+name = "imposter-push"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "PUSH_KV"
+id = "0ec81c20f72440c38b0bdb23c6261c99"
+
+[triggers]
+crons = ["0 * * * *"]
+
+[vars]
+VAPID_PUBLIC_KEY = "BD7PbiC_PAJysOwmqJVyikrzsLK2wdBy5NtE4C4IFlJmJhYm7WBRXaAd0LrX7wvZV_C1tFVVnDjtYadnn10SK0A"
+VAPID_SUBJECT = "https://playimposter.pages.dev"
+# Secrets (wrangler secret put): VAPID_PRIVATE_JWK, optional TEST_SECRET

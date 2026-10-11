@@ -16,3 +16,7 @@ __pycache__/
 test-results/
 .wrangler/
 dist/
+
+# Push worker secrets (never commit)
+push-worker/.vapid.local.json
+push-worker/.dev.vars
