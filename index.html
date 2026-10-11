@@ -173,6 +173,25 @@
   }
   .sound-btn:hover { background: #252c48; border-color: var(--neon-cyan); }
   .sound-btn:active { transform: translateY(1px); }
+  .leaderboard-btn {
+    all: unset;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #ffde59;
+    background: #181d2f;
+    border: 1px solid #3d476c;
+    padding: 5px 9px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.1s;
+    user-select: none;
+  }
+  .leaderboard-btn:hover { background: #262e49; border-color: #ffde59; transform: translateY(-1px); }
+  .leaderboard-btn:active { transform: translateY(1px); }
   .user-btn {
     all: unset;
     cursor: pointer;
@@ -333,6 +352,55 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .mission-meta-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .speed-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    background: #0d0f18;
+    border: 1px solid #2e3756;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .speed-label {
+    font-size: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    color: #8b97bc;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .speed-timer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .speed-summary-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .speed-stat-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--neon-cyan);
+    background: #14192b;
+    border: 1px solid #2d3859;
+    padding: 4px 10px;
+    border-radius: 999px;
   }
   .lives-box {
     display: flex;
@@ -1107,6 +1175,149 @@
   .archive-play-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
   .archive-item.active-case { border-color: var(--neon-cyan); background: #1c223a; }
 
+  /* Leaderboard Modal (Sign-in Gated) */
+  .leaderboard-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 12, 20, 0.94);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .leaderboard-modal.open { display: flex; }
+  .leaderboard-card {
+    background: #141726;
+    border: 2px solid #2e3756;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 480px;
+    padding: 24px 20px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    color: #fff;
+    animation: fadeIn 0.15s;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .leaderboard-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #8b97bc;
+  }
+  .leaderboard-close:hover { color: #fff; }
+  .lb-header { text-align: center; margin-bottom: 16px; }
+  .lb-trophy { font-size: 32px; display: block; margin-bottom: 4px; }
+  .lb-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .lb-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #ffaa00;
+    background: rgba(255, 170, 0, 0.12);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .lb-gate-banner {
+    background: #1c1529;
+    border: 1px solid #7928ca;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+  }
+  .lb-gate-icon { font-size: 24px; }
+  .lb-gate-info h4 { font-size: 13px; font-weight: 700; color: #ff0080; }
+  .lb-gate-info p { font-size: 11px; color: #a29db8; line-height: 1.4; }
+  .btn-lb-signin {
+    all: unset;
+    cursor: pointer;
+    background: linear-gradient(135deg, #7928ca, #ff0080);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px rgba(121, 40, 202, 0.4);
+    transition: all 0.1s;
+  }
+  .btn-lb-signin:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .lb-user-banner {
+    background: #0f1c24;
+    border: 1px solid var(--neon-cyan);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .lb-user-avatar { font-size: 24px; }
+  .lb-user-info { flex: 1; }
+  .lb-user-name { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 800; color: #fff; }
+  .lb-user-stat { font-size: 11px; color: var(--neon-cyan); }
+  .lb-edit-btn {
+    all: unset;
+    cursor: pointer;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #8b97bc;
+    border: 1px solid #3c4669;
+    padding: 3px 6px;
+    border-radius: 4px;
+  }
+  .lb-edit-btn:hover { color: #fff; border-color: #fff; }
+  .lb-list { display: flex; flex-direction: column; gap: 6px; }
+  .lb-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0d0f18;
+    border: 1px solid #232a42;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .lb-row.highlight-user {
+    border-color: var(--neon-green);
+    background: #101c1c;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+  }
+  .lb-rank { width: 32px; font-weight: 800; color: #ffde59; }
+  .lb-name {
+    flex: 1;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 8px;
+  }
+  .lb-meta { text-align: right; }
+  .lb-score { font-weight: 800; color: var(--neon-green); }
+  .lb-time { font-size: 10px; color: #8b97bc; }
+
   /* Toast */
   .toast {
     position: fixed;
@@ -1140,6 +1351,7 @@
     <div class="header-actions">
       <button class="sound-btn" id="btnSound" title="Toggle Sound">🔊</button>
       <div class="streak-pill" id="btnStats" title="View Detective Stats">🔥 <span id="streakCount">1</span></div>
+      <button class="leaderboard-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆 Ranks</button>
       <button class="user-btn" id="btnUserAccount">Sign in</button>
     </div>
   </header>
@@ -1176,12 +1388,18 @@
           3 authentic historic homes · 1 synthetic AI imposter
         </div>
       </div>
-      <div class="lives-box">
-        <div class="lives-label">ATTEMPTS</div>
-        <div class="lives-pips">
-          <span class="heart-pip" id="dot1">❤️</span>
-          <span class="heart-pip" id="dot2">❤️</span>
-          <span class="heart-pip" id="dot3">❤️</span>
+      <div class="mission-meta-group">
+        <div class="speed-box">
+          <div class="speed-label">TIME</div>
+          <div class="speed-timer" id="liveTimer">00:00.0</div>
+        </div>
+        <div class="lives-box">
+          <div class="lives-label">ATTEMPTS</div>
+          <div class="lives-pips">
+            <span class="heart-pip" id="dot1">❤️</span>
+            <span class="heart-pip" id="dot2">❤️</span>
+            <span class="heart-pip" id="dot3">❤️</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1206,6 +1424,10 @@
   <!-- 4-Round Solved Summary View -->
   <section class="case-results" id="viewResults">
     <div class="summary-score-badge" id="summaryScoreBadge">4 / 4</div>
+    <div class="speed-summary-row" id="speedSummaryRow">
+      <div class="speed-stat-pill">⚡ Time: <span id="summaryTimeVal">00.0s</span></div>
+      <div class="speed-stat-pill">🚀 Speed Bonus: <span id="summarySpeedBonusVal">+0 pts</span></div>
+    </div>
     <div class="stars-row" id="starsRow">⭐⭐⭐⭐</div>
     <h2 class="result-title" id="resultTitle">Daily Detective Master</h2>
     <p class="result-desc" id="resultDesc">You caught all 4 synthetic machine imposters across every theme today.</p>
@@ -1340,6 +1562,42 @@
     <div class="next-timer-box">
       <div class="timer-label">Next Daily Case Drops In</div>
       <div class="timer-val" id="nextCaseTimer">00:00:00</div>
+  </div>
+</div>
+
+<!-- Leaderboard Modal (Sign-In Gated) -->
+<div class="leaderboard-modal" id="leaderboardModal">
+  <div class="leaderboard-card">
+    <div class="leaderboard-close" onclick="closeLeaderboardModal()">✕</div>
+    <div class="lb-header">
+      <span class="lb-trophy">🏆</span>
+      <h3 class="lb-title">Daily Hall of Fame</h3>
+      <span class="lb-badge">🎃 HALLOWEEN SPECIAL</span>
+    </div>
+    
+    <!-- If NOT signed in: Gated Lock Callout -->
+    <div class="lb-gate-banner" id="lbGateBanner">
+      <div class="lb-gate-icon">🔒</div>
+      <div class="lb-gate-info">
+        <h4>Sign In to Submit Score & View Full Board</h4>
+        <p>Rankings are scored on forensics accuracy + live speed. Join top detectives worldwide!</p>
+      </div>
+      <button class="btn-lb-signin" onclick="openAuthModal('Leaderboard')">Sign In to Join Board</button>
+    </div>
+
+    <!-- If signed in: Detective Identity Card -->
+    <div class="lb-user-banner" id="lbUserBanner" style="display:none;">
+      <div class="lb-user-avatar">🕵️</div>
+      <div class="lb-user-info">
+        <div class="lb-user-name" id="lbUserName">Agent Phantom</div>
+        <div class="lb-user-stat" id="lbUserStat">Today: 485 PTS (24.2s) · Rank #7</div>
+      </div>
+      <button class="lb-edit-btn" onclick="promptChangeName()">Edit Call-Sign</button>
+    </div>
+
+    <!-- Leaderboard Table -->
+    <div class="lb-list" id="lbList">
+      <!-- Populated dynamically -->
     </div>
   </div>
 </div>
@@ -1358,6 +1616,207 @@ let selectedCardId = null;
 let attemptsUsedThisRound = 0;
 let isCurrentRoundOver = false;
 let userProfile = null;
+
+// Live Speed Stopwatch
+let caseStartTime = null;
+let caseEndTime = null;
+let timerInterval = null;
+let elapsedSeconds = 0;
+
+function startSpeedTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  caseStartTime = Date.now();
+  caseEndTime = null;
+  elapsedSeconds = 0;
+  updateLiveTimerUI(0);
+  timerInterval = setInterval(() => {
+    if (!caseStartTime) return;
+    const now = Date.now();
+    elapsedSeconds = (now - caseStartTime) / 1000;
+    updateLiveTimerUI(elapsedSeconds);
+  }, 100);
+}
+
+function stopSpeedTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  caseEndTime = Date.now();
+  if (caseStartTime) {
+    elapsedSeconds = (caseEndTime - caseStartTime) / 1000;
+  }
+  updateLiveTimerUI(elapsedSeconds);
+  return elapsedSeconds;
+}
+
+function updateLiveTimerUI(secs) {
+  const el = $("liveTimer");
+  if (el) {
+    el.textContent = `${secs.toFixed(1)}s`;
+  }
+}
+
+function calculateSpeedBonus(secs, totalWon) {
+  if (totalWon === 0) return 0;
+  let raw = 0;
+  if (secs <= 25) {
+    raw = 100;
+  } else if (secs <= 45) {
+    raw = Math.round(100 - (secs - 25) * (25 / 20));
+  } else if (secs <= 90) {
+    raw = Math.round(75 - (secs - 45) * (50 / 45));
+  } else {
+    raw = Math.max(10, Math.round(25 - (secs - 90) * (15 / 60)));
+  }
+  return Math.round(raw * (totalWon / 4));
+}
+
+// Daily Hall of Fame Leaderboard (Sign-In Gated)
+const DEFAULT_LEADERBOARD = [
+  { rank: 1, name: "CipherWolf", score: 495, time: 18.4, accuracy: "4/4 (1st try)", badge: "👑" },
+  { rank: 2, name: "PixelForensics", score: 488, time: 21.2, accuracy: "4/4 (1st try)", badge: "🥈" },
+  { rank: 3, name: "NeonSpecter", score: 482, time: 24.6, accuracy: "4/4 (1st try)", badge: "🥉" },
+  { rank: 4, name: "SleuthRaven", score: 476, time: 27.8, accuracy: "4/4 (1st try)", badge: "🎃" },
+  { rank: 5, name: "AgentZero", score: 468, time: 32.1, accuracy: "4/4 (1st try)", badge: "🕵️" },
+  { rank: 6, name: "ShadowLens", score: 445, time: 38.5, accuracy: "4/4 (1st try)", badge: "🦇" },
+  { rank: 7, name: "OpticHunter", score: 432, time: 42.0, accuracy: "4/4 (1st try)", badge: "⚡" },
+  { rank: 8, name: "GhostProtocol", score: 418, time: 49.3, accuracy: "4/4 (2nd try)", badge: "👻" },
+  { rank: 9, name: "ByteBuster", score: 395, time: 54.7, accuracy: "4/4 (2nd try)", badge: "🔍" },
+  { rank: 10, name: "VaporGlitch", score: 370, time: 61.2, accuracy: "3/4", badge: "💀" }
+];
+
+function getLeaderboard() {
+  try {
+    const raw = localStorage.getItem("imposter_leaderboard");
+    if (raw) return JSON.parse(raw);
+  } catch (_) {}
+  return JSON.parse(JSON.stringify(DEFAULT_LEADERBOARD));
+}
+
+function saveLeaderboard(lb) {
+  try {
+    localStorage.setItem("imposter_leaderboard", JSON.stringify(lb));
+  } catch (_) {}
+}
+
+function openLeaderboardModal() {
+  playSound("tap");
+  renderLeaderboard();
+  $("leaderboardModal").classList.add("open");
+}
+
+function closeLeaderboardModal() {
+  $("leaderboardModal").classList.remove("open");
+}
+
+function promptChangeName() {
+  if (!userProfile) return;
+  const curName = userProfile.callsign || (userProfile.email ? userProfile.email.split("@")[0] : "Agent");
+  const newName = prompt("Enter your Detective Call-Sign:", curName);
+  if (newName && newName.trim()) {
+    userProfile.callsign = newName.trim().slice(0, 16);
+    localStorage.setItem("imposter_user", JSON.stringify(userProfile));
+    $("btnUserAccount").textContent = userProfile.callsign;
+    
+    const lb = getLeaderboard();
+    const entry = lb.find(e => e.isUser);
+    if (entry) {
+      entry.name = userProfile.callsign;
+      saveLeaderboard(lb);
+    }
+    renderLeaderboard();
+    showToast(`Call-sign updated to "${userProfile.callsign}"`);
+  }
+}
+
+function renderLeaderboard() {
+  const lb = getLeaderboard();
+  const listEl = $("lbList");
+  const gateBanner = $("lbGateBanner");
+  const userBanner = $("lbUserBanner");
+
+  if (!userProfile) {
+    gateBanner.style.display = "flex";
+    userBanner.style.display = "none";
+    
+    const previewList = lb.slice(0, 5);
+    listEl.innerHTML = previewList.map((entry, idx) => `
+      <div class="lb-row">
+        <span class="lb-rank">${entry.badge || `#${idx + 1}`}</span>
+        <span class="lb-name">${entry.name}</span>
+        <div class="lb-meta">
+          <div class="lb-score">${entry.score} PTS</div>
+          <div class="lb-time">${entry.time.toFixed(1)}s · ${entry.accuracy}</div>
+        </div>
+      </div>
+    `).join("") + `
+      <div style="text-align:center;padding:12px 8px;color:#8b97bc;font-size:11px;font-family:'JetBrains Mono',monospace;">
+        🔒 Positions #6–50 locked. Sign in to join board & submit today's score!
+      </div>
+    `;
+  } else {
+    gateBanner.style.display = "none";
+    userBanner.style.display = "flex";
+
+    const callsign = userProfile.callsign || (userProfile.email ? userProfile.email.split("@")[0] : "Agent");
+    $("lbUserName").textContent = callsign;
+
+    const userEntry = lb.find(e => e.isUser);
+    if (userEntry) {
+      $("lbUserStat").textContent = `Today: ${userEntry.score} PTS (${userEntry.time.toFixed(1)}s) · Rank #${userEntry.rank}`;
+    } else {
+      $("lbUserStat").textContent = `Case #${dailyCaseData.caseNumber}: Solve case to post your rank!`;
+    }
+
+    listEl.innerHTML = lb.map((entry) => `
+      <div class="lb-row ${entry.isUser ? 'highlight-user' : ''}">
+        <span class="lb-rank">${entry.rank <= 3 ? entry.badge : `#${entry.rank}`}</span>
+        <span class="lb-name">${entry.name} ${entry.isUser ? '<span style="font-size:10px;color:#39ff14;margin-left:4px;">(YOU)</span>' : ''}</span>
+        <div class="lb-meta">
+          <div class="lb-score">${entry.score} PTS</div>
+          <div class="lb-time">${entry.time.toFixed(1)}s · ${entry.accuracy}</div>
+        </div>
+      </div>
+    `).join("");
+  }
+}
+
+function submitScoreToLeaderboard(finalScore, elapsedSecs, firstTryCount, totalWon) {
+  if (!userProfile) return null;
+  const lb = getLeaderboard().filter(e => !e.isUser);
+  const callsign = userProfile.callsign || (userProfile.email ? userProfile.email.split("@")[0] : "Detective");
+
+  let accStr = `${totalWon}/4`;
+  if (firstTryCount === 4) accStr = "4/4 (1st try)";
+  else if (firstTryCount > 0) accStr = `${totalWon}/4 (${firstTryCount} 1st)`;
+
+  const userEntry = {
+    name: callsign,
+    score: finalScore,
+    time: Number(elapsedSecs.toFixed(1)),
+    accuracy: accStr,
+    badge: "🕵️",
+    isUser: true
+  };
+
+  lb.push(userEntry);
+  lb.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.time - b.time;
+  });
+
+  lb.forEach((e, idx) => {
+    e.rank = idx + 1;
+    if (idx === 0) e.badge = "👑";
+    else if (idx === 1) e.badge = "🥈";
+    else if (idx === 2) e.badge = "🥉";
+  });
+
+  saveLeaderboard(lb);
+  const myRank = lb.find(e => e.isUser)?.rank || 1;
+  return myRank;
+}
 
 const $ = id => document.getElementById(id);
 
@@ -1544,13 +2003,15 @@ async function init() {
   updateSoundButton();
   $("btnSound").onclick = toggleSound;
   $("btnStats").onclick = openStatsModal;
+  if ($("btnLeaderboard")) $("btnLeaderboard").onclick = openLeaderboardModal;
 
   // Load saved profile
   try {
     const saved = localStorage.getItem("imposter_user");
     if (saved) {
       userProfile = JSON.parse(saved);
-      $("btnUserAccount").textContent = userProfile.email ? userProfile.email.split("@")[0] : "Account";
+      const callsign = userProfile.callsign || (userProfile.email ? userProfile.email.split("@")[0] : "Account");
+      $("btnUserAccount").textContent = callsign;
     }
   } catch (_) {}
 
@@ -1610,6 +2071,7 @@ function switchCase(caseId) {
   roundResults = [];
   $("viewResults").style.display = "none";
   $("viewPlaying").style.display = "block";
+  caseStartTime = null;
   loadRound(0);
   showToast(`Loaded ${dailyCaseData.title}`);
 }
@@ -1619,6 +2081,10 @@ function loadRound(rIndex) {
   selectedCardId = null;
   attemptsUsedThisRound = 0;
   isCurrentRoundOver = false;
+
+  if (rIndex === 0 && !caseStartTime) {
+    startSpeedTimer();
+  }
 
   const round = dailyCaseData.rounds[rIndex];
 
@@ -1766,6 +2232,8 @@ $("btnNextRound").onclick = () => {
 
 function showFinalResults() {
   playSound("victory");
+  const finalSecs = stopSpeedTimer();
+
   $("viewPlaying").style.display = "none";
   $("viewResults").style.display = "flex";
 
@@ -1774,38 +2242,44 @@ function showFinalResults() {
   const secondTryCount = roundResults.filter(r => r.solved && r.attempts === 2).length;
   const thirdTryCount = roundResults.filter(r => r.solved && r.attempts === 3).length;
 
-  // Weighted score: 1st try = 100pts, 2nd try = 65pts, 3rd try = 35pts, fail = 0pts. Max 400pts.
-  const totalScore = (firstTryCount * 100) + (secondTryCount * 65) + (thirdTryCount * 35);
+  // Base forensic score: 1st try = 100pts, 2nd try = 65pts, 3rd try = 35pts, fail = 0pts (Max 400pts)
+  const baseScore = (firstTryCount * 100) + (secondTryCount * 65) + (thirdTryCount * 35);
+  // Speed bonus: up to 100 bonus pts based on solve time, weighted by accuracy
+  const speedBonus = calculateSpeedBonus(finalSecs, totalWon);
+  const finalScore = baseScore + speedBonus; // Max 500 PTS
+
+  $("summaryTimeVal").textContent = `${finalSecs.toFixed(1)}s`;
+  $("summarySpeedBonusVal").textContent = `+${speedBonus} pts`;
 
   let stars = "⭐⭐⭐⭐";
   let title = "Grand Detective 🕵️‍♂️";
-  let desc = `You unmasked ${totalWon} of 4 AI imposters today.`;
+  let desc = `You unmasked ${totalWon} of 4 AI imposters in ${finalSecs.toFixed(1)}s today.`;
 
   if (firstTryCount === 4) {
-    $("summaryScoreBadge").innerHTML = `FLAWLESS 4/4 <span style="font-size:16px;color:#39ff14;display:block;margin-top:4px;">400 / 400 PTS · ALL 1ST TRY</span>`;
+    $("summaryScoreBadge").innerHTML = `FLAWLESS 4/4 <span style="font-size:16px;color:#39ff14;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "⭐⭐⭐⭐⭐";
     title = "Master Detective · Flawless Run 🏆";
-    desc = "Incredible forensics! You aced all 4 rounds on your very first guess without a single strike!";
+    desc = `Incredible forensics in ${finalSecs.toFixed(1)}s! You aced all 4 rounds on your first guess (+${speedBonus} speed bonus)!`;
   } else if (totalWon === 4) {
-    $("summaryScoreBadge").innerHTML = `4 / 4 CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${totalScore} / 400 PTS (${firstTryCount} Aced 1st Try)</span>`;
+    $("summaryScoreBadge").innerHTML = `4 / 4 CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "⭐⭐⭐⭐";
     title = "All 4 Imposters Caught 🎯";
-    desc = `You caught every single AI imposter today! (${firstTryCount} on 1st guess, ${secondTryCount} on 2nd, ${thirdTryCount} on 3rd).`;
+    desc = `You caught every single AI imposter in ${finalSecs.toFixed(1)}s! (${firstTryCount} on 1st guess, +${speedBonus} speed bonus).`;
   } else if (totalWon === 3) {
-    $("summaryScoreBadge").innerHTML = `3 / 4 CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${totalScore} / 400 PTS</span>`;
+    $("summaryScoreBadge").innerHTML = `3 / 4 CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "⭐⭐⭐";
     title = "Sharp Sleuth 🔍";
-    desc = "3 out of 4 AI imposters caught. You outsmarted modern AI diffusion models on almost every stage.";
+    desc = `3 out of 4 AI imposters caught in ${finalSecs.toFixed(1)}s (+${speedBonus} speed bonus). You outsmarted AI models on almost every stage.`;
   } else if (totalWon === 2) {
-    $("summaryScoreBadge").innerHTML = `2 / 4 CLEARED <span style="font-size:16px;color:#ffaa00;display:block;margin-top:4px;">${totalScore} / 400 PTS</span>`;
+    $("summaryScoreBadge").innerHTML = `2 / 4 CLEARED <span style="font-size:16px;color:#ffaa00;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "⭐⭐";
     title = "Keen Observer 👀";
-    desc = "2 out of 4 AI imposters detected. The boundary between real photography and AI generation is getting razor thin.";
+    desc = `2 out of 4 AI imposters detected in ${finalSecs.toFixed(1)}s (+${speedBonus} speed bonus). The boundary between photography and AI is getting razor thin.`;
   } else {
-    $("summaryScoreBadge").innerHTML = `${totalWon} / 4 CLEARED <span style="font-size:16px;color:#ff3344;display:block;margin-top:4px;">${totalScore} / 400 PTS</span>`;
+    $("summaryScoreBadge").innerHTML = `${totalWon} / 4 CLEARED <span style="font-size:16px;color:#ff3344;display:block;margin-top:4px;">${finalScore} / 500 PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
     stars = "💀";
     title = "Tricked by AI 🤖";
-    desc = "AI diffusion artifacts fooled your eye today. Come back tomorrow for a fresh daily case!";
+    desc = `AI diffusion artifacts fooled your eye today. Come back tomorrow for a fresh daily case!`;
   }
 
   $("starsRow").textContent = stars;
@@ -1827,6 +2301,14 @@ function showFinalResults() {
     `;
   }).join("");
 
+  // Submit to Leaderboard if signed in
+  if (userProfile) {
+    const myRank = submitScoreToLeaderboard(finalScore, finalSecs, firstTryCount, totalWon);
+    if (myRank) {
+      showToast(`🏆 Score submitted! You are Rank #${myRank} on the Daily Leaderboard!`);
+    }
+  }
+
   // Update & Save Player Stats
   playerStats.played++;
   if (totalWon >= 3 || firstTryCount === 4) {
@@ -1842,7 +2324,7 @@ function showFinalResults() {
   playerStats.catches2 += secondTryCount;
   playerStats.catches3 += thirdTryCount;
   playerStats.strikes += (4 - totalWon);
-  playerStats.history[dailyCaseData.id] = { won: totalWon, score: totalScore, date: new Date().toISOString() };
+  playerStats.history[dailyCaseData.id] = { won: totalWon, score: finalScore, time: finalSecs, date: new Date().toISOString() };
   saveStats();
 
   renderArchiveList();
@@ -1854,10 +2336,11 @@ function renderArchiveList() {
 
   archiveList.innerHTML = allCases.map(c => {
     const isCurrent = c.id === dailyCaseData.id;
+    const badgeText = c.eventBadge ? `<span style="color:#ffaa00;font-size:10px;font-weight:800;margin-left:6px;">${c.eventBadge}</span>` : '';
     return `
       <div class="archive-item ${isCurrent ? 'active-case' : ''}">
         <div class="arch-info">
-          <h4>${c.title}</h4>
+          <h4>${c.title} ${badgeText}</h4>
           <p>${c.rounds.map(r => r.shortName).join(' · ')}</p>
         </div>
         <div>
@@ -1904,7 +2387,9 @@ $("lightboxStage").onclick = () => {
 function getDailyShareText() {
   const totalWon = roundResults.filter(r => r.solved).length;
   const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
-  const totalScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 65) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 35);
+  const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 65) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 35);
+  const speedBonus = calculateSpeedBonus(elapsedSeconds, totalWon);
+  const finalScore = baseScore + speedBonus;
 
   const rows = roundResults.map(r => {
     if (r.solved && r.attempts === 1) return `R${r.roundIndex} · ${r.theme}: 🟩 (1st try)`;
@@ -1913,9 +2398,9 @@ function getDailyShareText() {
     return `R${r.roundIndex} · ${r.theme}: 🟥 (fooled)`;
   }).join("\n");
 
-  const grade = firstTryCount === 4 ? "FLAWLESS 4/4 ⭐⭐⭐⭐⭐" : `${totalWon}/4 Imposters Caught (${totalScore}/400 pts)`;
+  const grade = firstTryCount === 4 ? `FLAWLESS 4/4 ⭐⭐⭐⭐⭐ (${finalScore}/500 PTS)` : `${totalWon}/4 Imposters Caught (${finalScore}/500 PTS)`;
 
-  return `Imposter Daily Case #${dailyCaseData.caseNumber}\n${grade}\n\n${rows}\n\nCan you spot which photo is AI?\nPlay: ${window.location.origin}`;
+  return `Imposter Case #${dailyCaseData.caseNumber} ${dailyCaseData.eventBadge || ''}\n${grade}\n⚡ Time: ${elapsedSeconds.toFixed(1)}s (+${speedBonus} Speed Bonus)\n\n${rows}\n\nCan you spot which photo is AI?\nPlay: ${window.location.origin}`;
 }
 
 $("btnCopyGrid").onclick = async () => {
@@ -1962,34 +2447,36 @@ $("btnShareStory").onclick = async () => {
 
   const totalWon = roundResults.filter(r => r.solved).length;
   const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
-  const totalScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 65) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 35);
+  const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 65) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 35);
+  const speedBonus = calculateSpeedBonus(elapsedSeconds, totalWon);
+  const finalScore = baseScore + speedBonus;
 
   // Score Area
   if (firstTryCount === 4) {
     ctx.font = "800 100px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#39ff14";
-    ctx.fillText("FLAWLESS", 540, 460);
+    ctx.fillText("FLAWLESS", 540, 450);
 
     ctx.font = "700 36px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText("4 / 4 ACED ON 1ST TRY ⭐⭐⭐⭐⭐", 540, 540);
+    ctx.fillText("4 / 4 ACED ON 1ST TRY ⭐⭐⭐⭐⭐", 540, 520);
 
-    ctx.font = "600 28px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillStyle = "#8fa0cb";
-    ctx.fillText("400 / 400 Points · Perfect Detection", 540, 595);
+    ctx.font = "700 32px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "#00f0ff";
+    ctx.fillText(`⚡ ${elapsedSeconds.toFixed(1)}s · ${finalScore} / 500 PTS`, 540, 585);
   } else {
     ctx.font = "800 110px 'JetBrains Mono', monospace";
     ctx.fillStyle = totalWon >= 3 ? "#39ff14" : (totalWon === 2 ? "#ffde59" : "#ff3344");
-    ctx.fillText(`${totalWon} / 4`, 540, 460);
+    ctx.fillText(`${totalWon} / 4`, 540, 450);
 
     ctx.font = "700 36px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#ffffff";
     const subText = totalWon === 4 ? `4 / 4 CAUGHT · ${firstTryCount} ON 1ST TRY` : (totalWon >= 2 ? `${totalWon} IMPOSTERS CAUGHT` : `FOOLED BY AI`);
-    ctx.fillText(subText, 540, 540);
+    ctx.fillText(subText, 540, 520);
 
-    ctx.font = "600 28px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillStyle = "#8fa0cb";
-    ctx.fillText(`${totalScore} / 400 Points`, 540, 595);
+    ctx.font = "700 32px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "#00f0ff";
+    ctx.fillText(`⚡ ${elapsedSeconds.toFixed(1)}s · ${finalScore} / 500 PTS`, 540, 585);
   }
 
   // 4 Round Blocks in Card (Plenty of vertical breathing room, zero text smushing)
@@ -1997,7 +2484,7 @@ $("btnShareStory").onclick = async () => {
   const boxH = 140;
   const gap = 24;
   const startX = 110;
-  const startY = 720;
+  const startY = 700;
 
   roundResults.forEach((r, i) => {
     const y = startY + i * (boxH + gap);
@@ -2079,11 +2566,31 @@ $("btnUserAccount").onclick = () => openAuthModal("Account");
 function simulateAuth(provider) {
   playSound("tap");
   const email = $("authEmail").value || "detective@example.com";
-  userProfile = { email, provider, streak: 3, casesSolved: 14 };
+  const callsign = email.split("@")[0];
+  userProfile = { email, provider, callsign, streak: 3, casesSolved: 14 };
   localStorage.setItem("imposter_user", JSON.stringify(userProfile));
-  $("btnUserAccount").textContent = email.split("@")[0];
+  $("btnUserAccount").textContent = callsign;
   closeAuthModal();
-  showToast(`Signed in with ${provider}! Archive unlocked.`);
+  showToast(`Signed in as ${callsign}! Full leaderboard & archives unlocked.`);
+
+  // If user completed a game in this session, submit score now
+  if ($("viewResults").style.display !== "none" && roundResults.length > 0) {
+    const totalWon = roundResults.filter(r => r.solved).length;
+    const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
+    const secondTryCount = roundResults.filter(r => r.solved && r.attempts === 2).length;
+    const thirdTryCount = roundResults.filter(r => r.solved && r.attempts === 3).length;
+    const baseScore = (firstTryCount * 100) + (secondTryCount * 65) + (thirdTryCount * 35);
+    const speedBonus = calculateSpeedBonus(elapsedSeconds, totalWon);
+    const myRank = submitScoreToLeaderboard(baseScore + speedBonus, elapsedSeconds, firstTryCount, totalWon);
+    if (myRank) {
+      showToast(`🏆 Score submitted! Rank #${myRank} on the Daily Leaderboard!`);
+    }
+  }
+
+  // Refresh leaderboard if open
+  if ($("leaderboardModal").classList.contains("open")) {
+    renderLeaderboard();
+  }
 }
 
 function showToast(msg) {

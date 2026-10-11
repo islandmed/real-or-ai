@@ -4,7 +4,7 @@
     "caseNumber": 66,
     "isSpecialEvent": true,
     "eventBadge": "🎃 HALLOWEEN SPECIAL",
-    "title": "Halloween Special Case #66",
+    "title": "Halloween Special Case #66: The Haunted Legacy",
     "totalRounds": 4,
     "rounds": [
       {
@@ -154,11 +154,319 @@
     ]
   },
   {
+    "id": "halloween_case_67",
+    "caseNumber": 67,
+    "isSpecialEvent": true,
+    "eventBadge": "🎃 HALLOWEEN PACK #67",
+    "title": "Halloween Case #67: Monsters & Mythos",
+    "totalRounds": 4,
+    "rounds": [
+      {
+        "roundIndex": 1,
+        "theme": "Round 1 of 4 · Gothic Stone Gargoyles",
+        "tagline": "Ancient medieval stonework. 3 real cathedral gargoyles; 1 algorithmic stone hallucination.",
+        "shortName": "GARGOYLES",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case67/r1_real_a.jpg",
+            "isAi": false,
+            "title": "Cathedral Ledge Gargoyle",
+            "details": "AUTHENTIC ARCHITECTURE. Real European limestone carving, organic centuries-old rain erosion channels, and authentic stone porosity."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case67/r1_real_b.jpg",
+            "isAi": false,
+            "title": "Gothic Grotesque Water Spout",
+            "details": "AUTHENTIC ARCHITECTURE. Genuine hand-chiseled sculptor tool marks and natural mineral oxidation patina."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case67/r1_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative diffusion. Look closely at the claws grasping the stone parapet: asymmetric digits, repeating stone texture noise, and uncanny wing membrane merging into the cathedral wall."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case67/r1_real_c.jpg",
+            "isAi": false,
+            "title": "Medieval Belfry Guardian",
+            "details": "AUTHENTIC ARCHITECTURE. Authentic atmospheric overcast lighting and genuine moss growth in the stone crevices."
+          }
+        ]
+      },
+      {
+        "roundIndex": 2,
+        "theme": "Round 2 of 4 · Subterranean Catacomb Skulls",
+        "tagline": "Aged ossuary relics. 3 real historic crypt walls; 1 neural bone synthesis.",
+        "shortName": "CATACOMBS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case67/r2_real_a.jpg",
+            "isAi": false,
+            "title": "Paris Catacombs Wall",
+            "details": "AUTHENTIC OSTEOLOGY. Real cranial suture lines, organic bone density variations, and authentic subterranean calcium decay."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case67/r2_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Diffusion model. Under close inspection, note the repetitive skull eye socket depths, merged nasal cavities, and unnaturally geometric crossbone stack patterns in the archway."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case67/r2_real_b.jpg",
+            "isAi": false,
+            "title": "Sedlec Ossuary Relics",
+            "details": "AUTHENTIC OSTEOLOGY. Genuine historic osteological arrangements with authentic candlelight falloff and real dust."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case67/r2_real_c.jpg",
+            "isAi": false,
+            "title": "Crypt Bone Vault",
+            "details": "AUTHENTIC OSTEOLOGY. Physically verified underground limestone arches with natural low-light shadow depth."
+          }
+        ]
+      },
+      {
+        "roundIndex": 3,
+        "theme": "Round 3 of 4 · Ravens & Midnight Crows",
+        "tagline": "Iridescent black feathers and corvid intelligence. 3 real birds; 1 synthetic avian render.",
+        "shortName": "RAVENS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case67/r3_real_a.jpg",
+            "isAi": false,
+            "title": "Autumn Branch Raven",
+            "details": "AUTHENTIC WILDLIFE. Natural iridescent feather barbules, genuine talon anatomy, and real wood bark lichen."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case67/r3_real_b.jpg",
+            "isAi": false,
+            "title": "Calling Black Crow",
+            "details": "AUTHENTIC WILDLIFE. Physically accurate corvid cornea light reflection, natural nasal bristle tufts, and genuine outdoor depth of field."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case67/r3_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative diffusion. Inspect the foot claws gripping the branch: unnatural digital talon curvature, melted moss texture, and feathers blurring artificially into background bokeh."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case67/r3_real_c.jpg",
+            "isAi": false,
+            "title": "Perched Forest Raven",
+            "details": "AUTHENTIC WILDLIFE. High-speed shutter capture showing realistic aerodynamic feather separation and natural eye moisture."
+          }
+        ]
+      },
+      {
+        "roundIndex": 4,
+        "theme": "Round 4 of 4 · Foggy Haunted Woodlands",
+        "tagline": "Atmospheric mist and twilight tree silhouettes. 3 real forests; 1 neural diffusion dream.",
+        "shortName": "FORESTS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case67/r4_real_a.jpg",
+            "isAi": false,
+            "title": "Misty Autumn Trail",
+            "details": "AUTHENTIC LANDSCAPE. Natural aerial perspective with physically accurate mist light scattering and real damp needle soil."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case67/r4_real_b.jpg",
+            "isAi": false,
+            "title": "Dusk Pine Forest Fog",
+            "details": "AUTHENTIC LANDSCAPE. Real pine trunk bark texture, organic undergrowth ferns, and natural atmospheric depth falloff."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case67/r4_real_c.jpg",
+            "isAi": false,
+            "title": "Sunlight Piercing Fog",
+            "details": "AUTHENTIC LANDSCAPE. Genuine optical lens flare through morning tree silhouettes without algorithmic distortion."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case67/r4_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative diffusion. Look closely at the distant background tree trunks: unnatural trunk merging into white mist, repeating branch fractal patterns, and floating foliage artifacts."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "halloween_case_68",
+    "caseNumber": 68,
+    "isSpecialEvent": true,
+    "eventBadge": "🎃 HALLOWEEN PACK #68",
+    "title": "Halloween Case #68: Witchcraft & Harvest Curios",
+    "totalRounds": 4,
+    "rounds": [
+      {
+        "roundIndex": 1,
+        "theme": "Round 1 of 4 · Apothecary Cauldrons & Potions",
+        "tagline": "Dark herbs, vials, and candle wax. 3 real still-life setups; 1 synthetic witch's brew.",
+        "shortName": "POTIONS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case68/r1_real_a.jpg",
+            "isAi": false,
+            "title": "Herbalist Apothecary Table",
+            "details": "AUTHENTIC STILL LIFE. Genuine dried botanicals, authentic glass vial liquid meniscus, and natural candlelight shadow softness."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case68/r1_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative model. Look closely at the handwritten labels on the glass vials: pseudo-script letterforms, cork stoppers merging into glass rims, and candle flame floating without a distinct wick base."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case68/r1_real_b.jpg",
+            "isAi": false,
+            "title": "Witches' Brew Pot & Smoke",
+            "details": "AUTHENTIC STILL LIFE. Real dry-ice vapor trails, genuine cast-iron surface pitting, and physically accurate room reflections."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case68/r1_real_c.jpg",
+            "isAi": false,
+            "title": "Potion Bottles & Dried Blooms",
+            "details": "AUTHENTIC STILL LIFE. Real organic pressed flowers, genuine twine knots around bottles, and real wood grain tabletop."
+          }
+        ]
+      },
+      {
+        "roundIndex": 2,
+        "theme": "Round 2 of 4 · Jack-o'-Lantern Porches & Steps",
+        "tagline": "Festive autumn twilight porches. 3 real decorated front doors; 1 neural doorstep.",
+        "shortName": "PORCHES",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case68/r2_real_a.jpg",
+            "isAi": false,
+            "title": "Twilight Jack-o'-Lantern Steps",
+            "details": "AUTHENTIC DECORATION. Genuine knife-cut pumpkin rind bevels, real outdoor wooden stairs, and organic maple leaves."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case68/r2_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative diffusion. Inspect the porch railings and door garland: repeating leaf cluster patterns, glowing pumpkins with floating candle flames, and impossible doorknob anatomy."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case68/r2_real_b.jpg",
+            "isAi": false,
+            "title": "Harvest Porch Display",
+            "details": "AUTHENTIC DECORATION. Real dried corn stalks, authentic outdoor string lighting cables, and natural evening shadow casting."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case68/r2_real_c.jpg",
+            "isAi": false,
+            "title": "Halloween Lantern Entryway",
+            "details": "AUTHENTIC DECORATION. Natural doorframe perspective, genuine painted wood siding, and authentic warm window glow."
+          }
+        ]
+      },
+      {
+        "roundIndex": 3,
+        "theme": "Round 3 of 4 · Dew-Drop Spider Webs",
+        "tagline": "Tensile silk threads and morning condensation. 3 real orb webs; 1 neural web matrix.",
+        "shortName": "SPIDER WEBS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case68/r3_real_a.jpg",
+            "isAi": false,
+            "title": "Morning Dew Orb Web",
+            "details": "AUTHENTIC NATURE. Organic silk tensile elasticity, physically accurate optical water droplet refraction, and natural wind vibration."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case68/r3_real_b.jpg",
+            "isAi": false,
+            "title": "Autumn Garden Cobweb",
+            "details": "AUTHENTIC NATURE. Real spider web geometry with natural wind breakage lines and genuine morning sunlight flare."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case68/r3_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative model. Look at the concentric web rings: impossible mathematical thread cross-connections, uniform droplet spacing, and unnatural spider leg anatomy in center hub."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case68/r3_real_c.jpg",
+            "isAi": false,
+            "title": "Glistening Shrub Spider Web",
+            "details": "AUTHENTIC NATURE. Genuine outdoor shrub framing with natural micro-depth of field and true optical lens bokeh."
+          }
+        ]
+      },
+      {
+        "roundIndex": 4,
+        "theme": "Round 4 of 4 · Antique Grimoires & Curios",
+        "tagline": "Aged parchment and library candlelight. 3 real historical tomes; 1 synthetic book of shadows.",
+        "shortName": "GRIMOIRES",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/case68/r4_real_a.jpg",
+            "isAi": false,
+            "title": "Aged Leather-Bound Tome",
+            "details": "AUTHENTIC ARTIFACT. Real antique book with historical paper fiber edges, genuine ink fading, and authentic binding wear."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/case68/r4_real_b.jpg",
+            "isAi": false,
+            "title": "Open Parchment & Quill",
+            "details": "AUTHENTIC ARTIFACT. Genuine historical manuscript with natural ink bleeding and organic leather spine creasing."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/case68/r4_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Diffusion generation. Inspect the printed Latin text: pseudo-lettering with impossible characters, page margins melting into the table, and candle flame without a true wick base."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/case68/r4_real_c.jpg",
+            "isAi": false,
+            "title": "Antique Library Desk",
+            "details": "AUTHENTIC ARTIFACT. Real library bookshelf backdrop with genuine optical lens bokeh and aged book collection."
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "archive_case_65",
     "caseNumber": 65,
     "isSpecialEvent": false,
     "eventBadge": "CASE #65",
-    "title": "Master Forensics Case #65",
+    "title": "Master Forensics Case #65: Portraits, Wildlife & Cities",
     "totalRounds": 4,
     "rounds": [
       {
