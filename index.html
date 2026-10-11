@@ -238,6 +238,11 @@
     box-shadow: 0 2px 0 #000;
     transition: all 0.1s;
     white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    display: inline-block;
   }
   .user-btn:hover { background: var(--neon-cyan); color: #000; border-color: #fff; }
   .user-btn:active { transform: translateY(1px); box-shadow: none; }
@@ -2637,7 +2642,10 @@
         <div class="lb-user-name" id="lbUserName">Agent Phantom</div>
         <div class="lb-user-stat" id="lbUserStat">Today: 485 PTS (24.2s) · Rank #7</div>
       </div>
-      <button class="lb-edit-btn" onclick="promptChangeName()">Edit Call-Sign ✏️</button>
+      <div style="display:flex;gap:5px;align-items:center;">
+        <button class="lb-edit-btn" onclick="promptChangeName()" title="Edit Detective Call-Sign">Edit ✏️</button>
+        <button class="lb-edit-btn" onclick="rerollDetectiveCallsign()" title="Roll Random Funny Call-Sign" style="padding:4px 8px;font-size:12px;">🎲</button>
+      </div>
     </div>
 
     <!-- Leaderboard Table -->
@@ -3133,23 +3141,85 @@ function calculateSpeedBonus(secs, resultsOrCount) {
 }
 
 // Daily Hall of Fame Leaderboard (Recalibrated for challenging speed curve)
+// Funny, unique AI Detective Rival Roster
 const DEFAULT_LEADERBOARD = [
-  { rank: 1, name: "CipherWolf", score: 486, time: 9.8, accuracy: "4/4 (1st try)", badge: "👑" },
-  { rank: 2, name: "PixelForensics", score: 474, time: 14.2, accuracy: "4/4 (1st try)", badge: "🥈" },
-  { rank: 3, name: "NeonSpecter", score: 464, time: 18.6, accuracy: "4/4 (1st try)", badge: "🥉" },
-  { rank: 4, name: "SleuthRaven", score: 455, time: 23.4, accuracy: "4/4 (1st try)", badge: "🎃" },
-  { rank: 5, name: "AgentZero", score: 446, time: 29.1, accuracy: "4/4 (1st try)", badge: "🕵️" },
-  { rank: 6, name: "ShadowLens", score: 436, time: 35.8, accuracy: "4/4 (1st try)", badge: "🦇" },
-  { rank: 7, name: "OpticHunter", score: 426, time: 42.5, accuracy: "4/4 (1st try)", badge: "⚡" },
-  { rank: 8, name: "GhostProtocol", score: 376, time: 48.0, accuracy: "4/4 (2nd try)", badge: "👻" },
-  { rank: 9, name: "ByteBuster", score: 369, time: 54.2, accuracy: "4/4 (2nd try)", badge: "🔍" },
-  { rank: 10, name: "VaporGlitch", score: 265, time: 63.1, accuracy: "3/4", badge: "💀" }
+  { rank: 1, name: "SirSquintsALot", score: 486, time: 9.8, accuracy: "4/4 (1st try)", badge: "👑" },
+  { rank: 2, name: "SixFingerSam", score: 474, time: 14.2, accuracy: "4/4 (1st try)", badge: "🥈" },
+  { rank: 3, name: "InspectorPigeon", score: 464, time: 18.6, accuracy: "4/4 (1st try)", badge: "🥉" },
+  { rank: 4, name: "SherlockBones", score: 455, time: 23.4, accuracy: "4/4 (1st try)", badge: "🎃" },
+  { rank: 5, name: "ArtifactAndy", score: 446, time: 29.1, accuracy: "4/4 (1st try)", badge: "🕵️" },
+  { rank: 6, name: "DeepfakeDundee", score: 436, time: 35.8, accuracy: "4/4 (1st try)", badge: "🦇" },
+  { rank: 7, name: "TeethCounter-99", score: 426, time: 42.5, accuracy: "4/4 (1st try)", badge: "⚡" },
+  { rank: 8, name: "OverthinkingOtter", score: 376, time: 48.0, accuracy: "4/4 (2nd try)", badge: "👻" },
+  { rank: 9, name: "WeirdHandsWilly", score: 369, time: 54.2, accuracy: "4/4 (2nd try)", badge: "🔍" },
+  { rank: 10, name: "CadetClueless", score: 265, time: 63.1, accuracy: "3/4", badge: "💀" }
 ];
+
+// Funny, quirky, unique detective aliases & combinatorial pools
+const FUNNY_HERO_TITLES = [
+  "SirSquintsALot", "SixFingerSam", "InspectorPigeon", "DetectiveDonut",
+  "ArtifactAndy", "DeepfakeDundee", "WeirdHandsWilly", "TeethCounter",
+  "HallucinationHarry", "SherlockBones", "ColumbosDog", "CaptainObvious",
+  "Agent404", "PixelSniffer", "PanicPixel", "CtrlAltDefeat",
+  "OverthinkingOtter", "ChaoticCapybara", "SnoopRaccoon", "CadetClueless",
+  "BlurrySherlock", "EyeballSkeptic", "EarlobeSheriff", "QuantumPotato",
+  "PromptWhisperer", "AccidentalSleuth", "GlitchGoblin", "SubtleDeepfake",
+  "NoHandsNoProblem", "DerpyForensics", "ParanoidPigeon", "SleepyOpossum",
+  "BaffledWalrus", "CaffeinatedCorgi", "ProfessorPanic", "FeralForensics",
+  "GlitchWhisperer", "SuspiciousWaffle", "MicroLensMothman", "DrPixelBuster",
+  "CluelessChupacabra", "DeputyDerp", "SassySquid", "PixelatedPlatypus"
+];
+
+const FUNNY_ADJECTIVES = [
+  "Caffeinated", "Suspicious", "Sleepy", "Sneaky", "Clueless",
+  "Overthinking", "Paranoid", "Squinting", "Glitchy", "Chaotic",
+  "Spooky", "Feral", "Derpy", "Accidental", "Grumpy",
+  "Hyper", "Cryptic", "Panicky", "Sassy", "Dramatic",
+  "Dubious", "Baffled", "Unbothered", "Quantum", "Snoopy",
+  "Zesty", "Vengeful", "Existential", "Unfiltered", "Cranky"
+];
+
+const FUNNY_NOUNS = [
+  "Capybara", "Pigeon", "Gremlin", "Opossum", "Ferret",
+  "Potato", "Walrus", "Wombat", "Raccoon", "Duck",
+  "Otter", "Toaster", "Cactus", "Llama", "Noodle",
+  "Badger", "Squid", "Penguin", "Mothman", "Hamster",
+  "Crow", "Frog", "Corgi", "Donut", "Waffle",
+  "Pickle", "Platypus", "Chihuahua", "Bagel", "Burrito"
+];
+
+function generateFunnyCallsign() {
+  const luckyNum = Math.floor(1 + Math.random() * 99);
+  const padNum = luckyNum < 10 ? `0${luckyNum}` : `${luckyNum}`;
+  if (Math.random() < 0.5) {
+    const hero = FUNNY_HERO_TITLES[Math.floor(Math.random() * FUNNY_HERO_TITLES.length)];
+    return Math.random() < 0.35 ? `${hero}-${padNum}` : hero;
+  } else {
+    const adj = FUNNY_ADJECTIVES[Math.floor(Math.random() * FUNNY_ADJECTIVES.length)];
+    const noun = FUNNY_NOUNS[Math.floor(Math.random() * FUNNY_NOUNS.length)];
+    return `${adj}${noun}-${padNum}`;
+  }
+}
 
 function getLeaderboard() {
   try {
     const raw = localStorage.getItem("imposter_leaderboard");
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Migrate legacy leaderboard if old placeholder names are present
+      if (parsed.some(e => e.name === "CipherWolf")) {
+        const userEntry = parsed.find(e => e.isUser);
+        const updated = JSON.parse(JSON.stringify(DEFAULT_LEADERBOARD));
+        if (userEntry) {
+          updated.push(userEntry);
+          updated.sort((a, b) => b.score - a.score || a.time - b.time);
+          updated.forEach((e, idx) => { e.rank = idx + 1; });
+        }
+        localStorage.setItem("imposter_leaderboard", JSON.stringify(updated.slice(0, 11)));
+        return updated.slice(0, 11);
+      }
+      return parsed;
+    }
   } catch (_) {}
   return JSON.parse(JSON.stringify(DEFAULT_LEADERBOARD));
 }
@@ -3172,11 +3242,12 @@ function closeLeaderboardModal() {
 
 function getDetectiveCallsign() {
   let saved = localStorage.getItem("imposter_callsign");
-  if (!saved) {
-    if (userProfile && userProfile.callsign) {
+  // If no saved callsign or if it was the old generic Agent-XXXX placeholder, upgrade to a funny unique one
+  if (!saved || /^Agent-\d{3,5}$/i.test(saved) || saved === "Agent Phantom") {
+    if (userProfile && userProfile.callsign && !/^Agent-\d{3,5}$/i.test(userProfile.callsign) && userProfile.callsign !== "Agent Phantom") {
       saved = userProfile.callsign;
     } else {
-      saved = `Agent-${Math.floor(1000 + Math.random() * 9000)}`;
+      saved = generateFunnyCallsign();
     }
     localStorage.setItem("imposter_callsign", saved);
   }
@@ -3185,7 +3256,7 @@ function getDetectiveCallsign() {
 
 function setDetectiveCallsign(name) {
   if (!name || !name.trim()) return;
-  const clean = name.trim().slice(0, 16);
+  const clean = name.trim().slice(0, 24);
   localStorage.setItem("imposter_callsign", clean);
   if (userProfile) {
     userProfile.callsign = clean;
@@ -3206,13 +3277,28 @@ function setDetectiveCallsign(name) {
   showToast(`Call-sign set to "${clean}"`);
 }
 
+function rerollDetectiveCallsign() {
+  playSound("tap");
+  const newName = generateFunnyCallsign();
+  setDetectiveCallsign(newName);
+  showToast(`🎲 Rolled Call-Sign: "${newName}"`);
+}
+
 function promptChangeName() {
+  playSound("tap");
   const curName = getDetectiveCallsign();
-  const newName = prompt("Enter your Detective Call-Sign:", curName);
-  if (newName && newName.trim()) {
-    setDetectiveCallsign(newName);
+  const suggestion = generateFunnyCallsign();
+  const input = prompt(`Enter Detective Call-Sign:\n(Leave blank to roll "${suggestion}")`, curName);
+  if (input === null) return;
+  const trimmed = input.trim();
+  if (!trimmed) {
+    setDetectiveCallsign(suggestion);
+    showToast(`🎲 Rolled Call-Sign: "${suggestion}"`);
+  } else {
+    setDetectiveCallsign(trimmed);
   }
 }
+
 
 function renderLeaderboard() {
   const lb = getLeaderboard();
@@ -3953,7 +4039,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.4').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=2.5').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4520,7 +4606,7 @@ function openAuthModal(packName) {
 function closeAuthModal() {
   $("authModal").classList.remove("open");
 }
-$("btnUserAccount").onclick = () => openAuthModal("Account");
+$("btnUserAccount").onclick = () => promptChangeName();
 
 function simulateAuth(provider) {
   playSound("tap");
