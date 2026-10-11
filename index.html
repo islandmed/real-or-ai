@@ -1051,17 +1051,7 @@
   .lb-user-info { flex: 1; }
   .lb-user-name { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 800; color: #fff; }
   .lb-user-stat { font-size: 11px; color: var(--neon-cyan); }
-  .lb-edit-btn {
-    all: unset;
-    cursor: pointer;
-    font-size: 10px;
-    font-family: 'JetBrains Mono', monospace;
-    color: #8b97bc;
-    border: 1px solid #3c4669;
-    padding: 3px 6px;
-    border-radius: 4px;
-  }
-  .lb-edit-btn:hover { color: #fff; border-color: #fff; }
+
   .lb-list { display: flex; flex-direction: column; gap: 6px; }
   .lb-row {
     display: flex;
@@ -1962,7 +1952,7 @@
       <button class="icon-btn" onclick="openHowModal()" title="How to Play">❓</button>
       <button class="icon-btn" id="btnSound" title="Toggle Sound">🔊</button>
       <button class="icon-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆</button>
-      <button class="user-pill-btn" id="btnUserAccount" onclick="promptChangeName()" title="Your Call-Sign">🕵️ Callsign</button>
+      <button class="user-pill-btn" id="btnUserAccount" onclick="openDossierModal()" title="Detective Career & Dossier">🕵️ Callsign</button>
     </div>
   </header>
 
@@ -2139,10 +2129,7 @@
         <div class="lb-user-name" id="lbUserName">Agent Phantom</div>
         <div class="lb-user-stat" id="lbUserStat">Today: 485 PTS (24.2s) · Rank #7</div>
       </div>
-      <div style="display:flex;gap:5px;align-items:center;">
-        <button class="lb-edit-btn" onclick="promptChangeName()" title="Edit Detective Call-Sign">Edit ✏️</button>
-        <button class="lb-edit-btn" onclick="rerollDetectiveCallsign()" title="Roll Random Funny Call-Sign" style="padding:4px 8px;font-size:12px;">🎲</button>
-      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#00f0ff;font-weight:700;padding:4px 8px;background:rgba(0,240,255,0.1);border-radius:6px;border:1px solid rgba(0,240,255,0.3);">YOU</div>
     </div>
 
     <!-- Leaderboard Table -->
@@ -2697,27 +2684,7 @@ function setDetectiveCallsign(name) {
   showToast(`Call-sign set to "${clean}"`);
 }
 
-function rerollDetectiveCallsign() {
-  playSound("tap");
-  const newName = generateFunnyCallsign();
-  setDetectiveCallsign(newName);
-  showToast(`🎲 Rolled Call-Sign: "${newName}"`);
-}
 
-function promptChangeName() {
-  playSound("tap");
-  const curName = getDetectiveCallsign();
-  const suggestion = generateFunnyCallsign();
-  const input = prompt(`Enter Detective Call-Sign:\n(Leave blank to roll "${suggestion}")`, curName);
-  if (input === null) return;
-  const trimmed = input.trim();
-  if (!trimmed) {
-    setDetectiveCallsign(suggestion);
-    showToast(`🎲 Rolled Call-Sign: "${suggestion}"`);
-  } else {
-    setDetectiveCallsign(trimmed);
-  }
-}
 
 
 function renderLeaderboard() {
@@ -3266,7 +3233,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.9').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.0').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3806,7 +3773,7 @@ function openAuthModal(packName) {
 function closeAuthModal() {
   $("authModal").classList.remove("open");
 }
-$("btnUserAccount").onclick = () => promptChangeName();
+$("btnUserAccount").onclick = () => openDossierModal();
 
 function simulateAuth(provider) {
   playSound("tap");
