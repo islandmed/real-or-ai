@@ -3,27 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Imposter Game · The Daily AI Detective Mystery</title>
+<title>Imposter Game · Spot the AI Fake · New Case Daily</title>
 <meta name="description" content="6 themed rounds. 4 photos each. Exactly 1 synthetic AI imposter per round. Can you spot all 6?">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="alternate icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <meta property="og:site_name" content="Imposter Game">
-<meta property="og:title" content="Imposter Game · {{SEASON_LABEL}} Edition · Daily AI Detective Mystery">
+<meta property="og:title" content="Imposter Game · {{SEASON_LABEL}} Edition · Can You Spot the AI Fake?">
 <meta property="og:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://playimposter.pages.dev/">
-<meta property="og:image" content="https://playimposter.pages.dev/og-image.png">
-<meta property="og:image:secure_url" content="https://playimposter.pages.dev/og-image.png">
+<meta property="og:url" content="https://play-imposter.lol/">
+<meta property="og:image" content="https://play-imposter.lol/og-image.png">
+<meta property="og:image:secure_url" content="https://play-imposter.lol/og-image.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Imposter Game: four photos. Three are real, one is AI. Can you spot the fake?">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Imposter Game · {{SEASON_LABEL}} Edition · Daily AI Detective Mystery">
+<meta name="twitter:title" content="Imposter Game · {{SEASON_LABEL}} Edition · Can You Spot the AI Fake?">
 <meta name="twitter:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
-<meta name="twitter:image" content="https://playimposter.pages.dev/og-image.png">
+<meta name="twitter:image" content="https://play-imposter.lol/og-image.png">
 <meta name="twitter:image:alt" content="Imposter Game: four photos. Three are real, one is AI. Can you spot the fake?">
 <meta name="theme-color" content="#0d0f18">
 <script type="application/ld+json">
@@ -2160,11 +2160,54 @@
     --on-accent: #1a1204;
     --pine: #2f9e64;
   }
-  html[data-season="christmas"] .halloween-badge { color: #ffe3a0; background: rgb(226 58 78 / 0.22); border-color: rgb(245 196 81 / 0.55); text-shadow: none; }
   html[data-season="christmas"] .app-header { border-bottom: 2px solid rgb(47 158 100 / 0.55); }
   html[data-season="thanksgiving"] .app-header { border-bottom: 2px solid rgb(232 105 42 / 0.5); }
   html[data-season="halloween"] .app-header,
   html:not([data-season]) .app-header { border-bottom: 2px solid rgb(180 92 255 / 0.45); }
+
+  /* ===== Header: big wordmark + filled season badge ===== */
+  .app-header {
+    background:
+      radial-gradient(120% 140% at 0% 0%, rgb(var(--badge-rgb) / 0.22), transparent 55%),
+      hsl(var(--h) calc(var(--sk) * 38%) 10.2%);
+    padding: 10px 12px;
+  }
+  .header-brand { gap: 5px; }
+  .logo-text {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 23px;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    background: linear-gradient(180deg, #ffffff 35%, var(--badge) 135%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 14px rgb(var(--badge-rgb) / 0.35));
+  }
+  .halloween-badge {
+    position: relative; overflow: hidden;
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.08em;
+    color: var(--on-accent);
+    background: linear-gradient(180deg, var(--badge), var(--badge2));
+    border: 0; border-radius: 999px; padding: 3px 10px;
+    text-shadow: none;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.12) inset, 0 0 16px rgb(var(--badge-rgb) / 0.45);
+  }
+  .halloween-badge::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+    transform: skewX(-20deg);
+    animation: badge-shine 4.5s ease-in-out 1s infinite;
+  }
+  @keyframes badge-shine { 0%, 70% { left: -60%; } 100% { left: 130%; } }
+  @media (prefers-reduced-motion: reduce) { .halloween-badge::after { animation: none; display: none; } }
+  @media (min-width: 600px) {
+    .header-brand { gap: 14px; }
+    .logo-text { font-size: 30px; }
+    .halloween-badge { font-size: 12px; padding: 4px 12px; }
+  }
+  html[data-season="christmas"] .halloween-badge { color: #ffe3a0; background: linear-gradient(180deg, #e23a4e, #b8202f); box-shadow: 0 0 0 1px rgb(245 196 81 / 0.5) inset, 0 0 16px rgb(226 58 78 / 0.5); }
+  html[data-season="christmas"] .logo-text { background-image: linear-gradient(180deg, #ffffff 35%, #f5c451 135%); }
   body { background:
       radial-gradient(1200px 600px at 50% -10%, rgb(var(--accent2-rgb) / 0.10), transparent 60%),
       radial-gradient(900px 500px at 50% 110%, rgb(var(--accent-rgb) / 0.07), transparent 60%),
@@ -2288,7 +2331,7 @@
         <span class="summary-score-badge" id="summaryScoreBadge">6 / 6 CLEARED</span>
         <span class="stars-row" id="starsRow">⭐⭐⭐⭐</span>
       </div>
-      <h2 class="result-title" id="resultTitle">Daily Mystery Solved!</h2>
+      <h2 class="result-title" id="resultTitle">Case Closed!</h2>
       <p class="result-desc" id="resultDesc">You unmasked all 6 AI imposters today.</p>
       <div class="results-streak" id="resultsStreak" hidden></div>
       <div class="challenge-result" id="challengeResult" hidden></div>
@@ -2316,7 +2359,7 @@
 
     <!-- 2. SMACK IN THE MIDDLE: Centerpiece Next Case Countdown -->
     <div class="next-case-box" id="nextCaseBox">
-      <div class="next-case-label">NEXT DAILY MYSTERY IN</div>
+      <div class="next-case-label">NEXT CASE DROPS IN</div>
       <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
       <div class="next-case-sub">A brand new forensic case with 6 unique themes drops every day at midnight.</div>
     </div>
@@ -2405,7 +2448,7 @@
       <h3 class="invite-title">Challenge a Friend</h3>
     </div>
     <p class="invite-desc">
-      Send today's mystery to your friends or group chat. See who has the sharper eye to spot the synthetic AI imposter!
+      Send today's case to your friends or group chat. See who has the sharper eye to spot the synthetic AI imposter!
     </p>
 
     <!-- Message preview -->
@@ -2416,7 +2459,7 @@
 
     <!-- Quick link copy -->
     <div class="invite-link-row">
-      <input type="text" class="invite-link-input" id="inviteShareLink" readonly value="https://playimposter.pages.dev">
+      <input type="text" class="invite-link-input" id="inviteShareLink" readonly value="https://play-imposter.lol">
       <button class="invite-btn-copy-link" id="btnCopyInviteLink" onclick="copyInviteLink()">
         <span>📋 Copy Link</span>
       </button>
@@ -3324,7 +3367,7 @@ const ALL_BADGES = [
   { id: "eagle_eye", icon: "🦅", name: "Eagle Eye", desc: "Flawless unmasking with 100% first-guess accuracy" },
   { id: "streak_master", icon: "🔥", name: "Streak Master", desc: "Maintain a 3-day active daily streak" },
   { id: "top_detective", icon: "🏆", name: "Top Detective", desc: "Score 600+ points in a single daily case" },
-  { id: "case_veteran", icon: "🎖️", name: "Case Veteran", desc: "Solve 7 daily mystery cases" }
+  { id: "case_veteran", icon: "🎖️", name: "Case Veteran", desc: "Solve 7 daily cases" }
 ];
 
 function getRankForXp(xp) {
@@ -3513,7 +3556,7 @@ function showAlreadyCompletedToday(record) {
   $("summaryScoreBadge").className = "summary-score-badge";
   $("starsRow").textContent = "⭐⭐⭐⭐";
   $("resultTitle").textContent = "Today's Case Complete! 🕵️";
-  $("resultDesc").textContent = "You already solved today's mystery. Come back tonight at midnight for the next case!";
+  $("resultDesc").textContent = "You already cracked today's case. A new one drops at midnight!";
   renderResultsExtras(score, time);
   startMidnightCountdown();
 }
@@ -3595,7 +3638,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.1').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.2').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4362,7 +4405,7 @@ function downloadCardImage() {
 function getInviteShareData() {
   const url = (window.location.origin && window.location.origin !== "file://" && !window.location.origin.includes("localhost"))
     ? window.location.origin
-    : "https://playimposter.pages.dev";
+    : "https://play-imposter.lol";
 
   const totalRounds = dailyCaseData?.rounds?.length || 6;
   const hasFinished = roundResults.length > 0 && roundResults.length === totalRounds;
@@ -4379,7 +4422,7 @@ function getInviteShareData() {
   return {
     url: url,
     title: "Can you spot the AI fake in Imposter?",
-    text: `🕵️ Can you spot the AI fake? In Imposter, 3 photos are real and 1 is a synthetic AI fake across 6 daily rounds.\n\nPlay today's mystery:\n${url}`
+    text: `🕵️ Can you spot the AI fake? In Imposter, 3 photos are real and 1 is a synthetic AI fake across 6 daily rounds.\n\nPlay today's case:\n${url}`
   };
 }
 
@@ -4496,7 +4539,7 @@ function showToast(msg) {
 const REMIND_API = 'https://imposter-push.human-number.workers.dev';
 const REMIND_VAPID = 'BD7PbiC_PAJysOwmqJVyikrzsLK2wdBy5NtE4C4IFlJmJhYm7WBRXaAd0LrX7wvZV_C1tFVVnDjtYadnn10SK0A';
 const REMIND_LS = 'imposterRemind';
-const REMIND_URL = 'https://playimposter.pages.dev';
+const REMIND_URL = 'https://play-imposter.lol';
 const remindIsIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const remindStandalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 const remindPushOK = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
@@ -4572,7 +4615,7 @@ function remindCalendar() {
   const ics = [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Imposter Game//Daily Reminder//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    'UID:daily-case-' + Date.now() + '@playimposter.pages.dev',
+    'UID:daily-case-' + Date.now() + '@play-imposter.lol',
     'DTSTAMP:' + utc(now),
     'DTSTART:' + local(start),   // floating time: the device's own time zone
     'DURATION:PT10M',

@@ -1,7 +1,7 @@
 // imposter-push: stores Web Push subscriptions in KV, sends one empty-payload
 // push per subscriber per day from an hourly cron. No payload means no
 // encryption: the service worker shows a fixed notification.
-const ORIGINS = ['https://playimposter.pages.dev', 'https://imposter-game-c73.pages.dev'];
+const ORIGINS = ['https://play-imposter.lol', 'https://www.play-imposter.lol', 'https://playimposter.pages.dev', 'https://imposter-game-c73.pages.dev'];
 const PUSH_HOSTS = [/^fcm\.googleapis\.com$/, /\.push\.services\.mozilla\.com$/, /\.notify\.windows\.com$/, /^web\.push\.apple\.com$/];
 
 function allowedOrigin(o) {

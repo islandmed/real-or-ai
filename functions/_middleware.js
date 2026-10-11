@@ -1,6 +1,6 @@
 // Personalised link preview for challenge links: /?c=<case>&s=<score>&t=<secs>&w=<won>
 // Rewrites og/twitter title and image on the HTML for "/" only; everything else passes through.
-const ORIGIN = "https://playimposter.pages.dev";
+const ORIGIN = "https://play-imposter.lol";
 const ALT = "Imposter Game: 3 photos are real. 1 is AI. Can you spot the fake?";
 
 function seasonOg(date) {
