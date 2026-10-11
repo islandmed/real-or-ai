@@ -14,4 +14,4 @@ __pycache__/
 
 # Local Test Outputs
 test-results/
-EOF
+.wrangler/
