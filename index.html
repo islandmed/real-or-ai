@@ -3,21 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Imposter · The Daily AI Detective Game</title>
-<meta name="description" content="4 rounds. 4 photos each. Exactly 1 synthetic AI imposter per round. Can you spot all 4?">
+<title>Imposter Game · The Daily AI Detective Mystery</title>
+<meta name="description" content="6 themed rounds. 4 photos each. Exactly 1 synthetic AI imposter per round. Can you spot all 6?">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="alternate icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-<meta property="og:site_name" content="Imposter">
-<meta property="og:title" content="Imposter · Daily AI Detective Game">
-<meta property="og:description" content="4 Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot all 4?">
+<meta property="og:site_name" content="Imposter Game">
+<meta property="og:title" content="Imposter Game · Daily AI Detective Mystery">
+<meta property="og:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
 <meta property="og:type" content="website">
-<meta property="og:image" content="og-image.png">
+<meta property="og:url" content="https://playimposter.pages.dev">
+<meta property="og:image" content="assets/icons/icon-512.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Imposter · Daily AI Detective Game">
-<meta name="twitter:description" content="4 Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot all 4?">
-<meta name="twitter:image" content="og-image.png">
+<meta name="twitter:title" content="Imposter Game · Daily AI Detective Mystery">
+<meta name="twitter:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
+<meta name="twitter:image" content="assets/icons/icon-512.png">
 <meta name="theme-color" content="#0d0f18">
 <script type="application/ld+json">
 {
@@ -898,6 +899,7 @@
     background: linear-gradient(135deg, #234580 0%, #1b58a3 100%);
     color: #fff;
   }
+  .channel-btn.facebook:hover { border-color: #1877f2; color: #1877f2; }
   .channel-btn.whatsapp:hover { border-color: #25d366; color: #25d366; }
   .channel-btn.twitter:hover { border-color: #1da1f2; color: #1da1f2; }
   .channel-btn.email:hover { border-color: #ea4335; color: #ea4335; }
@@ -975,6 +977,20 @@
     border-radius: 8px;
   }
   .btn-preview-download:hover { color: #fff; border-color: #8b97bc; }
+  .btn-preview-fb {
+    all: unset;
+    cursor: pointer;
+    background: #1877f2;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 8px;
+    transition: all 0.15s;
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+  }
+  .btn-preview-fb:hover { filter: brightness(1.15); }
 
   /* Centerpiece Next Case Countdown Box (Smack in the Middle) */
   .next-case-box {
@@ -2457,6 +2473,9 @@
       <button class="btn-preview-copy" id="btnCopyCardImage" onclick="copyCardImageToClipboard()">
         <span>📋 Copy Image</span>
       </button>
+      <button class="btn-preview-fb" onclick="shareInviteFacebook()" title="Share to Facebook">
+        <span>📘 Share to FB</span>
+      </button>
       <button class="btn-preview-download" id="btnDownloadCardImage" onclick="downloadCardImage()">
         <span>💾 Save Image</span>
       </button>
@@ -2494,6 +2513,9 @@
     <div class="invite-channels">
       <button class="channel-btn native-share" id="btnNativeShare" onclick="triggerNativeShare()">
         <span>📱 Send via Share Sheet</span>
+      </button>
+      <button class="channel-btn facebook" onclick="shareInviteFacebook()">
+        <span>📘 Facebook</span>
       </button>
       <button class="channel-btn whatsapp" onclick="shareInviteWhatsApp()">
         <span>💬 WhatsApp</span>
@@ -3776,7 +3798,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.6').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.7').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4455,6 +4477,13 @@ async function triggerNativeShare() {
   } else {
     copyInviteMessage();
   }
+}
+
+function shareInviteFacebook() {
+  playSound("tap");
+  const data = getInviteShareData();
+  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(data.url)}&quote=${encodeURIComponent(data.text)}`;
+  window.open(fbUrl, "_blank", "width=600,height=520,noopener,noreferrer");
 }
 
 function shareInviteWhatsApp() {
