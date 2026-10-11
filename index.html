@@ -164,6 +164,12 @@
   }
   .user-pill-btn:hover { background: var(--neon-cyan); color: #000; border-color: #fff; }
 
+  @media (max-width: 420px) {
+    .header-actions { gap: 4px; }
+    .icon-btn { padding: 5px 6px; font-size: 13px; }
+    .user-pill-btn { max-width: 105px; padding: 5px 7px; font-size: 10px; }
+  }
+
   /* Clean, Spacious Game Status Bar (Replaces all stacked clutter) */
   .game-status-bar {
     display: flex;
@@ -616,6 +622,191 @@
     border-color: #00f0ff;
     color: #fff;
   }
+  .btn-invite-friend {
+    all: unset;
+    cursor: pointer;
+    background: linear-gradient(135deg, #1b264a 0%, #172a59 100%);
+    border: 2px solid #3c5aa6;
+    color: #ffffff;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 13px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.15s;
+    box-shadow: 0 4px 14px rgba(45, 90, 200, 0.25);
+  }
+  .btn-invite-friend:hover {
+    border-color: #00f0ff;
+    color: #00f0ff;
+    background: #203162;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 240, 255, 0.3);
+  }
+  .btn-invite-friend:active {
+    transform: translateY(1px);
+  }
+
+  /* Invite / Challenge Modal */
+  .invite-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 10, 18, 0.94);
+    backdrop-filter: blur(12px);
+    z-index: 10004;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .invite-modal.open { display: flex; }
+  .invite-card {
+    background: #0f1426;
+    border: 2px solid var(--neon-cyan);
+    box-shadow: 0 0 35px rgba(0, 240, 255, 0.35);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 22px 20px;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .invite-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 28px;
+  }
+  .invite-icon { font-size: 26px; line-height: 1; }
+  .invite-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 17px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+  .invite-desc {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #9bb0db;
+    margin: 0;
+  }
+  .invite-preview-box {
+    background: #151c33;
+    border: 1px solid #28375e;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #e0e8ff;
+    position: relative;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .invite-preview-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .invite-link-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .invite-link-input {
+    flex: 1;
+    background: #0a0e1c;
+    border: 1px solid #28375e;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #ffffff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    user-select: all;
+  }
+  .invite-link-input:focus {
+    border-color: var(--neon-cyan);
+  }
+  .invite-btn-copy-link {
+    all: unset;
+    cursor: pointer;
+    background: var(--neon-cyan);
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    white-space: nowrap;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .invite-btn-copy-link:hover {
+    filter: brightness(1.15);
+  }
+  .invite-btn-copy-link:active {
+    transform: scale(0.97);
+  }
+  .invite-channels {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .channel-btn {
+    all: unset;
+    cursor: pointer;
+    background: #141b31;
+    border: 1px solid #28375e;
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .channel-btn:hover {
+    background: #1c2645;
+    border-color: #3f5591;
+    transform: translateY(-1px);
+  }
+  .channel-btn.native-share {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #1b3563 0%, #15457f 100%);
+    border-color: #00f0ff;
+    color: #00f0ff;
+    font-size: 12px;
+    padding: 12px;
+  }
+  .channel-btn.native-share:hover {
+    background: linear-gradient(135deg, #234580 0%, #1b58a3 100%);
+    color: #fff;
+  }
+  .channel-btn.whatsapp:hover { border-color: #25d366; color: #25d366; }
+  .channel-btn.twitter:hover { border-color: #1da1f2; color: #1da1f2; }
+  .channel-btn.email:hover { border-color: #ea4335; color: #ea4335; }
 
   /* Result Card Preview Modal (Desktop Share) */
   .card-preview-modal {
@@ -2046,6 +2237,7 @@
     </div>
     <div class="header-actions">
       <button class="icon-btn" onclick="openHowModal()" title="How to Play">❓</button>
+      <button class="icon-btn" onclick="openInviteModal()" title="Invite a Friend">👥</button>
       <button class="icon-btn" id="btnSound" title="Toggle Sound">🔊</button>
       <button class="icon-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆</button>
       <button class="user-pill-btn" id="btnUserAccount" onclick="openDossierModal()" title="Detective Career & Dossier">🕵️ Callsign</button>
@@ -2109,6 +2301,9 @@
       <button class="btn-copy" id="btnCopyGrid">
         <span>📋 Copy Daily Score</span>
       </button>
+      <button class="btn-invite-friend" id="btnInviteFriend" onclick="openInviteModal()">
+        <span>👥 Challenge a Friend</span>
+      </button>
       <button class="btn-replay" id="btnReplayDaily" onclick="resetDailyChallenge()">
         <span>🔄 Play Case Again (Reset)</span>
       </button>
@@ -2139,6 +2334,53 @@
       </button>
       <button class="btn-preview-download" id="btnDownloadCardImage" onclick="downloadCardImage()">
         <span>💾 Save Image</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Invite / Challenge a Friend Modal -->
+<div class="invite-modal" id="inviteModal">
+  <div class="invite-card">
+    <div class="modal-close-x" onclick="closeInviteModal()">✕</div>
+    <div class="invite-header">
+      <span class="invite-icon">👥</span>
+      <h3 class="invite-title">Challenge a Friend</h3>
+    </div>
+    <p class="invite-desc">
+      Send today's mystery to your friends or group chat. See who has the sharper eye to spot the synthetic AI imposter!
+    </p>
+
+    <!-- Message preview -->
+    <div class="invite-preview-box">
+      <div class="invite-preview-label">Challenge Message Preview</div>
+      <div id="invitePreviewText">Loading challenge...</div>
+    </div>
+
+    <!-- Quick link copy -->
+    <div class="invite-link-row">
+      <input type="text" class="invite-link-input" id="inviteShareLink" readonly value="https://playimposter.pages.dev">
+      <button class="invite-btn-copy-link" id="btnCopyInviteLink" onclick="copyInviteLink()">
+        <span>📋 Copy Link</span>
+      </button>
+    </div>
+
+    <!-- Social / Native Channels -->
+    <div class="invite-channels">
+      <button class="channel-btn native-share" id="btnNativeShare" onclick="triggerNativeShare()">
+        <span>📱 Send via Share Sheet</span>
+      </button>
+      <button class="channel-btn whatsapp" onclick="shareInviteWhatsApp()">
+        <span>💬 WhatsApp</span>
+      </button>
+      <button class="channel-btn twitter" onclick="shareInviteTwitter()">
+        <span>🐦 X / Twitter</span>
+      </button>
+      <button class="channel-btn email" onclick="shareInviteEmail()">
+        <span>✉️ Email</span>
+      </button>
+      <button class="channel-btn" onclick="copyInviteMessage()">
+        <span>📋 Copy Text</span>
       </button>
     </div>
   </div>
@@ -2404,6 +2646,10 @@
     <div class="badges-grid" id="dossierBadgesGrid">
       <!-- Injected dynamically -->
     </div>
+
+    <button onclick="closeDossierModal();openInviteModal();" class="btn-invite-friend" style="margin-top:16px;padding:12px;font-size:12px;width:100%;box-sizing:border-box;">
+      <span>👥 Challenge a Friend</span>
+    </button>
   </div>
 </div>
 
@@ -3390,7 +3636,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.1').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.2').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3968,6 +4214,129 @@ function downloadCardImage() {
   a.click();
   showToast("Result card image downloaded!");
 }
+
+// Invite & Challenge a Friend
+function getInviteShareData() {
+  const url = (window.location.origin && window.location.origin !== "file://" && !window.location.origin.includes("localhost"))
+    ? window.location.origin
+    : "https://playimposter.pages.dev";
+
+  const totalRounds = dailyCaseData?.rounds?.length || 6;
+  const hasFinished = roundResults.length > 0 && roundResults.length === totalRounds;
+
+  if (hasFinished) {
+    const totalWon = roundResults.filter(r => r.solved).length;
+    const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
+    const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
+    const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
+    const finalScore = baseScore + speedBonus;
+    const maxScore = (totalRounds * 100) + 100;
+    const caseNum = dailyCaseData?.caseNumber || "66";
+
+    return {
+      url: url,
+      title: "Think you can beat my Imposter score?",
+      text: `🕵️ I scored ${finalScore}/${maxScore} PTS on today's Imposter case (#${caseNum}) in ${elapsedSeconds.toFixed(1)}s!\n\nCan you spot which photos are real vs synthetic AI fakes? Play today's case:\n${url}`
+    };
+  }
+
+  return {
+    url: url,
+    title: "Can you spot the AI fake in Imposter?",
+    text: `🕵️ Can you spot the AI fake? In Imposter, 3 photos are real and 1 is a synthetic AI fake across 6 daily rounds.\n\nPlay today's mystery:\n${url}`
+  };
+}
+
+function openInviteModal() {
+  playSound("tap");
+  const data = getInviteShareData();
+  const linkInput = $("inviteShareLink");
+  if (linkInput) linkInput.value = data.url;
+  const previewEl = $("invitePreviewText");
+  if (previewEl) previewEl.textContent = data.text;
+
+  const nativeBtn = $("btnNativeShare");
+  if (nativeBtn) {
+    nativeBtn.style.display = (navigator.share) ? "flex" : "none";
+  }
+
+  $("inviteModal").classList.add("open");
+}
+
+function closeInviteModal() {
+  $("inviteModal").classList.remove("open");
+}
+
+async function copyInviteLink() {
+  playSound("tap");
+  const data = getInviteShareData();
+  try {
+    await navigator.clipboard.writeText(data.url);
+    showToast("📋 Game link copied to clipboard!");
+  } catch (_) {
+    const input = $("inviteShareLink");
+    if (input) {
+      input.select();
+      showToast("Selected! Press Ctrl+C / Cmd+C to copy");
+    }
+  }
+}
+
+async function copyInviteMessage() {
+  playSound("tap");
+  const data = getInviteShareData();
+  try {
+    await navigator.clipboard.writeText(data.text);
+    showToast("📋 Challenge message copied to clipboard!");
+  } catch (_) {
+    showToast("Failed to copy message.");
+  }
+}
+
+async function triggerNativeShare() {
+  playSound("tap");
+  const data = getInviteShareData();
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: data.title,
+        text: data.text,
+        url: data.url
+      });
+      showToast("Challenge shared!");
+    } catch (_) {}
+  } else {
+    copyInviteMessage();
+  }
+}
+
+function shareInviteWhatsApp() {
+  playSound("tap");
+  const data = getInviteShareData();
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(data.text)}`;
+  window.open(waUrl, "_blank", "noopener,noreferrer");
+}
+
+function shareInviteTwitter() {
+  playSound("tap");
+  const data = getInviteShareData();
+  const twUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(data.text)}`;
+  window.open(twUrl, "_blank", "noopener,noreferrer");
+}
+
+function shareInviteEmail() {
+  playSound("tap");
+  const data = getInviteShareData();
+  const mailUrl = `mailto:?subject=${encodeURIComponent(data.title)}&body=${encodeURIComponent(data.text)}`;
+  window.location.href = mailUrl;
+}
+
+$("cardPreviewModal").addEventListener("click", e => {
+  if (e.target === $("cardPreviewModal")) closeCardPreviewModal();
+});
+$("inviteModal").addEventListener("click", e => {
+  if (e.target === $("inviteModal")) closeInviteModal();
+});
 
 // Auth Modal
 function openAuthModal(packName) {
