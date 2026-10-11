@@ -594,6 +594,102 @@
     transition: all 0.1s;
   }
   .btn-copy:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+  .btn-replay {
+    all: unset;
+    cursor: pointer;
+    background: #14192b;
+    border: 1.5px solid rgba(0, 240, 255, 0.4);
+    color: #00f0ff;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  .btn-replay:hover {
+    background: rgba(0, 240, 255, 0.12);
+    border-color: #00f0ff;
+    color: #fff;
+  }
+
+  /* Result Card Preview Modal (Desktop Share) */
+  .card-preview-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 10, 18, 0.94);
+    backdrop-filter: blur(12px);
+    z-index: 10003;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .card-preview-modal.open { display: flex; }
+  .card-preview-card {
+    background: #0f1426;
+    border: 2px solid var(--neon-cyan);
+    box-shadow: 0 0 35px rgba(0, 240, 255, 0.35);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 20px;
+    position: relative;
+    text-align: center;
+  }
+  .card-preview-stage {
+    background: #060810;
+    border-radius: 10px;
+    border: 1px solid #283658;
+    padding: 10px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: center;
+    max-height: 52vh;
+    overflow-y: auto;
+  }
+  .card-preview-stage img {
+    max-width: 100%;
+    max-height: 48vh;
+    border-radius: 6px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  }
+  .card-preview-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-preview-copy {
+    all: unset;
+    cursor: pointer;
+    background: linear-gradient(135deg, #00f0ff 0%, #0077ff 100%);
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 10px 18px;
+    border-radius: 8px;
+  }
+  .btn-preview-download {
+    all: unset;
+    cursor: pointer;
+    background: #171d34;
+    color: #8b97bc;
+    border: 1px solid #283658;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+  .btn-preview-download:hover { color: #fff; border-color: #8b97bc; }
 
   /* Next Case Countdown Box (Pure Daily Game Cycle) */
   .next-case-box {
@@ -2005,7 +2101,7 @@
       <!-- Dynamically generated rows -->
     </div>
 
-    <!-- Social Viral Share Buttons -->
+    <!-- Social Viral Share Buttons & Replay -->
     <div class="share-grid">
       <button class="btn-share" id="btnShareStory">
         <span>📸 Share Result Card</span>
@@ -2013,15 +2109,39 @@
       <button class="btn-copy" id="btnCopyGrid">
         <span>📋 Copy Daily Score</span>
       </button>
+      <button class="btn-replay" id="btnReplayDaily" onclick="resetDailyChallenge()">
+        <span>🔄 Play Case Again (Reset)</span>
+      </button>
     </div>
 
     <!-- Next Daily Mystery Countdown -->
     <div class="next-case-box" id="nextCaseBox">
       <div class="next-case-label">NEXT DAILY MYSTERY IN</div>
       <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
-      <div class="next-case-sub">A brand new forensic case with 4 unique themes drops every day at midnight.</div>
+      <div class="next-case-sub">A brand new forensic case with 6 unique themes drops every day at midnight.</div>
     </div>
   </section>
+</div>
+
+<!-- Result Card Preview Modal (Desktop Share) -->
+<div class="card-preview-modal" id="cardPreviewModal">
+  <div class="card-preview-card">
+    <div class="modal-close-x" onclick="closeCardPreviewModal()">✕</div>
+    <h3 style="font-family:'JetBrains Mono',monospace;color:#fff;font-size:15px;margin:0 0 12px;display:flex;align-items:center;justify-content:center;gap:8px;">
+      📸 <span>Daily Forensic Scorecard</span>
+    </h3>
+    <div class="card-preview-stage">
+      <img id="cardPreviewImg" src="" alt="Scorecard Preview">
+    </div>
+    <div class="card-preview-actions">
+      <button class="btn-preview-copy" id="btnCopyCardImage" onclick="copyCardImageToClipboard()">
+        <span>📋 Copy Image</span>
+      </button>
+      <button class="btn-preview-download" id="btnDownloadCardImage" onclick="downloadCardImage()">
+        <span>💾 Save Image</span>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Lightbox Modal for Inspection -->
@@ -3188,6 +3308,31 @@ function showAlreadyCompletedToday(record) {
   startMidnightCountdown();
 }
 
+function resetDailyChallenge() {
+  playSound("tap");
+  const todayStr = new Date().toISOString().slice(0, 10);
+  try {
+    const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
+    delete records[todayStr];
+    localStorage.setItem("imposter_daily_records", JSON.stringify(records));
+  } catch (_) {}
+
+  roundResults = [];
+  attemptsUsedThisRound = 0;
+  isCurrentRoundOver = false;
+  caseStartTime = null;
+  caseEndTime = null;
+  elapsedSeconds = 0;
+  if (timerInterval) clearInterval(timerInterval);
+
+  $("viewResults").style.display = "none";
+  $("viewPlaying").style.display = "block";
+
+  loadRound(0);
+  showCountdownReadyState();
+  showToast("Case reset! Ready to play again 🕵️");
+}
+
 // --- Initialization ---
 async function init() {
   loadStats();
@@ -3195,6 +3340,18 @@ async function init() {
   updateSoundButton();
   $("btnSound").onclick = toggleSound;
   if ($("btnLeaderboard")) $("btnLeaderboard").onclick = openLeaderboardModal;
+
+  // Handle URL reset/replay query parameter (?reset=1 or ?replay=1)
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("reset") || urlParams.has("replay")) {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
+      delete records[todayStr];
+      localStorage.setItem("imposter_daily_records", JSON.stringify(records));
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  } catch (_) {}
 
   // Load saved profile or initialize active callsign
   try {
@@ -3233,7 +3390,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.0').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.1').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3739,31 +3896,78 @@ $("btnShareStory").onclick = async () => {
 
   ctx.font = "500 26px 'Plus Jakarta Sans', sans-serif";
   ctx.fillStyle = "#8fa0cb";
-  ctx.fillText("4 Photos · 1 Imposter · Daily Challenge", 540, 1580);
+  ctx.fillText("6 Rounds · 1 Imposter · Daily Challenge", 540, 1580);
 
   ctx.font = "800 38px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#00f0ff";
   ctx.fillText(window.location.host || "impostergame.com", 540, 1650);
 
   canvas.toBlob(async blob => {
+    currentCardBlob = blob;
     const file = new File([blob], `imposter-case-${dailyCaseData.caseNumber}.png`, { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    const isMobile = /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent);
+
+    // Native mobile share sheet (iOS/Android)
+    if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
           files: [file],
           title: "My Imposter Score",
           text: getDailyShareText()
         });
+        return;
       } catch (_) {}
-    } else {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `imposter-case-${dailyCaseData.caseNumber}.png`;
-      a.click();
-      showToast("Result card saved!");
+    }
+
+    // On Desktop: Open sleek card preview modal & copy directly to clipboard (NEVER auto-download!)
+    const imgUrl = URL.createObjectURL(blob);
+    $("cardPreviewImg").src = imgUrl;
+    $("cardPreviewModal").classList.add("open");
+
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob })
+      ]);
+      showToast("📸 Card image copied to clipboard! (Press Ctrl+V / Cmd+V to paste)");
+    } catch (_) {
+      showToast("📸 Scorecard preview opened!");
     }
   });
 };
+
+let currentCardBlob = null;
+
+function closeCardPreviewModal() {
+  $("cardPreviewModal").classList.remove("open");
+}
+
+async function copyCardImageToClipboard() {
+  playSound("tap");
+  if (!currentCardBlob) return;
+  try {
+    await navigator.clipboard.write([
+      new ClipboardItem({ "image/png": currentCardBlob })
+    ]);
+    showToast("📋 Card image copied to clipboard! Paste directly into chat or social media.");
+  } catch (_) {
+    try {
+      await navigator.clipboard.writeText(getDailyShareText());
+      showToast("Score text copied to clipboard! (Right-click image to copy picture)");
+    } catch (_) {
+      showToast("Right-click image to copy.");
+    }
+  }
+}
+
+function downloadCardImage() {
+  playSound("tap");
+  if (!currentCardBlob) return;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(currentCardBlob);
+  a.download = `imposter-case-${dailyCaseData.caseNumber}.png`;
+  a.click();
+  showToast("Result card image downloaded!");
+}
 
 // Auth Modal
 function openAuthModal(packName) {
