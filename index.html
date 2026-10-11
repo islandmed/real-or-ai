@@ -2137,7 +2137,7 @@
         <div class="score-pill"><span>3rd Try</span><strong>+35 PTS</strong></div>
         <div class="score-pill highlight"><span>Speed Bonus</span><strong>+100 PTS</strong></div>
       </div>
-      <p class="score-note">Complete all 4 rounds quickly to maximize your speed bonus and claim a spot on the Daily Leaderboard!</p>
+      <p class="score-note">⚡ <strong>Speed Bonus Decays in 60s:</strong> The timer begins ticking down after 3s and drops to 0 at 60s. High speed scores require fast <strong>1st-try accusations</strong> (wrong guesses penalize speed bonus).</p>
     </div>
 
     <button class="how-play-btn" onclick="closeHowModal()">Got it, Let's Play!</button>
@@ -2180,7 +2180,7 @@
         <span class="cd-rule-icon">⚡</span>
         <div class="cd-rule-info">
           <strong>3. Tap to Accuse</strong>
-          <p>4 rounds daily. Speed bonus awards up to 500 PTS!</p>
+          <p>4 rounds daily. +100 speed bonus decays in 60s!</p>
         </div>
       </div>
     </div>
@@ -2416,7 +2416,23 @@ function updateLiveTimerUI(secs) {
   const bonusEl = $("liveSpeedBonus");
   if (bonusEl) {
     const liveBonus = calculateSpeedBonus(secs, 4);
-    bonusEl.textContent = `+${liveBonus} PTS`;
+    if (liveBonus > 0) {
+      bonusEl.textContent = `+${liveBonus} PTS`;
+      if (liveBonus >= 60) {
+        bonusEl.style.color = "#39ff14";
+        bonusEl.style.textShadow = "0 0 8px rgba(57, 255, 20, 0.7)";
+      } else if (liveBonus >= 30) {
+        bonusEl.style.color = "#ffde59";
+        bonusEl.style.textShadow = "0 0 8px rgba(255, 222, 89, 0.7)";
+      } else {
+        bonusEl.style.color = "#ff4466";
+        bonusEl.style.textShadow = "0 0 8px rgba(255, 68, 102, 0.7)";
+      }
+    } else {
+      bonusEl.textContent = `+0 PTS`;
+      bonusEl.style.color = "#6d7899";
+      bonusEl.style.textShadow = "none";
+    }
   }
 }
 
@@ -2434,33 +2450,51 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-function calculateSpeedBonus(secs, totalWon) {
-  if (totalWon === 0) return 0;
+// Challenging speed bonus formula:
+// 100 max points, begins decaying after 3s, hits 0 at 60s (15s per round average).
+// Heavily weighted by 1st-try accuracy to prevent blind spam clicking.
+function calculateSpeedBonus(secs, resultsOrCount) {
+  if (secs >= 60) return 0; // Hard cutoff after 60 seconds
+
   let raw = 0;
-  if (secs <= 25) {
+  if (secs <= 3) {
     raw = 100;
-  } else if (secs <= 45) {
-    raw = Math.round(100 - (secs - 25) * (25 / 20));
-  } else if (secs <= 90) {
-    raw = Math.round(75 - (secs - 45) * (50 / 45));
+  } else if (secs <= 20) {
+    raw = 100 - (secs - 3) * (40 / 17); // 100 down to 60 (at ~2.35 pts/s)
+  } else if (secs <= 40) {
+    raw = 60 - (secs - 20) * (35 / 20); // 60 down to 25 (at 1.75 pts/s)
   } else {
-    raw = Math.max(10, Math.round(25 - (secs - 90) * (15 / 60)));
+    raw = 25 - (secs - 40) * (25 / 20); // 25 down to 0 (at 1.25 pts/s)
   }
-  return Math.round(raw * (totalWon / 4));
+  raw = Math.max(0, Math.min(100, Math.round(raw)));
+
+  let accuracyMult = 1.0;
+  if (Array.isArray(resultsOrCount)) {
+    const totalWon = resultsOrCount.filter(r => r.solved).length;
+    if (totalWon === 0) return 0;
+    const firstTry = resultsOrCount.filter(r => r.solved && r.attempts === 1).length;
+    const secondTry = resultsOrCount.filter(r => r.solved && r.attempts === 2).length;
+    const thirdTry = resultsOrCount.filter(r => r.solved && r.attempts === 3).length;
+    accuracyMult = (firstTry * 1.0 + secondTry * 0.4 + thirdTry * 0.1) / 4;
+  } else if (typeof resultsOrCount === "number") {
+    accuracyMult = Math.max(0, Math.min(1, resultsOrCount / 4));
+  }
+
+  return Math.round(raw * accuracyMult);
 }
 
-// Daily Hall of Fame Leaderboard (Sign-In Gated)
+// Daily Hall of Fame Leaderboard (Recalibrated for challenging speed curve)
 const DEFAULT_LEADERBOARD = [
-  { rank: 1, name: "CipherWolf", score: 495, time: 18.4, accuracy: "4/4 (1st try)", badge: "👑" },
-  { rank: 2, name: "PixelForensics", score: 488, time: 21.2, accuracy: "4/4 (1st try)", badge: "🥈" },
-  { rank: 3, name: "NeonSpecter", score: 482, time: 24.6, accuracy: "4/4 (1st try)", badge: "🥉" },
-  { rank: 4, name: "SleuthRaven", score: 476, time: 27.8, accuracy: "4/4 (1st try)", badge: "🎃" },
-  { rank: 5, name: "AgentZero", score: 468, time: 32.1, accuracy: "4/4 (1st try)", badge: "🕵️" },
-  { rank: 6, name: "ShadowLens", score: 445, time: 38.5, accuracy: "4/4 (1st try)", badge: "🦇" },
-  { rank: 7, name: "OpticHunter", score: 432, time: 42.0, accuracy: "4/4 (1st try)", badge: "⚡" },
-  { rank: 8, name: "GhostProtocol", score: 418, time: 49.3, accuracy: "4/4 (2nd try)", badge: "👻" },
-  { rank: 9, name: "ByteBuster", score: 395, time: 54.7, accuracy: "4/4 (2nd try)", badge: "🔍" },
-  { rank: 10, name: "VaporGlitch", score: 370, time: 61.2, accuracy: "3/4", badge: "💀" }
+  { rank: 1, name: "CipherWolf", score: 486, time: 9.8, accuracy: "4/4 (1st try)", badge: "👑" },
+  { rank: 2, name: "PixelForensics", score: 474, time: 14.2, accuracy: "4/4 (1st try)", badge: "🥈" },
+  { rank: 3, name: "NeonSpecter", score: 464, time: 18.6, accuracy: "4/4 (1st try)", badge: "🥉" },
+  { rank: 4, name: "SleuthRaven", score: 455, time: 23.4, accuracy: "4/4 (1st try)", badge: "🎃" },
+  { rank: 5, name: "AgentZero", score: 446, time: 29.1, accuracy: "4/4 (1st try)", badge: "🕵️" },
+  { rank: 6, name: "ShadowLens", score: 436, time: 35.8, accuracy: "4/4 (1st try)", badge: "🦇" },
+  { rank: 7, name: "OpticHunter", score: 426, time: 42.5, accuracy: "4/4 (1st try)", badge: "⚡" },
+  { rank: 8, name: "GhostProtocol", score: 376, time: 48.0, accuracy: "4/4 (2nd try)", badge: "👻" },
+  { rank: 9, name: "ByteBuster", score: 369, time: 54.2, accuracy: "4/4 (2nd try)", badge: "🔍" },
+  { rank: 10, name: "VaporGlitch", score: 265, time: 63.1, accuracy: "3/4", badge: "💀" }
 ];
 
 function getLeaderboard() {
@@ -2844,7 +2878,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=2.2').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=2.3').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3065,7 +3099,7 @@ function showFinalResults() {
   // Base forensic score: 1st try = 100pts, 2nd try = 65pts, 3rd try = 35pts, fail = 0pts (Max 400pts)
   const baseScore = (firstTryCount * 100) + (secondTryCount * 65) + (thirdTryCount * 35);
   // Speed bonus: up to 100 bonus pts based on solve time, weighted by accuracy
-  const speedBonus = calculateSpeedBonus(finalSecs, totalWon);
+  const speedBonus = calculateSpeedBonus(finalSecs, roundResults);
   const finalScore = baseScore + speedBonus; // Max 500 PTS
 
   $("summaryTimeVal").textContent = `${finalSecs.toFixed(1)}s`;
@@ -3208,7 +3242,7 @@ function getDailyShareText() {
   const totalWon = roundResults.filter(r => r.solved).length;
   const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
   const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 65) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 35);
-  const speedBonus = calculateSpeedBonus(elapsedSeconds, totalWon);
+  const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
   const finalScore = baseScore + speedBonus;
 
   const rows = roundResults.map(r => {
@@ -3268,7 +3302,7 @@ $("btnShareStory").onclick = async () => {
   const totalWon = roundResults.filter(r => r.solved).length;
   const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
   const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 65) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 35);
-  const speedBonus = calculateSpeedBonus(elapsedSeconds, totalWon);
+  const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
   const finalScore = baseScore + speedBonus;
 
   // Score Area
@@ -3400,7 +3434,7 @@ function simulateAuth(provider) {
     const secondTryCount = roundResults.filter(r => r.solved && r.attempts === 2).length;
     const thirdTryCount = roundResults.filter(r => r.solved && r.attempts === 3).length;
     const baseScore = (firstTryCount * 100) + (secondTryCount * 65) + (thirdTryCount * 35);
-    const speedBonus = calculateSpeedBonus(elapsedSeconds, totalWon);
+    const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
     const myRank = submitScoreToLeaderboard(baseScore + speedBonus, elapsedSeconds, firstTryCount, totalWon);
     if (myRank) {
       showToast(`🏆 Score submitted! Rank #${myRank} on the Daily Leaderboard!`);
