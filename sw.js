@@ -1,4 +1,4 @@
-const CACHE_NAME = 'imposter-v3.9';
+const CACHE_NAME = 'imposter-v4.0';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './favicon.svg',
@@ -23,8 +23,11 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Network-first for HTML pages, navigation, and cases.json so daily updates are immediate
-  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('cases.json')) {
+  // Never touch the API (guesses, today's case) or anything that is not a GET
+  if (event.request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+
+  // Network-first for HTML pages and navigation so updates are immediate
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname === '/') {
     event.respondWith(
       fetch(event.request)
         .then(response => {

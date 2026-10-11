@@ -15,3 +15,9 @@ __pycache__/
 # Local Test Outputs
 test-results/
 .wrangler/
+
+# Imposter pipeline: private state (answers, credits, images, raw downloads, shared secret).
+# The repo is public, so nothing that maps a card to real/AI may be committed.
+private/
+dist/
+functions/_data/

@@ -1,0 +1,990 @@
+{
+ "_doc": "Date-ranged seasons. start/end are MM-DD (inclusive) and repeat every year. Each theme: key, name, short, queries (Wikimedia Commons search terms), match (regex that a photo's title, categories or description must hit), prompts (scene ideas for the AI imposter). Add a season or a theme here; nothing else needs to change.",
+ "seasons": [
+  {
+   "id": "halloween",
+   "start": "10-01",
+   "end": "10-31",
+   "badge": "🎃 HALLOWEEN SPECIAL",
+   "label": "Halloween",
+   "themes": [
+    {
+     "key": "mansions",
+     "name": "Haunted Mansions",
+     "short": "MANSIONS",
+     "queries": [
+      "victorian mansion",
+      "\"haunted house\"",
+      "gothic revival house",
+      "queen anne style house",
+      "abandoned mansion"
+     ],
+     "match": "mansion|victorian (house|home)|haunted|queen anne (style )?(house|home)|gothic revival (house|mansion|villa)|manor house|herrenhaus",
+     "prompts": [
+      "an old Victorian mansion with turrets and dark windows",
+      "a gothic revival manor house under a grey sky",
+      "a weathered Queen Anne style house with a wraparound porch",
+      "a large old stone manor at the end of a gravel drive"
+     ],
+     "cats": [
+      "Haunted houses",
+      "Mansions",
+      "Victorian architecture in the United States",
+      "Gothic Revival houses"
+     ]
+    },
+    {
+     "key": "jackolanterns",
+     "name": "Jack-o'-Lanterns",
+     "short": "JACK-O'-LANTERNS",
+     "queries": [
+      "jack-o'-lantern",
+      "carved pumpkin",
+      "halloween pumpkin carving",
+      "jack o lantern"
+     ],
+     "match": "lantern|carved pumpkin|pumpkin carving|halloween|kürbis|citrouille|zucca",
+     "prompts": [
+      "a carved jack-o'-lantern with a glowing candle inside",
+      "several carved halloween pumpkins on front steps",
+      "a jack-o'-lantern with a jagged grin on a wooden porch",
+      "a row of carved pumpkins lit from inside"
+     ],
+     "cats": [
+      "Jack-o'-lanterns",
+      "Halloween decorations",
+      "Pumpkin carving"
+     ]
+    },
+    {
+     "key": "blackcats",
+     "name": "Black Cats",
+     "short": "BLACK CATS",
+     "queries": [
+      "\"black cat\"",
+      "black domestic cat",
+      "black kitten"
+     ],
+     "match": "black cat|black kitten|\\bcat\\b.*\\bblack\\b|\\bblack\\b.*\\bcat\\b",
+     "prompts": [
+      "a black cat sitting and looking at the camera",
+      "a black cat lying on a windowsill",
+      "a black cat walking across a garden",
+      "a black cat with yellow eyes resting on a step"
+     ],
+     "cats": [
+      "Black cats"
+     ]
+    },
+    {
+     "key": "cemeteries",
+     "name": "Old Cemeteries",
+     "short": "CEMETERIES",
+     "queries": [
+      "old cemetery gravestones",
+      "churchyard graves",
+      "historic cemetery",
+      "graveyard tombstones"
+     ],
+     "match": "cemeter|graveyard|churchyard|grave|tomb|headstone|mausole|friedhof|cimeti|cimitero|cementerio|kirkegård|hřbitov",
+     "prompts": [
+      "an old cemetery with weathered gravestones",
+      "a mossy churchyard with leaning headstones",
+      "rows of old tombstones under bare trees",
+      "a historic graveyard with stone crosses"
+     ],
+     "cats": [
+      "Gravestones",
+      "Churchyards",
+      "Cemeteries"
+     ]
+    },
+    {
+     "key": "costumes",
+     "name": "Halloween Costumes",
+     "short": "COSTUMES",
+     "queries": [
+      "halloween costume",
+      "halloween parade costume",
+      "halloween party costume"
+     ],
+     "match": "halloween|cosplay|costume party|costume parade|in costume|fancy dress|dressed as|zombie walk|carnival costume|karneval|fasching|fastnacht",
+     "prompts": [
+      "people in homemade halloween costumes at a street parade",
+      "a person dressed as a witch at a halloween party",
+      "a group of friends in halloween costumes outdoors",
+      "a person in a skeleton costume at a halloween event"
+     ],
+     "cats": [
+      "Halloween costumes",
+      "Halloween parades"
+     ]
+    },
+    {
+     "key": "foggyforest",
+     "name": "Foggy Forests",
+     "short": "FOGGY FORESTS",
+     "queries": [
+      "foggy forest",
+      "forest fog",
+      "misty woods",
+      "mist forest"
+     ],
+     "match": "\\bfog|\\bmist|\\bmisty\\b|nebel|brouillard|nebbia|niebla",
+     "prompts": [
+      "a dense forest in thick morning fog",
+      "tall dark trees fading into mist",
+      "a misty woodland path in autumn",
+      "a pine forest shrouded in fog"
+     ],
+     "cats": [
+      "Forests in fog"
+     ]
+    },
+    {
+     "key": "candles",
+     "name": "Candlelight",
+     "short": "CANDLES",
+     "queries": [
+      "candles burning",
+      "candlelight church",
+      "lit candles",
+      "votive candles"
+     ],
+     "match": "\\bcandles?\\b|candlelight|votive|kerze|bougie|candela|vela",
+     "prompts": [
+      "a group of lit candles in a dark room",
+      "candles burning on an old wooden table",
+      "rows of votive candles flickering in a church",
+      "melting candles on a candelabra"
+     ],
+     "cats": [
+      "Candles",
+      "Burning candles"
+     ]
+    },
+    {
+     "key": "skulls",
+     "name": "Skulls & Ossuaries",
+     "short": "SKULLS",
+     "queries": [
+      "ossuary skulls",
+      "catacombs skulls",
+      "human skull",
+      "charnel house bones"
+     ],
+     "match": "\\bskulls?\\b|ossuar|catacomb|charnel|schädel|beinhaus|crâne|kostnice",
+     "prompts": [
+      "stacked human skulls in an old ossuary",
+      "a wall of skulls and bones in catacombs",
+      "an old human skull on a stone shelf",
+      "rows of skulls in a dimly lit crypt"
+     ],
+     "cats": [
+      "Skulls in ossuaries",
+      "Ossuaries",
+      "Catacombs"
+     ]
+    },
+    {
+     "key": "witches",
+     "name": "Witches' Hats & Brooms",
+     "short": "WITCHES",
+     "queries": [
+      "witch hat",
+      "witch broom",
+      "witch costume",
+      "besom broom",
+      "witches halloween"
+     ],
+     "match": "witch.{0,4}(hat|costume|broom)|broomstick|\\bbesom|dressed as (a )?witch|witches'? (hat|costume)|hexenkostüm|walpurgis|hexen ?(fest|kostüm)|halloween.*witch|witch.*halloween",
+     "prompts": [
+      "a black pointed witch hat and a straw broom",
+      "a person dressed as a witch with a broomstick",
+      "an old straw besom broom leaning on a wall",
+      "witch hats on display at a halloween festival"
+     ],
+     "cats": [
+      "Witch costumes",
+      "Witches in popular culture"
+     ]
+    },
+    {
+     "key": "bats",
+     "name": "Bats",
+     "short": "BATS",
+     "queries": [
+      "bat flying",
+      "chiroptera",
+      "fruit bat",
+      "bats roosting"
+     ],
+     "match": "\\bbats?\\b|chiroptera|pteropus|myotis|flying fox|rhinolophus|nyctalus|pipistrell",
+     "prompts": [
+      "a bat hanging upside down in a cave",
+      "a fruit bat clinging to a branch",
+      "a bat in flight at dusk",
+      "a small bat roosting on a wooden beam"
+     ],
+     "cats": [
+      "Bats in flight",
+      "Chiroptera"
+     ]
+    },
+    {
+     "key": "cornmazes",
+     "name": "Corn Mazes",
+     "short": "CORN MAZES",
+     "queries": [
+      "corn maze",
+      "maize maze",
+      "cornfield autumn",
+      "corn field harvest"
+     ],
+     "match": "\\bmaze|\\bcorn ?fields?\\b|\\bmaize\\b|maislabyrinth|labyrinth|maisfeld",
+     "prompts": [
+      "a path through a tall autumn corn maze",
+      "dry corn stalks lining a maze path",
+      "an aerial-looking view down a corn maze path",
+      "a farm corn maze in late autumn"
+     ],
+     "cats": [
+      "Maize mazes",
+      "Maize fields"
+     ]
+    },
+    {
+     "key": "scarecrows",
+     "name": "Scarecrows",
+     "short": "SCARECROWS",
+     "queries": [
+      "scarecrow",
+      "scarecrow field",
+      "scarecrow festival"
+     ],
+     "match": "scarecrow|vogelscheuche|épouvantail|spaventapasseri",
+     "prompts": [
+      "a scarecrow standing in a harvested field",
+      "a straw scarecrow in an old hat and flannel shirt",
+      "a scarecrow on a pole in a vegetable garden",
+      "a homemade scarecrow at an autumn festival"
+     ],
+     "cats": [
+      "Scarecrows"
+     ]
+    },
+    {
+     "key": "gargoyles",
+     "name": "Gargoyles",
+     "short": "GARGOYLES",
+     "queries": [
+      "gargoyle",
+      "gargoyle cathedral",
+      "grotesque sculpture church"
+     ],
+     "match": "gargoyle|grotesque|chimera|wasserspeier|gargouille|gargoyl",
+     "prompts": [
+      "a stone gargoyle on a gothic cathedral",
+      "a weathered gargoyle waterspout on a church roof",
+      "a carved stone grotesque on an old building",
+      "a gargoyle looking down from a medieval tower"
+     ],
+     "cats": [
+      "Gargoyles"
+     ]
+    },
+    {
+     "key": "pumpkinpatch",
+     "name": "Pumpkin Patches",
+     "short": "PUMPKIN PATCHES",
+     "queries": [
+      "pumpkin patch",
+      "pumpkin field",
+      "pumpkins farm",
+      "pumpkins harvest"
+     ],
+     "match": "pumpkin|kürbis|citrouille|calabaza",
+     "prompts": [
+      "a pumpkin patch full of orange pumpkins",
+      "pumpkins in a field after harvest",
+      "a farm stand piled with pumpkins",
+      "rows of pumpkins on dry vines in a field"
+     ],
+     "cats": [
+      "Pumpkin fields",
+      "Pumpkins"
+     ]
+    },
+    {
+     "key": "abandoned",
+     "name": "Abandoned Buildings",
+     "short": "ABANDONED",
+     "queries": [
+      "abandoned building",
+      "abandoned house",
+      "derelict building interior",
+      "ruined house"
+     ],
+     "match": "abandon|derelict|\\bruins?\\b|ruined|disused|dilapidated|\\bdecay",
+     "prompts": [
+      "an abandoned house with broken windows",
+      "the decaying interior of a derelict building",
+      "a crumbling abandoned farmhouse",
+      "an empty abandoned hallway with peeling paint"
+     ],
+     "cats": [
+      "Abandoned buildings",
+      "Abandoned houses"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "thanksgiving",
+   "start": "11-01",
+   "end": "11-30",
+   "badge": "🦃 THANKSGIVING SPECIAL",
+   "label": "Thanksgiving",
+   "themes": [
+    {
+     "key": "pies",
+     "name": "Pumpkin Pies",
+     "short": "PUMPKIN PIES",
+     "queries": [
+      "pumpkin pie",
+      "pecan pie",
+      "apple pie baked"
+     ],
+     "match": "\\bpies?\\b",
+     "prompts": [
+      "a homemade pumpkin pie on a kitchen table",
+      "a slice of pumpkin pie with whipped cream",
+      "a pecan pie fresh from the oven",
+      "a lattice apple pie cooling on a counter"
+     ],
+     "cats": [
+      "Pumpkin pies",
+      "Pies"
+     ]
+    },
+    {
+     "key": "turkey",
+     "name": "Roast Turkey Dinners",
+     "short": "TURKEY DINNERS",
+     "queries": [
+      "roast turkey",
+      "thanksgiving dinner",
+      "thanksgiving turkey"
+     ],
+     "match": "roast turkey|thanksgiving|turkey dinner|\\broast",
+     "prompts": [
+      "a roast turkey on a platter at a family dinner table",
+      "a thanksgiving dinner table with turkey and side dishes",
+      "a golden roast turkey being carved",
+      "a holiday dinner plate with turkey, stuffing and cranberry sauce"
+     ],
+     "cats": [
+      "Roast turkey",
+      "Thanksgiving dinners"
+     ]
+    },
+    {
+     "key": "harvesttable",
+     "name": "Harvest Tables",
+     "short": "HARVEST TABLES",
+     "queries": [
+      "harvest table decoration",
+      "autumn table setting",
+      "thanksgiving table"
+     ],
+     "match": "harvest|thanksgiving|table setting|centerpiece|centrepiece",
+     "prompts": [
+      "a rustic harvest table decorated with squash and candles",
+      "an autumn table setting with leaves and gourds",
+      "a long wooden table set for a harvest meal",
+      "a festive fall table centerpiece"
+     ],
+     "cats": [
+      "Thanksgiving decorations",
+      "Harvest festivals"
+     ]
+    },
+    {
+     "key": "cornucopia",
+     "name": "Cornucopias",
+     "short": "CORNUCOPIAS",
+     "queries": [
+      "cornucopia",
+      "harvest basket fruit vegetables",
+      "horn of plenty"
+     ],
+     "match": "cornucopia|horn of plenty|harvest basket|harvest festival",
+     "prompts": [
+      "a wicker cornucopia spilling fruit and vegetables",
+      "a harvest basket full of apples and squash",
+      "a horn of plenty centerpiece on a table",
+      "a cornucopia display at a farm market"
+     ],
+     "cats": [
+      "Cornucopias",
+      "Harvest festivals"
+     ]
+    },
+    {
+     "key": "foliage",
+     "name": "Fall Foliage",
+     "short": "FALL FOLIAGE",
+     "queries": [
+      "autumn foliage",
+      "fall colors forest",
+      "autumn leaves trees"
+     ],
+     "match": "autumn|\\bfall\\b|foliage",
+     "prompts": [
+      "a hillside of trees in bright autumn colors",
+      "a country road lined with orange and red trees",
+      "a lake reflecting fall foliage",
+      "a forest in peak autumn color"
+     ],
+     "cats": [
+      "Autumn foliage",
+      "Autumn in forests"
+     ]
+    },
+    {
+     "key": "orchards",
+     "name": "Apple Orchards",
+     "short": "APPLE ORCHARDS",
+     "queries": [
+      "apple orchard",
+      "apple harvest",
+      "apples on tree"
+     ],
+     "match": "\\bapples?\\b|orchard|\\bmalus\\b",
+     "prompts": [
+      "rows of apple trees heavy with red apples",
+      "ripe apples hanging on a branch in an orchard",
+      "crates of freshly picked apples in an orchard",
+      "an apple orchard in autumn sunlight"
+     ],
+     "cats": [
+      "Apple orchards",
+      "Apple harvest"
+     ]
+    },
+    {
+     "key": "cornfields",
+     "name": "Corn Fields",
+     "short": "CORN FIELDS",
+     "queries": [
+      "corn field",
+      "maize field",
+      "cornfield harvest",
+      "corn harvest combine"
+     ],
+     "match": "\\bcorn\\b|\\bmaize\\b|zea mays|cornfield",
+     "prompts": [
+      "a dry corn field ready for harvest",
+      "rows of golden corn stalks in late autumn",
+      "a combine harvesting a corn field",
+      "a corn field under a wide autumn sky"
+     ],
+     "cats": [
+      "Maize fields"
+     ]
+    },
+    {
+     "key": "haybales",
+     "name": "Hay Bales",
+     "short": "HAY BALES",
+     "queries": [
+      "hay bales",
+      "round bales field",
+      "straw bales"
+     ],
+     "match": "\\bhay\\b|\\bbales?\\b|haystack|straw bale",
+     "prompts": [
+      "round hay bales in a harvested field",
+      "stacked square straw bales by a barn",
+      "hay bales scattered across a field at sunset",
+      "a farm field dotted with round bales"
+     ],
+     "cats": [
+      "Hay bales",
+      "Round bales",
+      "Straw bales"
+     ]
+    },
+    {
+     "key": "gourds",
+     "name": "Gourds & Squash",
+     "short": "GOURDS",
+     "queries": [
+      "gourds",
+      "ornamental gourds",
+      "winter squash",
+      "squash harvest"
+     ],
+     "match": "\\bgourds?\\b|\\bsquash|cucurbita|pumpkin",
+     "prompts": [
+      "a pile of colorful ornamental gourds",
+      "assorted winter squash at a market",
+      "warty gourds in a wooden crate",
+      "a display of squash and gourds"
+     ],
+     "cats": [
+      "Gourds",
+      "Winter squash"
+     ]
+    },
+    {
+     "key": "cranberries",
+     "name": "Cranberry Bogs",
+     "short": "CRANBERRIES",
+     "queries": [
+      "cranberry bog",
+      "cranberry harvest",
+      "cranberries"
+     ],
+     "match": "cranberr",
+     "prompts": [
+      "a flooded cranberry bog full of floating red berries",
+      "workers harvesting a cranberry bog",
+      "fresh cranberries in a bowl",
+      "a cranberry bog in autumn"
+     ],
+     "cats": [
+      "Cranberry bogs",
+      "Cranberry harvest",
+      "Vaccinium macrocarpon"
+     ]
+    },
+    {
+     "key": "pumpkinpatch",
+     "name": "Pumpkin Patches",
+     "short": "PUMPKIN PATCHES",
+     "queries": [
+      "pumpkin patch",
+      "pumpkin field",
+      "pumpkins farm",
+      "pumpkins harvest"
+     ],
+     "match": "pumpkin",
+     "prompts": [
+      "a pumpkin patch full of orange pumpkins",
+      "pumpkins in a field after harvest",
+      "a farm stand piled with pumpkins",
+      "rows of pumpkins on dry vines in a field"
+     ],
+     "cats": [
+      "Pumpkin fields",
+      "Pumpkins"
+     ]
+    },
+    {
+     "key": "cabins",
+     "name": "Cozy Autumn Cabins",
+     "short": "AUTUMN CABINS",
+     "queries": [
+      "log cabin autumn",
+      "cabin woods",
+      "wooden cabin forest"
+     ],
+     "match": "\\bcabins?\\b|\\bcottage|log house|\\bhut\\b",
+     "prompts": [
+      "a log cabin in the woods surrounded by autumn trees",
+      "a small wooden cabin with smoke from the chimney",
+      "a cozy cabin porch with fallen leaves",
+      "a rustic cabin by a lake in fall"
+     ],
+     "cats": [
+      "Log cabins"
+     ]
+    },
+    {
+     "key": "markets",
+     "name": "Harvest Markets",
+     "short": "HARVEST MARKETS",
+     "queries": [
+      "farmers market vegetables",
+      "harvest market",
+      "farm stand produce"
+     ],
+     "match": "\\bmarket|farm stand|farmstand|\\bproduce\\b|vegetable stall",
+     "prompts": [
+      "a farmers market stall piled with autumn vegetables",
+      "crates of produce at a harvest market",
+      "a roadside farm stand with apples and squash",
+      "shoppers at an outdoor autumn market"
+     ],
+     "cats": [
+      "Farmers' markets",
+      "Vegetable markets"
+     ]
+    },
+    {
+     "key": "maple",
+     "name": "Maple Leaves",
+     "short": "MAPLE LEAVES",
+     "queries": [
+      "maple leaves autumn",
+      "acer leaves autumn",
+      "red maple leaf"
+     ],
+     "match": "\\bmaple|\\bacer\\b",
+     "prompts": [
+      "bright red maple leaves on a branch",
+      "fallen maple leaves on the ground",
+      "a close view of an orange maple leaf",
+      "a maple tree in full autumn color"
+     ],
+     "cats": [
+      "Acer in autumn",
+      "Autumn leaves"
+     ]
+    },
+    {
+     "key": "parades",
+     "name": "Parades",
+     "short": "PARADES",
+     "queries": [
+      "thanksgiving parade",
+      "parade balloon",
+      "marching band parade"
+     ],
+     "match": "\\bparade|marching band",
+     "prompts": [
+      "a giant balloon in a city parade",
+      "a marching band in a street parade",
+      "crowds watching a holiday parade",
+      "a parade float moving down a city street"
+     ],
+     "cats": [
+      "Macy's Thanksgiving Day Parade",
+      "Thanksgiving parades",
+      "Marching bands"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "christmas",
+   "start": "12-01",
+   "end": "12-31",
+   "badge": "🎄 CHRISTMAS SPECIAL",
+   "label": "Christmas",
+   "themes": [
+    {
+     "key": "trees",
+     "name": "Decorated Trees",
+     "short": "CHRISTMAS TREES",
+     "queries": [
+      "christmas tree decorated",
+      "christmas tree lights",
+      "christmas tree"
+     ],
+     "match": "christmas tree|tannenbaum|xmas tree|weihnachtsbaum",
+     "prompts": [
+      "a decorated christmas tree with warm lights in a living room",
+      "a tall christmas tree in a town square",
+      "a christmas tree covered in ornaments and tinsel",
+      "a christmas tree glowing in a dark room"
+     ],
+     "cats": [
+      "Christmas trees"
+     ]
+    },
+    {
+     "key": "gingerbread",
+     "name": "Gingerbread Houses",
+     "short": "GINGERBREAD",
+     "queries": [
+      "gingerbread house",
+      "gingerbread cookies",
+      "lebkuchen"
+     ],
+     "match": "gingerbread|lebkuchen|pepparkak",
+     "prompts": [
+      "a homemade gingerbread house with icing and candy",
+      "a gingerbread house on a kitchen counter",
+      "a tray of decorated gingerbread cookies",
+      "a gingerbread village display"
+     ],
+     "cats": [
+      "Gingerbread houses",
+      "Gingerbread"
+     ]
+    },
+    {
+     "key": "presents",
+     "name": "Wrapped Presents",
+     "short": "PRESENTS",
+     "queries": [
+      "christmas presents",
+      "wrapped gifts",
+      "christmas gifts"
+     ],
+     "match": "christmas present|christmas gift|wrapped (gift|present)|gift wrap",
+     "prompts": [
+      "wrapped presents under a christmas tree",
+      "a stack of gifts with ribbons",
+      "christmas presents on a wooden floor",
+      "a pile of wrapped gifts by a fireplace"
+     ],
+     "cats": [
+      "Christmas presents",
+      "Gift wrapping"
+     ]
+    },
+    {
+     "key": "snowvillage",
+     "name": "Snowy Villages",
+     "short": "SNOWY VILLAGES",
+     "queries": [
+      "snowy village",
+      "village winter snow",
+      "snow covered town"
+     ],
+     "match": "\\bsnow|\\bwinter\\b",
+     "prompts": [
+      "a small village covered in fresh snow",
+      "snowy rooftops of an old town at dusk",
+      "a quiet village street in winter snow",
+      "a mountain village blanketed with snow"
+     ],
+     "cats": [
+      "Villages in winter",
+      "Snow in villages"
+     ]
+    },
+    {
+     "key": "markets",
+     "name": "Christmas Markets",
+     "short": "XMAS MARKETS",
+     "queries": [
+      "christmas market",
+      "weihnachtsmarkt",
+      "christkindlmarkt"
+     ],
+     "match": "christmas market|weihnachtsmarkt|christkindl|advent market|marché de noël",
+     "prompts": [
+      "a busy christmas market with wooden stalls and lights",
+      "a christmas market stall selling ornaments",
+      "people at an evening christmas market",
+      "a christmas market in an old town square"
+     ],
+     "cats": [
+      "Christmas markets"
+     ]
+    },
+    {
+     "key": "ornaments",
+     "name": "Ornaments",
+     "short": "ORNAMENTS",
+     "queries": [
+      "christmas ornaments",
+      "christmas baubles",
+      "christmas decorations"
+     ],
+     "match": "christmas ornament|bauble|christmas decoration|christbaumschmuck",
+     "prompts": [
+      "shiny christmas baubles on a tree branch",
+      "a box of vintage christmas ornaments",
+      "glass ornaments hanging in close view",
+      "christmas decorations on a table"
+     ],
+     "cats": [
+      "Christmas ornaments",
+      "Christmas baubles"
+     ]
+    },
+    {
+     "key": "fireplaces",
+     "name": "Fireplaces & Stockings",
+     "short": "FIREPLACES",
+     "queries": [
+      "fireplace christmas",
+      "christmas stockings",
+      "fireplace mantel decorated"
+     ],
+     "match": "fireplace|stocking|hearth|mantel",
+     "prompts": [
+      "a fireplace with christmas stockings hanging from the mantel",
+      "a crackling fire in a decorated living room",
+      "a mantel with garland and stockings",
+      "a cozy hearth with a wood fire"
+     ],
+     "cats": [
+      "Christmas stockings",
+      "Fireplaces"
+     ]
+    },
+    {
+     "key": "lights",
+     "name": "Holiday Lights",
+     "short": "HOLIDAY LIGHTS",
+     "queries": [
+      "christmas lights house",
+      "christmas illumination",
+      "holiday lights"
+     ],
+     "match": "christmas lights|christmas illumination|holiday lights|weihnachtsbeleuchtung|festive lights",
+     "prompts": [
+      "a house covered in christmas lights at night",
+      "a street decorated with holiday lights",
+      "colorful lights on a suburban home",
+      "strings of christmas lights on a porch"
+     ],
+     "cats": [
+      "Christmas lights",
+      "Christmas illuminations"
+     ]
+    },
+    {
+     "key": "reindeer",
+     "name": "Reindeer",
+     "short": "REINDEER",
+     "queries": [
+      "reindeer",
+      "rangifer tarandus",
+      "reindeer snow"
+     ],
+     "match": "reindeer|rangifer|caribou",
+     "prompts": [
+      "a reindeer standing in the snow",
+      "a herd of reindeer in a winter landscape",
+      "a reindeer with large antlers in a forest",
+      "reindeer grazing in snowy tundra"
+     ],
+     "cats": [
+      "Rangifer tarandus"
+     ]
+    },
+    {
+     "key": "snowmen",
+     "name": "Snowmen",
+     "short": "SNOWMEN",
+     "queries": [
+      "snowman",
+      "snowmen",
+      "snow sculpture"
+     ],
+     "match": "\\bsnowm[ae]n",
+     "prompts": [
+      "a homemade snowman in a backyard",
+      "a snowman with a scarf and carrot nose",
+      "a lopsided snowman in a park",
+      "two snowmen in a snowy yard"
+     ],
+     "cats": [
+      "Snowmen"
+     ]
+    },
+    {
+     "key": "candycanes",
+     "name": "Candy Canes & Sweets",
+     "short": "CANDY CANES",
+     "queries": [
+      "candy cane",
+      "christmas candy",
+      "christmas sweets"
+     ],
+     "match": "candy cane|christmas candy|christmas sweets|zuckerstange",
+     "prompts": [
+      "a pile of red and white candy canes",
+      "candy canes hanging on a christmas tree",
+      "a bowl of christmas sweets",
+      "striped candy canes on a table"
+     ],
+     "cats": [
+      "Candy canes",
+      "Christmas sweets"
+     ]
+    },
+    {
+     "key": "wreaths",
+     "name": "Wreaths",
+     "short": "WREATHS",
+     "queries": [
+      "christmas wreath",
+      "advent wreath",
+      "door wreath"
+     ],
+     "match": "wreath",
+     "prompts": [
+      "an evergreen christmas wreath on a front door",
+      "a wreath with red ribbon and pine cones",
+      "a holly wreath on a wooden door",
+      "a decorated wreath hanging on a window"
+     ],
+     "cats": [
+      "Christmas wreaths",
+      "Advent wreaths"
+     ]
+    },
+    {
+     "key": "cookies",
+     "name": "Holiday Cookies",
+     "short": "COOKIES",
+     "queries": [
+      "christmas cookies",
+      "christmas baking",
+      "christmas biscuits"
+     ],
+     "match": "\\bcookies?\\b|\\bbiscuits?\\b|christmas baking|plätzchen|platzchen",
+     "prompts": [
+      "a plate of decorated christmas cookies",
+      "christmas cookies cooling on a baking tray",
+      "sugar cookies shaped like stars and trees",
+      "a tin of homemade holiday biscuits"
+     ],
+     "cats": [
+      "Christmas cookies"
+     ]
+    },
+    {
+     "key": "wintercabins",
+     "name": "Winter Cabins",
+     "short": "WINTER CABINS",
+     "queries": [
+      "cabin snow",
+      "log cabin winter",
+      "mountain hut winter"
+     ],
+     "match": "\\bcabins?\\b|\\bhut\\b|\\bcottage|\\blodge\\b|chalet",
+     "prompts": [
+      "a log cabin in deep snow",
+      "a snowy mountain hut under a clear sky",
+      "a wooden chalet with snow on the roof",
+      "a cabin in a winter forest with lit windows"
+     ],
+     "cats": [
+      "Log cabins in winter",
+      "Mountain huts in winter"
+     ]
+    },
+    {
+     "key": "winterscenes",
+     "name": "Winter Scenes",
+     "short": "WINTER SCENES",
+     "queries": [
+      "winter landscape snow",
+      "snowy forest",
+      "frozen lake winter"
+     ],
+     "match": "\\bwinter\\b|\\bsnow|\\bfrost|frozen",
+     "prompts": [
+      "a snowy forest on a quiet winter morning",
+      "a frozen lake surrounded by snowy trees",
+      "a winter landscape with frost on the fields",
+      "a snowy country road through pine trees"
+     ],
+     "cats": [
+      "Winter landscapes",
+      "Snowy forests"
+     ]
+    }
+   ]
+  }
+ ]
+}

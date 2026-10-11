@@ -37,108 +37,51 @@ Imposter is a fast-paced, viral daily forensic deduction game built with a **$0 
 
 ---
 
-## 🚀 $0 Free Hosting & Deployment (Cloudflare Pages)
+## How it works (and why the answer is not in the browser)
 
-The entire application runs as a static Progressive Web App with zero backend requirements or database costs.
+- `index.html`, `sw.js` and friends are the client. `gen/build.py` copies only the
+  files players need into `dist/`, plus that run's case images in `dist/img/`
+  (random filenames, every image 1024x768 WebP at one quality, no metadata,
+  equal byte size within a round).
+- `functions/api/case.js`: `GET /api/case?date=YYYY-MM-DD` returns a day's
+  rounds and image URLs, no answers. Any past date, up to UTC today + 1.
+- `functions/api/guess.js`: `POST /api/guess {date, round, card}` returns
+  `{correct}` and the photo credits. The answers live in
+  `functions/_data/cases.json`, which is bundled into the Function and never
+  served as a file.
+- The case switches at the player's local midnight.
 
-### Deploying to Cloudflare Pages (Recommended $0 Method)
+**This repo is public.** Everything that maps a card to real/AI lives in
+`private/` and `functions/_data/` (both gitignored): the generator state,
+processed images, raw downloads and the generator secret. Back up `private/`.
 
-1. **Push to GitHub**:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: Imposter Daily Game"
-   git remote add origin https://github.com/<your-username>/imposter-game.git
-   git branch -M main
-   git push -u origin main
-   ```
+## Content generator
 
-2. **Connect to Cloudflare Pages**:
-   - Go to [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **Create application** → **Pages** → **Connect to Git**.
-   - Select your repository (`imposter-game`).
-   - Build settings:
-     - **Framework preset**: None
-     - **Build command**: *(leave blank)*
-     - **Build output directory**: `.` (root directory)
-   - Click **Save and Deploy**.
+`gen/imposter_gen.py` builds days from `gen/seasons.json` (date-ranged seasons,
+about 15 sub-themes each). Real photos come from Wikimedia Commons (CC0, PD,
+CC BY, CC BY-SA, credited in the game); the imposter comes from the
+`imposter-gen` Worker (`gen-worker/`, Workers AI flux-1-schnell, free tier,
+capped at 9,000 neurons per UTC day). It is idempotent and resumable and
+always exits 0 when the budget runs out, so it can run nightly:
 
-3. **Custom Domain ($0 Cloudflare DNS)**:
-   - In your Cloudflare Pages project dashboard, click **Custom domains**.
-   - Add your apex domain (e.g. `impostergame.com`) or subdomain. Cloudflare handles SSL, CDN edge caching, and DDoS protection automatically for $0.
-
----
-
-## 📁 Repository Structure
-
-```
-real-or-ai/
-├── assets/
-│   ├── cases/
-│   │   ├── c1_... to c4_...        # Archive Case #65 image assets
-│   │   └── halloween/              # Halloween Case #66 matched image assets
-│   └── icons/
-│       ├── icon-192.png            # PWA home screen icon
-│       ├── icon-512.png            # PWA splash icon
-│       ├── apple-touch-icon.png    # iOS touch icon
-│       ├── favicon.svg             # Vector favicon
-│       └── og-image.png            # 1200x630 social sharing card
-├── cases.json                      # Structured daily & archive case database
-├── index.html                      # Complete self-contained game interface
-├── manifest.json                   # PWA Web App Manifest
-├── sw.js                           # PWA Service Worker
-├── _headers                        # Cloudflare Pages cache & security headers
-├── robots.txt                      # Search engine bot directives
-├── sitemap.xml                     # XML Sitemap for search indexing
-└── server.py                       # Local development zero-cache test server
-```
-
----
-
-## 🛠️ Adding New Daily Cases
-
-Cases are structured in `cases.json`. Each case contains 4 rounds with exactly 4 cards per round (3 real, 1 AI):
-
-```json
-{
-  "id": "daily_case_67",
-  "caseNumber": 67,
-  "isSpecialEvent": false,
-  "eventBadge": "CASE #67",
-  "title": "Daily Case #67",
-  "totalRounds": 4,
-  "rounds": [
-    {
-      "roundIndex": 1,
-      "theme": "Round 1 of 4 · Emerald Hummingbirds",
-      "tagline": "3 high-speed macro wildlife photos. 1 generative diffusion bird.",
-      "shortName": "BIRDS",
-      "cards": [
-        {
-          "id": "A",
-          "image": "assets/cases/c67_real_a.jpg",
-          "isAi": false,
-          "title": "Violet-Crowned Hummingbird",
-          "details": "AUTHENTIC PHOTO. High-speed 1/4000s mechanical shutter feather separation."
-        },
-        {
-          "id": "B",
-          "image": "assets/cases/c67_ai.jpg",
-          "isAi": true,
-          "title": "The Neural Imposter",
-          "details": "SYNTHETIC AI. Generative diffusion. Look closely at the beak tip and claw barbs."
-        }
-      ]
-    }
-  ]
-}
-```
-
----
-
-## 🧪 Local Testing
-
-To run the local development server:
 ```bash
-python3 server.py
-# Server opens at http://localhost:8080
+python3 gen/imposter_gen.py            # seed nearest dates first, within budget
+python3 gen/imposter_gen.py --status   # which dates are done
+python3 gen/imposter_gen.py --redo 2026-10-12:3      # new photos + new AI
+python3 gen/imposter_gen.py --redo-ai 2026-10-12:3   # new AI only
+python3 gen/imposter_gen.py --swap 2026-10-12:3:B    # replace one real photo
 ```
+
+Contact sheets for checking a day by eye land in `private/sheets/`.
+
+## Build and deploy (free tier only)
+
+Run from the repo root so wrangler picks up `./functions`:
+
+```bash
+python3 gen/build.py
+npx wrangler pages deploy dist --project-name=playimposter --branch=main
+npx wrangler pages deploy dist --project-name=imposter-game --branch=main
+```
+
+Local: `npx wrangler pages dev dist` (Functions included).

@@ -10,7 +10,7 @@
 <link rel="alternate icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <meta property="og:site_name" content="Imposter Game">
-<meta property="og:title" content="Imposter Game · Daily AI Detective Mystery">
+<meta property="og:title" content="Imposter Game · {{SEASON_LABEL}} Edition · Daily AI Detective Mystery">
 <meta property="og:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://playimposter.pages.dev/">
@@ -19,12 +19,12 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Imposter Game: four Halloween mansion photos. Three are real, one is AI. Can you spot the fake?">
+<meta property="og:image:alt" content="Imposter Game: four photos. Three are real, one is AI. Can you spot the fake?">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Imposter Game · Daily AI Detective Mystery">
+<meta name="twitter:title" content="Imposter Game · {{SEASON_LABEL}} Edition · Daily AI Detective Mystery">
 <meta name="twitter:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
 <meta name="twitter:image" content="https://playimposter.pages.dev/og-image.png">
-<meta name="twitter:image:alt" content="Imposter Game: four Halloween mansion photos. Three are real, one is AI. Can you spot the fake?">
+<meta name="twitter:image:alt" content="Imposter Game: four photos. Three are real, one is AI. Can you spot the fake?">
 <meta name="theme-color" content="#0d0f18">
 <script type="application/ld+json">
 {
@@ -404,6 +404,21 @@
     max-height: 70px;
     overflow-y: auto;
   }
+
+  .imposter-card.checking { opacity: 0.75; }
+  .round-credits, .photo-credits {
+    width: 100%;
+    font-family: var(--mono-font);
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--fg);
+    opacity: 0.8;
+    margin: 6px 0 0;
+    word-break: break-word;
+  }
+  .round-credits[hidden], .photo-credits[hidden] { display: none; }
+  .round-credits a, .photo-credits a { color: inherit; text-decoration: underline; }
+  .photo-credits summary { cursor: pointer; font-weight: 700; margin-bottom: 4px; }
 
   /* Control Bar & Next Round Action */
   .control-bar {
@@ -2130,7 +2145,7 @@
   <header class="app-header">
     <div class="header-brand">
       <div class="logo-text">IMPOSTER GAME</div>
-      <div class="halloween-badge" id="caseTag">🎃 HALLOWEEN SPECIAL</div>
+      <div class="halloween-badge" id="caseTag">{{SEASON_BADGE}}</div>
     </div>
     <div class="header-actions">
       <button class="icon-btn" onclick="openHowModal()" title="How to Play">❓</button>
@@ -2165,6 +2180,7 @@
     <div class="grid-wrap" id="gridWrap">
       <!-- 4 Cards populated dynamically -->
     </div>
+    <div class="round-credits" id="roundCredits" hidden></div>
 
     <div class="control-bar">
       <button class="btn-next-round" id="btnNextRound">
@@ -2233,15 +2249,16 @@
         <button class="btn-invite-friend" id="btnInviteFriend" onclick="openInviteModal()">
           <span>👥 Challenge a Friend</span>
         </button>
-        <button class="btn-replay" id="btnReplayDaily" onclick="resetDailyChallenge()">
-          <span>🔄 Play Case Again (Reset)</span>
-        </button>
       </div>
 
       <!-- Round by Round Breakdown -->
       <div class="round-breakdown" id="roundBreakdown">
         <!-- Dynamically generated rows -->
       </div>
+      <details class="photo-credits" id="photoCredits" hidden>
+        <summary>Photo credits</summary>
+        <div id="photoCreditsList"></div>
+      </details>
     </div>
   </section>
 </div>
@@ -2440,7 +2457,7 @@
 
   <!-- Mission Onboarding / Explainer (Visible in Ready State) -->
   <div class="cd-briefing" id="cdBriefing">
-    <div class="cd-badge" id="cdBadge">🎃 DAILY FORENSIC CASE #66 · HALLOWEEN SPECIAL</div>
+    <div class="cd-badge" id="cdBadge">{{SEASON_BADGE}}</div>
     <h1 class="cd-hero-title">IMPOSTER</h1>
     <div class="cd-hero-tagline">THE DAILY AI DETECTIVE GAME</div>
     
@@ -2462,7 +2479,7 @@
 
   <!-- Countdown Stage (Visible during 3... 2... 1... GO!) -->
   <div class="cd-active-stage" id="cdActiveStage" style="display:none;">
-    <div class="cd-badge" id="cdActiveBadge">🎃 HALLOWEEN SPEED CASE #66</div>
+    <div class="cd-badge" id="cdActiveBadge">{{SEASON_BADGE}}</div>
     <div class="cd-title" id="cdActiveTitle">HAUNTED LEGACY · 6 ROUNDS</div>
 
     <div class="cd-ring-wrap">
@@ -2558,7 +2575,6 @@
    ======================================================================== */
 const ADS = { enabled: false, adsenseClient: "", resultsSlot: "", video: { enabled: false, src: "", clickUrl: "", skipAfter: 5 } };
 
-let allCases = [];
 let dailyCaseData = null;
 let currentRoundIndex = 0; // 0, 1, 2, 3
 let roundResults = []; // [{ round: 1, solved: true, attempts: 1 }, ...]
@@ -2980,19 +2996,23 @@ function loadStats() {
   updateStreakUI();
 }
 
-// One daily case per UTC day (matches getDailyCaseForToday). The streak is the
-// number of consecutive days, ending today or yesterday, with a completed case.
-function utcDayStr(offsetDays = 0) {
-  return new Date(Date.now() + offsetDays * 86400000).toISOString().slice(0, 10);
+// One daily case per LOCAL day (Wordle-style: it switches at the player's
+// midnight, matching the countdown). The streak is the number of consecutive
+// days, ending today or yesterday, with a completed case.
+function localDayStr(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const pad = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 function computeStreakFromRecords() {
   let records = {};
   try { records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}"); } catch (_) {}
   const done = d => records[d] && records[d].solved;
-  let offset = done(utcDayStr(0)) ? 0 : -1;
+  let offset = done(localDayStr(0)) ? 0 : -1;
   let streak = 0;
-  while (done(utcDayStr(offset))) { streak++; offset--; }
+  while (done(localDayStr(offset))) { streak++; offset--; }
   return streak;
 }
 
@@ -3210,20 +3230,10 @@ function getDeceptionRate(cardId, isAi) {
 
 
 // --- Daily Date-Based Engine & Completion Locking ---
-function getDailyCaseForToday() {
-  if (!allCases || allCases.length === 0) return null;
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const epoch = new Date("2026-10-11").getTime();
-  const now = new Date(todayStr).getTime();
-  const dayDiff = Math.max(0, Math.floor((now - epoch) / (1000 * 60 * 60 * 24)));
-  const caseIndex = dayDiff % allCases.length;
-  return allCases[caseIndex];
-}
-
 function checkDailyStatus() {
   try {
     const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayStr = localDayStr();
     const badge = $("dailyStatusBadge");
     if (records[todayStr] && badge) {
       badge.textContent = "SOLVED ✓";
@@ -3281,31 +3291,6 @@ function showAlreadyCompletedToday(record) {
   startMidnightCountdown();
 }
 
-function resetDailyChallenge() {
-  playSound("tap");
-  const todayStr = new Date().toISOString().slice(0, 10);
-  try {
-    const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
-    delete records[todayStr];
-    localStorage.setItem("imposter_daily_records", JSON.stringify(records));
-  } catch (_) {}
-
-  roundResults = [];
-  attemptsUsedThisRound = 0;
-  isCurrentRoundOver = false;
-  caseStartTime = null;
-  caseEndTime = null;
-  elapsedSeconds = 0;
-  if (timerInterval) clearInterval(timerInterval);
-
-  $("viewResults").style.display = "none";
-  $("viewPlaying").style.display = "block";
-
-  loadRound(0);
-  showCountdownReadyState();
-  showToast("Case reset! Ready to play again 🕵️");
-}
-
 // --- Initialization ---
 let friendChallenge = null; // { s: number, t: number } when a valid link for today's case
 
@@ -3351,23 +3336,12 @@ async function init() {
   updateSoundButton();
   $("btnSound").onclick = toggleSound;
 
-  // Handle URL reset/replay query parameter (?reset=1 or ?replay=1)
+  // Fetch today's case (no answers in it: guesses are checked by /api/guess)
+  const todayStr = localDayStr();
   try {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("reset") || urlParams.has("replay")) {
-      const todayStr = new Date().toISOString().slice(0, 10);
-      const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
-      delete records[todayStr];
-      localStorage.setItem("imposter_daily_records", JSON.stringify(records));
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  } catch (_) {}
-
-  // Fetch 4-round cases
-  try {
-    const res = await fetch("cases.json");
-    allCases = await res.json();
-    dailyCaseData = getDailyCaseForToday() || allCases[0];
+    const res = await fetch(`/api/case?date=${todayStr}`);
+    if (!res.ok) throw new Error(`case ${res.status}`);
+    dailyCaseData = await res.json();
     readChallengeParams();
     renderChallengeBanner();
 
@@ -3379,22 +3353,22 @@ async function init() {
       badgeEl.textContent = dailyCaseData.eventBadge || `DAILY CASE #${dailyCaseData.caseNumber}`;
     }
 
-    // Check if player already finished today's case
-    const todayStr = new Date().toISOString().slice(0, 10);
+    // A finished day stays finished (only a record for THIS case counts)
     const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
-    if (records[todayStr] && records[todayStr].solved) {
-      showAlreadyCompletedToday(records[todayStr]);
-      return;
+    const rec = records[todayStr];
+    if (rec && rec.solved && (!rec.caseNumber || rec.caseNumber === dailyCaseData.caseNumber)) {
+      showAlreadyCompletedToday(rec);
+    } else {
+      loadRound(0);
     }
-
-    loadRound(0);
   } catch (err) {
-    console.error("Failed to load cases", err);
+    console.error("Failed to load case", err);
+    showToast("Today's case could not be loaded. Check your connection and refresh.");
   }
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.9').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.0').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3439,6 +3413,11 @@ function loadRound(rIndex) {
     });
   }
 
+  guessInFlight = false;
+  roundCredits = {};
+  const creditsEl = $("roundCredits");
+  if (creditsEl) { creditsEl.innerHTML = ""; creditsEl.hidden = true; }
+
   // Populate 4 cards with fallback
   const wrap = $("gridWrap");
   wrap.innerHTML = round.cards.map(card => `
@@ -3450,14 +3429,71 @@ function loadRound(rIndex) {
       <div class="card-status-badge" id="badge_${card.id}">
         <div class="badge-icon" id="badgeIcon_${card.id}">🧑</div>
         <div class="badge-title" id="badgeTitle_${card.id}">AUTHENTIC</div>
-        <div class="badge-desc" id="badgeDesc_${card.id}">${card.details}</div>
+        <div class="badge-desc" id="badgeDesc_${card.id}"></div>
       </div>
     </div>
   `).join("");
 }
 
-function selectCard(id) {
-  if (isCurrentRoundOver || prerollShowing) return;
+// --- Guess checking (server-side: the answer never ships to the browser) ---
+let guessInFlight = false;
+let roundCredits = {};
+let dayCredits = [];
+
+function renderPhotoCredits() {
+  const box = $("photoCredits"), list = $("photoCreditsList");
+  if (!box || !list) return;
+  const rows = [];
+  dayCredits.forEach(r => Object.keys(r.credits).sort().forEach(id => rows.push(`<div>R${r.round} ${id}: ${creditLine(r.credits[id])}</div>`)));
+  list.innerHTML = rows.join("");
+  box.hidden = rows.length === 0;
+}
+
+function escapeHtml(str) {
+  return String(str == null ? "" : str).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+
+function safeUrl(u) {
+  return /^https:\/\//.test(u || "") ? u : "";
+}
+
+function creditLine(c) {
+  if (!c) return "";
+  const lic = safeUrl(c.licenseUrl) ? `<a href="${escapeHtml(c.licenseUrl)}" target="_blank" rel="noopener">${escapeHtml(c.license)}</a>` : escapeHtml(c.license);
+  const src = safeUrl(c.source) ? `<a href="${escapeHtml(c.source)}" target="_blank" rel="noopener">Wikimedia Commons</a>` : "Wikimedia Commons";
+  return `Photo: ${escapeHtml(c.artist)} · ${lic} · ${src}`;
+}
+
+function renderRoundCredits() {
+  const el = $("roundCredits");
+  if (!el) return;
+  const ids = Object.keys(roundCredits).sort();
+  if (!ids.length) { el.hidden = true; return; }
+  el.innerHTML = ids.map(id => `<div><b>${id}</b> ${creditLine(roundCredits[id])}</div>`).join("");
+  el.hidden = false;
+}
+
+async function postGuess(round, card) {
+  const res = await fetch("/api/guess", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ date: dailyCaseData.date, round, card })
+  });
+  if (!res.ok) throw new Error(`guess ${res.status}`);
+  return res.json();
+}
+
+function markImposter(cardId, caughtByPlayer) {
+  const el = $(`card_${cardId}`);
+  if (!el) return;
+  el.classList.add("caught");
+  $(`badgeIcon_${cardId}`).textContent = "🤖";
+  $(`badgeTitle_${cardId}`).textContent = caughtByPlayer ? "AI IMPOSTER CAUGHT" : "AI IMPOSTER";
+  $(`badgeDesc_${cardId}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(cardId, true)}% of detectives caught this AI fake</div><div style="margin-top:4px;">Generated by AI (FLUX.1 schnell). Look for textures that are too smooth and details that do not quite add up.</div>`;
+}
+
+async function selectCard(id) {
+  if (isCurrentRoundOver || prerollShowing || guessInFlight) return;
   if (prerollNeeded() && !caseStartTime) { dismissCountdown(); return; }
 
   // If user clicks a card while countdown is running, dismiss countdown instantly and start timer!
@@ -3465,20 +3501,35 @@ function selectCard(id) {
 
   const cardEl = $(`card_${id}`);
   if (!cardEl || cardEl.classList.contains("eliminated") || cardEl.classList.contains("caught")) return;
+
+  const roundIdx = currentRoundIndex;
+  const round = dailyCaseData.rounds[roundIdx];
+  guessInFlight = true;
+  cardEl.classList.add("checking");
+  let result;
+  try {
+    result = await postGuess(roundIdx, id);
+  } catch (err) {
+    console.error(err);
+    showToast("Connection problem. Tap the photo again.");
+    return;
+  } finally {
+    guessInFlight = false;
+    cardEl.classList.remove("checking");
+  }
+  if (roundIdx !== currentRoundIndex || isCurrentRoundOver) return;
+
   // Instant accusation on tap
   attemptsUsedThisRound++;
+  const theme = round.shortName || round.theme.split("·")[1]?.trim() || `Round ${roundIdx + 1}`;
 
-  const round = dailyCaseData.rounds[currentRoundIndex];
-  const card = round.cards.find(c => c.id === id);
-
-  if (card.isAi) {
+  if (result.correct) {
     // Solved round!
     playSound("caught");
     isCurrentRoundOver = true;
-    cardEl.classList.add("caught");
-    $(`badgeIcon_${card.id}`).textContent = "🤖";
-    $(`badgeTitle_${card.id}`).textContent = "AI IMPOSTER CAUGHT";
-    $(`badgeDesc_${card.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(card.id, true)}% of detectives caught this AI fake</div><div style="margin-top:4px;">${card.details}</div>`;
+    markImposter(id, true);
+    roundCredits = { ...roundCredits, ...(result.credits || {}) };
+    renderRoundCredits();
 
     const solvedPip = $(`dot${attemptsUsedThisRound}`);
     if (solvedPip) {
@@ -3486,22 +3537,17 @@ function selectCard(id) {
       solvedPip.textContent = "🎯";
     }
 
-    roundResults.push({
-      roundIndex: currentRoundIndex + 1,
-      theme: round.shortName || round.theme.split("·")[1]?.trim() || `Round ${currentRoundIndex + 1}`,
-      solved: true,
-      attempts: attemptsUsedThisRound
-    });
-
+    roundResults.push({ roundIndex: roundIdx + 1, theme, solved: true, attempts: attemptsUsedThisRound });
     finishRoundUI(true);
   } else {
     // Wrong guess: Eliminated authentic card
     playSound("strike");
     applyFalseAccusationPenalty();
     cardEl.classList.add("eliminated");
-    $(`badgeIcon_${card.id}`).textContent = "🏛️";
-    $(`badgeTitle_${card.id}`).textContent = "100% REAL";
-    $(`badgeDesc_${card.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(card.id, false)}% of detectives were tricked by this photo</div><div style="margin-top:4px;">${card.details}</div>`;
+    if (result.credit) roundCredits[id] = result.credit;
+    $(`badgeIcon_${id}`).textContent = "🏛️";
+    $(`badgeTitle_${id}`).textContent = "100% REAL";
+    $(`badgeDesc_${id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(id, false)}% of detectives were tricked by this photo</div><div style="margin-top:4px;">A real photograph.</div>`;
 
     const lostPip = $(`dot${attemptsUsedThisRound}`);
     if (lostPip) {
@@ -3510,31 +3556,19 @@ function selectCard(id) {
     }
 
     if (attemptsUsedThisRound === 1) {
-      showToast(`Card ${card.id} is authentic! +3.0s Penalty. 2 attempts left.`);
+      showToast(`Card ${id} is authentic! +3.0s Penalty. 2 attempts left.`);
     } else if (attemptsUsedThisRound === 2) {
-      showToast(`Card ${card.id} is authentic! +3.0s Penalty. 1 attempt left.`);
+      showToast(`Card ${id} is authentic! +3.0s Penalty. 1 attempt left.`);
     } else {
-      // 3 attempts used and still wrong: Failed round
+      // 3 strikes: the one card left is the imposter, by elimination
       isCurrentRoundOver = true;
-
-      const imposter = round.cards.find(c => c.isAi);
-      if (imposter) {
-        const imposterEl = $(`card_${imposter.id}`);
-        if (imposterEl) {
-          imposterEl.classList.add("caught");
-          $(`badgeIcon_${imposter.id}`).textContent = "🤖";
-          $(`badgeTitle_${imposter.id}`).textContent = "AI IMPOSTER";
-          $(`badgeDesc_${imposter.id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(imposter.id, true)}% of detectives caught this AI fake</div><div style="margin-top:4px;">${imposter.details}</div>`;
-        }
-      }
-
-      roundResults.push({
-        roundIndex: currentRoundIndex + 1,
-        theme: round.shortName || round.theme.split("·")[1]?.trim() || `Round ${currentRoundIndex + 1}`,
-        solved: false,
-        attempts: 3
+      const left = round.cards.find(c => {
+        const el = $(`card_${c.id}`);
+        return el && !el.classList.contains("eliminated");
       });
-
+      if (left) markImposter(left.id, false);
+      renderRoundCredits();
+      roundResults.push({ roundIndex: roundIdx + 1, theme, solved: false, attempts: 3 });
       finishRoundUI(false);
     }
   }
@@ -3553,9 +3587,10 @@ function finishRoundUI(didWin) {
 
   // Smooth auto-advance with comfortable observation time
   if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
+  dayCredits.push({ round: currentRoundIndex + 1, credits: { ...roundCredits } });
   autoAdvanceTimeout = setTimeout(() => {
     advanceToNextStage();
-  }, 1600);
+  }, 2600);
 }
 
 function advanceToNextStage() {
@@ -3663,10 +3698,12 @@ function showFinalResults() {
   }
 
   // Save official daily completion record first: the streak is derived from it
-  const todayStr = utcDayStr();
+  const todayStr = dailyCaseData.date || localDayStr();
   try {
     const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
-    records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, date: new Date().toISOString() };
+    const prior = records[todayStr];
+    // First result stands: a finished day is never overwritten
+    if (!(prior && prior.solved && prior.caseNumber === dailyCaseData.caseNumber)) records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, date: new Date().toISOString() };
     localStorage.setItem("imposter_daily_records", JSON.stringify(records));
     checkDailyStatus();
   } catch (_) {}
@@ -3694,6 +3731,7 @@ function showFinalResults() {
   if (finalSecs < 20.0 && firstTryCount >= (totalRounds - 1)) unlockBadge("lightning_instinct");
 
   renderResultsExtras(finalScore, finalSecs);
+  renderPhotoCredits();
   startMidnightCountdown();
 }
 
@@ -3703,7 +3741,7 @@ function openLightbox(e, cardId) {
   playSound("tap");
   const round = dailyCaseData.rounds[currentRoundIndex];
   const card = round.cards.find(c => c.id === cardId);
-  $("lightboxLabel").textContent = `Card ${cardId} · ${card.title} (Tap to Zoom)`;
+  $("lightboxLabel").textContent = `Card ${cardId} (Tap to Zoom)`;
   $("lightboxImg").src = card.image;
   $("lightboxStage").classList.remove("zoomed");
   $("lightboxModal").classList.add("open");
@@ -3727,15 +3765,16 @@ function buildEmojiGrid(results) {
 // Today's finished result: from this session's rounds, or from the saved daily record
 function getTodayResult() {
   const totalRounds = dailyCaseData?.rounds?.length || 6;
+  // The saved record is the first result for this day, and it is what we share
+  try {
+    const rec = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}")[dailyCaseData.date || localDayStr()];
+    if (rec && rec.solved && (!rec.caseNumber || rec.caseNumber === dailyCaseData.caseNumber)) return { won: rec.won || 0, total: rec.total || totalRounds, score: rec.score || 0, time: typeof rec.time === "number" ? rec.time : 0, grid: rec.grid || "" };
+  } catch (_) {}
   if (roundResults.length > 0 && roundResults.length === totalRounds) {
     const firstTry = roundResults.filter(r => r.solved && r.attempts === 1).length;
     const base = (firstTry * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
     return { won: roundResults.filter(r => r.solved).length, total: totalRounds, score: base + calculateSpeedBonus(elapsedSeconds, roundResults), time: elapsedSeconds, grid: buildEmojiGrid(roundResults) };
   }
-  try {
-    const rec = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}")[utcDayStr()];
-    if (rec && rec.solved) return { won: rec.won || 0, total: rec.total || totalRounds, score: rec.score || 0, time: typeof rec.time === "number" ? rec.time : 0, grid: rec.grid || "" };
-  } catch (_) {}
   return null;
 }
 
