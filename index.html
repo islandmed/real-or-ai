@@ -1060,141 +1060,63 @@
     justify-content: center;
   }
 
-  /* Replayability & Soft-Auth Gate: The Case Archive */
-  .archive-section {
-    width: 100%;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 14px;
-    text-align: left;
-    margin-top: 4px;
-  }
-  .archive-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-  }
-  .archive-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #fff;
-  }
-  .archive-badge {
-    font-size: 11px;
+  /* Streak, friend challenge, ad slot, pre-roll */
+  [hidden] { display: none !important; }
+  .results-streak {
+    margin: 10px auto 10px;
     font-family: 'JetBrains Mono', monospace;
-    color: var(--warning);
-    background: rgba(224, 175, 104, 0.12);
-    border: 1px solid rgba(224, 175, 104, 0.3);
-    padding: 2px 7px;
-    border-radius: 6px;
-  }
-  .archive-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .archive-item {
-    background: var(--card-alt);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .archive-item:hover { border-color: var(--accent); }
-  .arch-info h4 { font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 2px; }
-  .arch-info p { font-size: 11px; color: var(--fg-sub); }
-  .arch-lock {
-    font-size: 11px;
-    color: var(--accent);
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  /* Auth Sign-In Modal */
-  .auth-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(14, 14, 20, 0.9);
-    backdrop-filter: blur(8px);
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-  .auth-modal.open { display: flex; }
-  .auth-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    width: 100%;
-    max-width: 400px;
-    padding: 24px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffaa00;
     text-align: center;
-    position: relative;
-    animation: fadeIn 0.15s;
   }
-  .auth-close {
-    position: absolute;
-    top: 14px;
-    right: 16px;
-    cursor: pointer;
-    color: var(--fg-sub);
-    font-size: 16px;
-  }
-  .auth-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; color: #fff; }
-  .auth-desc { font-size: 12px; color: var(--fg-sub); line-height: 1.5; margin-bottom: 18px; }
-  .btn-google {
-    width: 100%;
-    background: #fff;
-    color: #111;
-    font-weight: 600;
-    font-size: 13px;
-    padding: 11px;
+  .challenge-result {
+    margin: 0 auto 12px;
+    padding: 6px 12px;
     border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .auth-or { font-size: 11px; color: var(--fg-sub); margin: 8px 0; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
-  .auth-input {
-    width: 100%;
-    background: var(--card-alt);
-    border: 1px solid var(--border);
-    color: #fff;
     font-size: 13px;
-    padding: 11px 13px;
-    border-radius: 8px;
-    outline: none;
-    margin-bottom: 10px;
-    font-family: inherit;
-  }
-  .auth-input:focus { border-color: var(--accent); }
-  .btn-email-submit {
-    width: 100%;
-    background: var(--accent);
-    color: #0e0e14;
     font-weight: 700;
-    font-size: 13px;
-    padding: 11px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+    width: fit-content;
+    max-width: 100%;
   }
+  .challenge-result.won { color: #39ff14; background: rgba(57, 255, 20, 0.1); border: 1px solid rgba(57, 255, 20, 0.35); }
+  .challenge-result.lost { color: #ff6b81; background: rgba(255, 51, 68, 0.1); border: 1px solid rgba(255, 51, 68, 0.35); }
+  .cd-challenge {
+    margin: 0 auto 14px;
+    padding: 10px 14px;
+    max-width: 420px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 170, 0, 0.5);
+    background: rgba(255, 170, 0, 0.1);
+    color: #ffde59;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .ad-slot { width: 100%; min-height: 118px; text-align: center; display: flex; flex-direction: column; align-items: stretch; box-sizing: border-box; }
+  .ad-slot-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-sub); margin-bottom: 4px; }
+  .ad-slot-inner { width: 100%; height: 100px; overflow: hidden; }
+  .preroll-overlay {
+    position: fixed; inset: 0; z-index: 10000;
+    background: #000;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .preroll-video { width: 100%; height: 100%; object-fit: contain; }
+  .preroll-label {
+    position: absolute; top: 14px; left: 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #fff; background: rgba(0, 0, 0, 0.55); padding: 4px 8px; border-radius: 6px;
+  }
+  .preroll-skip {
+    position: absolute; right: 14px; bottom: 24px;
+    font: 700 14px 'JetBrains Mono', monospace;
+    color: #fff; background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 8px;
+    padding: 10px 16px; cursor: pointer;
+  }
+  .preroll-skip:disabled { opacity: 0.75; cursor: default; }
 
   /* Stats & Streaks Modal */
   .stats-modal {
@@ -1344,154 +1266,6 @@
     color: var(--neon-cyan);
     letter-spacing: 0.1em;
   }
-  .archive-play-btn {
-    all: unset;
-    cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 800;
-    color: #000;
-    background: var(--neon-green);
-    border: 1px solid #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: all 0.1s;
-  }
-  .archive-play-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
-  .archive-item.active-case { border-color: var(--neon-cyan); background: #1c223a; }
-
-  /* Leaderboard Modal (Sign-in Gated) */
-  .leaderboard-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 12, 20, 0.94);
-    backdrop-filter: blur(8px);
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-  .leaderboard-modal.open { display: flex; }
-  .leaderboard-card {
-    background: #141726;
-    border: 2px solid #2e3756;
-    border-radius: 14px;
-    width: 100%;
-    max-width: 480px;
-    padding: 24px 20px;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-    color: #fff;
-    animation: fadeIn 0.15s;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  .leaderboard-close {
-    position: absolute;
-    top: 14px;
-    right: 16px;
-    cursor: pointer;
-    font-size: 18px;
-    color: #8b97bc;
-  }
-  .leaderboard-close:hover { color: #fff; }
-  .lb-header { text-align: center; margin-bottom: 16px; }
-  .lb-trophy { font-size: 32px; display: block; margin-bottom: 4px; }
-  .lb-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 18px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #fff;
-    margin-bottom: 6px;
-  }
-  .lb-badge {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 800;
-    color: #ffaa00;
-    background: rgba(255, 170, 0, 0.12);
-    border: 1px solid rgba(255, 170, 0, 0.3);
-    padding: 3px 8px;
-    border-radius: 999px;
-  }
-  .lb-gate-banner {
-    background: #1c1529;
-    border: 1px solid #7928ca;
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 8px;
-  }
-  .lb-gate-icon { font-size: 24px; }
-  .lb-gate-info h4 { font-size: 13px; font-weight: 700; color: #ff0080; }
-  .lb-gate-info p { font-size: 11px; color: #a29db8; line-height: 1.4; }
-  .btn-lb-signin {
-    all: unset;
-    cursor: pointer;
-    background: linear-gradient(135deg, #7928ca, #ff0080);
-    color: #fff;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 800;
-    padding: 8px 16px;
-    border-radius: 6px;
-    text-transform: uppercase;
-    box-shadow: 0 4px 10px rgba(121, 40, 202, 0.4);
-    transition: all 0.1s;
-  }
-  .btn-lb-signin:hover { filter: brightness(1.15); transform: translateY(-1px); }
-  .lb-user-banner {
-    background: #0f1c24;
-    border: 1px solid var(--neon-cyan);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .lb-user-avatar { font-size: 24px; }
-  .lb-user-info { flex: 1; }
-  .lb-user-name { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 800; color: #fff; }
-  .lb-user-stat { font-size: 11px; color: var(--neon-cyan); }
-
-  .lb-list { display: flex; flex-direction: column; gap: 6px; }
-  .lb-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #0d0f18;
-    border: 1px solid #232a42;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-  }
-  .lb-row.highlight-user {
-    border-color: var(--neon-green);
-    background: #101c1c;
-    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
-  }
-  .lb-rank { width: 32px; font-weight: 800; color: #ffde59; }
-  .lb-name {
-    flex: 1;
-    font-weight: 700;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 8px;
-  }
-  .lb-meta { text-align: right; }
-  .lb-score { font-weight: 800; color: var(--neon-green); }
-  .lb-time { font-size: 10px; color: #8b97bc; }
 
   /* In-HUD Countdown Banner */
   .countdown-banner {
@@ -2361,7 +2135,6 @@
     <div class="header-actions">
       <button class="icon-btn" onclick="openHowModal()" title="How to Play">❓</button>
       <button class="icon-btn" onclick="openInviteModal()" title="Challenge a Friend">👥</button>
-      <button class="icon-btn" id="btnLeaderboard" title="Daily Leaderboard">🏆</button>
       <button class="icon-btn" id="btnUserAccount" onclick="openDossierModal()" title="Detective Career Dossier">🕵️</button>
       <button class="icon-btn" id="btnSound" title="Toggle Sound">🔊</button>
     </div>
@@ -2410,6 +2183,8 @@
       </div>
       <h2 class="result-title" id="resultTitle">Daily Mystery Solved!</h2>
       <p class="result-desc" id="resultDesc">You unmasked all 6 AI imposters today.</p>
+      <div class="results-streak" id="resultsStreak" hidden></div>
+      <div class="challenge-result" id="challengeResult" hidden></div>
 
       <!-- 4-Box Stats Grid (Wordle / NYT style) -->
       <div class="results-stats-grid" id="speedSummaryRow">
@@ -2437,6 +2212,12 @@
       <div class="next-case-label">NEXT DAILY MYSTERY IN</div>
       <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
       <div class="next-case-sub">A brand new forensic case with 6 unique themes drops every day at midnight.</div>
+    </div>
+
+    <!-- Display ad (see ADS config). Hidden = zero space, nothing loaded. -->
+    <div class="ad-slot" id="resultsAdSlot" hidden>
+      <div class="ad-slot-label">Advertisement</div>
+      <div class="ad-slot-inner"></div>
     </div>
 
     <!-- 3. Bottom: Responsive Share Grid & Round Breakdown -->
@@ -2550,23 +2331,6 @@
   </div>
 </div>
 
-<!-- Auth Modal (Google 1-Tap / Email) -->
-<div class="auth-modal" id="authModal">
-  <div class="auth-card">
-    <div class="auth-close" onclick="closeAuthModal()">✕</div>
-    <h3 class="auth-title">Save Streaks & Unlock Archive</h3>
-    <p class="auth-desc">Sign in to save your daily score across all devices and play 300+ archive rounds.</p>
-    
-    <button class="btn-google" onclick="simulateAuth('Google')">
-      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-      Continue with Google
-    </button>
-    <div class="auth-or">or continue with email</div>
-    <input type="email" class="auth-input" id="authEmail" placeholder="detective@example.com">
-    <button class="btn-email-submit" onclick="simulateAuth('Email')">Send Magic Link</button>
-  </div>
-</div>
-
 <!-- Stats & Streaks Modal -->
 <div class="stats-modal" id="statsModal">
   <div class="stats-card">
@@ -2627,39 +2391,6 @@
   </div>
 </div>
 
-<!-- Leaderboard Modal (Open to All Players) -->
-<div class="leaderboard-modal" id="leaderboardModal">
-  <div class="leaderboard-card">
-    <div class="leaderboard-close" onclick="closeLeaderboardModal()">✕</div>
-    <div class="lb-header">
-      <span class="lb-trophy">🏆</span>
-      <h3 class="lb-title">Daily Hall of Fame</h3>
-      <span class="lb-badge">🎃 HALLOWEEN SPECIAL</span>
-    </div>
-    
-    <!-- Detective Identity Card (Always Active) -->
-    <div class="lb-user-banner" id="lbUserBanner">
-      <div class="lb-user-avatar">🕵️</div>
-      <div class="lb-user-info">
-        <div class="lb-user-name" id="lbUserName">Agent Phantom</div>
-        <div class="lb-user-stat" id="lbUserStat">Today: 485 PTS (24.2s) · Rank #7</div>
-      </div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#00f0ff;font-weight:700;padding:4px 8px;background:rgba(0,240,255,0.1);border-radius:6px;border:1px solid rgba(0,240,255,0.3);">YOU</div>
-    </div>
-
-    <!-- Leaderboard Table -->
-    <div class="lb-list" id="lbList">
-      <!-- Populated dynamically -->
-    </div>
-
-    <!-- Cloud Sync Prompt -->
-    <div class="lb-cloud-footer" style="margin-top:14px;padding:10px 14px;background:#141b33;border:1px solid #283658;border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
-      <span style="font-size:11px;color:#8b97bc;">☁️ Sync ranks & medals across devices:</span>
-      <button onclick="openAuthModal('Leaderboard')" style="background:transparent;border:1px solid var(--neon-cyan);color:var(--neon-cyan);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;">Sign In</button>
-    </div>
-  </div>
-</div>
-
 <!-- How to Play / Rules Modal -->
 <div class="how-modal" id="howModal">
   <div class="how-card">
@@ -2715,8 +2446,10 @@
     
     <div class="cd-hook-box">
       <div class="cd-hook-heading">3 Real Photos · 1 Synthetic AI Fake</div>
-      <div class="cd-hook-sub">6 themed rounds daily. Exactly 1 synthetic AI imposter per round. Tap to accuse. Speed & accuracy earn top ranks.</div>
+      <div class="cd-hook-sub">6 themed rounds daily. Exactly 1 synthetic AI imposter per round. Tap to accuse. Faster and sharper means more points.</div>
     </div>
+
+    <div class="cd-challenge" id="cdChallenge" hidden></div>
 
     <!-- Action Launch -->
     <div class="cd-action-box">
@@ -2751,7 +2484,7 @@
     </div>
 
     <div class="cd-label" id="cdLabel">CALIBRATING FORENSIC MATRIX</div>
-    <div class="cd-hint" id="cdHint">Max +100 Speed Bonus · Rapid Unmasking Unlocks Hall of Fame</div>
+    <div class="cd-hint" id="cdHint">Max +100 Speed Bonus · Be quick, be right</div>
   </div>
 </div>
 
@@ -2763,7 +2496,7 @@
       <div class="dossier-avatar" id="dossierAvatarIcon">🎖️</div>
       <div class="dossier-rank-info">
         <div class="dossier-rank-title" id="dossierModalRankTitle">Cadet</div>
-        <div class="dossier-rank-sub" id="dossierModalCallsign">AGENT PHANTOM · LEVEL 1</div>
+        <div class="dossier-rank-sub" id="dossierModalCallsign">DETECTIVE · LEVEL 1</div>
         <div class="xp-bar-wrap">
           <div class="xp-label-row">
             <span id="dossierXpLabel">XP: 0 / 150</span>
@@ -2812,6 +2545,19 @@
 <div class="toast" id="toast"></div>
 
 <script>
+/* ===== ADS (all off by default) ==========================================
+   Results banner (AdSense): set enabled: true, adsenseClient: "ca-pub-XXXX",
+   resultsSlot: "1234567890". Only then is the adsbygoogle script injected and
+   the slot (under the countdown, above the breakdown) given its reserved
+   height. Anything missing = the slot stays hidden, takes no space, loads
+   nothing.
+   Pre-roll video (launch sponsor): set video.enabled: true and video.src to an
+   mp4 URL; clickUrl (optional) opens in a new tab on tap; skipAfter is the
+   seconds before "Skip" unlocks. It plays once per page load after the
+   player taps Start, and the game timer does not start until it is gone.
+   ======================================================================== */
+const ADS = { enabled: false, adsenseClient: "", resultsSlot: "", video: { enabled: false, src: "", clickUrl: "", skipAfter: 5 } };
+
 let allCases = [];
 let dailyCaseData = null;
 let currentRoundIndex = 0; // 0, 1, 2, 3
@@ -2819,7 +2565,6 @@ let roundResults = []; // [{ round: 1, solved: true, attempts: 1 }, ...]
 let selectedCardId = null;
 let attemptsUsedThisRound = 0;
 let isCurrentRoundOver = false;
-let userProfile = null;
 let countdownInterval = null;
 let autoAdvanceTimeout = null;
 
@@ -2882,7 +2627,8 @@ function triggerCyberCountdown(e) {
     e.stopPropagation();
     e.preventDefault();
   }
-  if (isCountingDown) return;
+  if (isCountingDown || prerollShowing) return;
+  if (prerollNeeded()) { runPreroll(() => triggerCyberCountdown()); return; }
   isCountingDown = true;
 
   const briefing = $("cdBriefing");
@@ -2957,6 +2703,8 @@ function handleOverlayClick(e) {
 
 function dismissCountdown(e) {
   if (e) e.stopPropagation();
+  if (prerollShowing) return;
+  if (prerollNeeded() && !caseStartTime) { runPreroll(() => dismissCountdown()); return; }
   if (countdownInterval) {
     clearInterval(countdownInterval);
     countdownInterval = null;
@@ -3065,210 +2813,6 @@ function calculateSpeedBonus(secs, resultsOrCount) {
   }
 
   return Math.round(raw * accuracyMult);
-}
-
-// Daily Hall of Fame Leaderboard (Recalibrated for 6-round case)
-const DEFAULT_LEADERBOARD = [
-  { rank: 1, name: "SirSquintsALot", score: 686, time: 14.8, accuracy: "6/6 (1st try)", badge: "👑" },
-  { rank: 2, name: "SixFingerSam", score: 674, time: 19.2, accuracy: "6/6 (1st try)", badge: "🥈" },
-  { rank: 3, name: "InspectorPigeon", score: 664, time: 24.6, accuracy: "6/6 (1st try)", badge: "🥉" },
-  { rank: 4, name: "SherlockBones", score: 655, time: 31.4, accuracy: "6/6 (1st try)", badge: "🎃" },
-  { rank: 5, name: "ArtifactAndy", score: 646, time: 38.1, accuracy: "6/6 (1st try)", badge: "🕵️" },
-  { rank: 6, name: "DeepfakeDundee", score: 636, time: 45.8, accuracy: "6/6 (1st try)", badge: "🦇" },
-  { rank: 7, name: "TeethCounter-99", score: 626, time: 54.5, accuracy: "6/6 (1st try)", badge: "⚡" },
-  { rank: 8, name: "OverthinkingOtter", score: 576, time: 62.0, accuracy: "6/6 (2nd try)", badge: "👻" },
-  { rank: 9, name: "WeirdHandsWilly", score: 569, time: 71.2, accuracy: "6/6 (2nd try)", badge: "🔍" },
-  { rank: 10, name: "CadetClueless", score: 465, time: 82.1, accuracy: "5/6", badge: "💀" }
-];
-
-// Funny, quirky, unique detective aliases & combinatorial pools
-const FUNNY_HERO_TITLES = [
-  "SirSquintsALot", "SixFingerSam", "InspectorPigeon", "DetectiveDonut",
-  "ArtifactAndy", "DeepfakeDundee", "WeirdHandsWilly", "TeethCounter",
-  "HallucinationHarry", "SherlockBones", "ColumbosDog", "CaptainObvious",
-  "Agent404", "PixelSniffer", "PanicPixel", "CtrlAltDefeat",
-  "OverthinkingOtter", "ChaoticCapybara", "SnoopRaccoon", "CadetClueless",
-  "BlurrySherlock", "EyeballSkeptic", "EarlobeSheriff", "QuantumPotato",
-  "PromptWhisperer", "AccidentalSleuth", "GlitchGoblin", "SubtleDeepfake",
-  "NoHandsNoProblem", "DerpyForensics", "ParanoidPigeon", "SleepyOpossum",
-  "BaffledWalrus", "CaffeinatedCorgi", "ProfessorPanic", "FeralForensics",
-  "GlitchWhisperer", "SuspiciousWaffle", "MicroLensMothman", "DrPixelBuster",
-  "CluelessChupacabra", "DeputyDerp", "SassySquid", "PixelatedPlatypus"
-];
-
-const FUNNY_ADJECTIVES = [
-  "Caffeinated", "Suspicious", "Sleepy", "Sneaky", "Clueless",
-  "Overthinking", "Paranoid", "Squinting", "Glitchy", "Chaotic",
-  "Spooky", "Feral", "Derpy", "Accidental", "Grumpy",
-  "Hyper", "Cryptic", "Panicky", "Sassy", "Dramatic",
-  "Dubious", "Baffled", "Unbothered", "Quantum", "Snoopy",
-  "Zesty", "Vengeful", "Existential", "Unfiltered", "Cranky"
-];
-
-const FUNNY_NOUNS = [
-  "Capybara", "Pigeon", "Gremlin", "Opossum", "Ferret",
-  "Potato", "Walrus", "Wombat", "Raccoon", "Duck",
-  "Otter", "Toaster", "Cactus", "Llama", "Noodle",
-  "Badger", "Squid", "Penguin", "Mothman", "Hamster",
-  "Crow", "Frog", "Corgi", "Donut", "Waffle",
-  "Pickle", "Platypus", "Chihuahua", "Bagel", "Burrito"
-];
-
-function generateFunnyCallsign() {
-  const luckyNum = Math.floor(1 + Math.random() * 99);
-  const padNum = luckyNum < 10 ? `0${luckyNum}` : `${luckyNum}`;
-  if (Math.random() < 0.5) {
-    const hero = FUNNY_HERO_TITLES[Math.floor(Math.random() * FUNNY_HERO_TITLES.length)];
-    return Math.random() < 0.35 ? `${hero}-${padNum}` : hero;
-  } else {
-    const adj = FUNNY_ADJECTIVES[Math.floor(Math.random() * FUNNY_ADJECTIVES.length)];
-    const noun = FUNNY_NOUNS[Math.floor(Math.random() * FUNNY_NOUNS.length)];
-    return `${adj}${noun}-${padNum}`;
-  }
-}
-
-// One board per daily case. The old single key never reset, so a board
-// saved under older scoring rules (or yesterday's case) kept ranking you.
-function leaderboardKey() {
-  const caseNo = dailyCaseData ? dailyCaseData.caseNumber : "0";
-  return `imposter_leaderboard_v2_${caseNo}`;
-}
-
-function getLeaderboard() {
-  try {
-    localStorage.removeItem("imposter_leaderboard");
-    const raw = localStorage.getItem(leaderboardKey());
-    if (raw) return JSON.parse(raw);
-  } catch (_) {}
-  return JSON.parse(JSON.stringify(DEFAULT_LEADERBOARD));
-}
-
-function saveLeaderboard(lb) {
-  try {
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith("imposter_leaderboard_v2_") && k !== leaderboardKey()) localStorage.removeItem(k);
-    }
-    localStorage.setItem(leaderboardKey(), JSON.stringify(lb));
-  } catch (_) {}
-}
-
-function openLeaderboardModal() {
-  playSound("tap");
-  renderLeaderboard();
-  $("leaderboardModal").classList.add("open");
-}
-
-function closeLeaderboardModal() {
-  $("leaderboardModal").classList.remove("open");
-}
-
-function getDetectiveCallsign() {
-  let saved = localStorage.getItem("imposter_callsign");
-  // If no saved callsign or if it was the old generic Agent-XXXX placeholder, upgrade to a funny unique one
-  if (!saved || /^Agent-\d{3,5}$/i.test(saved) || saved === "Agent Phantom") {
-    if (userProfile && userProfile.callsign && !/^Agent-\d{3,5}$/i.test(userProfile.callsign) && userProfile.callsign !== "Agent Phantom") {
-      saved = userProfile.callsign;
-    } else {
-      saved = generateFunnyCallsign();
-    }
-    localStorage.setItem("imposter_callsign", saved);
-  }
-  return saved;
-}
-
-function setDetectiveCallsign(name) {
-  if (!name || !name.trim()) return;
-  const clean = name.trim().slice(0, 24);
-  localStorage.setItem("imposter_callsign", clean);
-  if (userProfile) {
-    userProfile.callsign = clean;
-    localStorage.setItem("imposter_user", JSON.stringify(userProfile));
-  }
-  const btn = $("btnUserAccount");
-  if (btn) {
-    btn.textContent = "🕵️";
-    btn.title = `Detective Dossier: ${clean}`;
-  }
-
-  const lb = getLeaderboard();
-  const entry = lb.find(e => e.isUser);
-  if (entry) {
-    entry.name = clean;
-    saveLeaderboard(lb);
-  }
-  if ($("leaderboardModal").classList.contains("open")) {
-    renderLeaderboard();
-  }
-  showToast(`Call-sign set to "${clean}"`);
-}
-
-
-
-
-function renderLeaderboard() {
-  const lb = getLeaderboard();
-  const listEl = $("lbList");
-  const userBanner = $("lbUserBanner");
-
-  if (userBanner) userBanner.style.display = "flex";
-
-  const callsign = getDetectiveCallsign();
-  if ($("lbUserName")) $("lbUserName").textContent = callsign;
-
-  const userEntry = lb.find(e => e.isUser);
-  if (userEntry) {
-    $("lbUserStat").textContent = `Today: ${userEntry.score} PTS (${userEntry.time.toFixed(1)}s) · Rank #${userEntry.rank}`;
-  } else {
-    $("lbUserStat").textContent = `Case #${dailyCaseData ? dailyCaseData.caseNumber : '66'}: Solve today's case to claim your rank!`;
-  }
-
-  listEl.innerHTML = lb.map((entry) => `
-    <div class="lb-row ${entry.isUser ? 'highlight-user' : ''}">
-      <span class="lb-rank">${entry.rank <= 3 ? entry.badge : `#${entry.rank}`}</span>
-      <span class="lb-name">${entry.name} ${entry.isUser ? '<span style="font-size:10px;color:#39ff14;margin-left:4px;">(YOU)</span>' : ''}</span>
-      <div class="lb-meta">
-        <div class="lb-score">${entry.score} PTS</div>
-        <div class="lb-time">${entry.time.toFixed(1)}s · ${entry.accuracy}</div>
-      </div>
-    </div>
-  `).join("");
-}
-
-function submitScoreToLeaderboard(finalScore, elapsedSecs, firstTryCount, totalWon) {
-  const lb = getLeaderboard().filter(e => !e.isUser);
-  const callsign = getDetectiveCallsign();
-
-  const totalRounds = dailyCaseData?.rounds?.length || 6;
-  let accStr = `${totalWon}/${totalRounds}`;
-  if (firstTryCount === totalRounds) accStr = `${totalRounds}/${totalRounds} (1st try)`;
-  else if (firstTryCount > 0) accStr = `${totalWon}/${totalRounds} (${firstTryCount} 1st)`;
-
-  const userEntry = {
-    name: callsign,
-    score: finalScore,
-    time: Number(elapsedSecs.toFixed(1)),
-    accuracy: accStr,
-    badge: "🕵️",
-    isUser: true
-  };
-
-  lb.push(userEntry);
-  lb.sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score;
-    return a.time - b.time;
-  });
-
-  lb.forEach((e, idx) => {
-    e.rank = idx + 1;
-    if (idx === 0) e.badge = "👑";
-    else if (idx === 1) e.badge = "🥈";
-    else if (idx === 2) e.badge = "🥉";
-  });
-
-  saveLeaderboard(lb);
-  const myRank = lb.find(e => e.isUser)?.rank || 1;
-  return myRank;
 }
 
 function applyFalseAccusationPenalty() {
@@ -3432,7 +2976,30 @@ function loadStats() {
       playerStats = { ...playerStats, ...JSON.parse(s) };
     }
   } catch (_) {}
+  playerStats.currentStreak = computeStreakFromRecords();
   updateStreakUI();
+}
+
+// One daily case per UTC day (matches getDailyCaseForToday). The streak is the
+// number of consecutive days, ending today or yesterday, with a completed case.
+function utcDayStr(offsetDays = 0) {
+  return new Date(Date.now() + offsetDays * 86400000).toISOString().slice(0, 10);
+}
+
+function computeStreakFromRecords() {
+  let records = {};
+  try { records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}"); } catch (_) {}
+  const done = d => records[d] && records[d].solved;
+  let offset = done(utcDayStr(0)) ? 0 : -1;
+  let streak = 0;
+  while (done(utcDayStr(offset))) { streak++; offset--; }
+  return streak;
+}
+
+function refreshStreak() {
+  playerStats.currentStreak = computeStreakFromRecords();
+  if (playerStats.currentStreak > (playerStats.maxStreak || 0)) playerStats.maxStreak = playerStats.currentStreak;
+  saveStats();
 }
 
 function saveStats() {
@@ -3509,7 +3076,7 @@ const ALL_BADGES = [
   { id: "flawless_case", icon: "🎯", name: "Flawless Case", desc: "Clear a 4/4 daily case with 4 first-try aces" },
   { id: "eagle_eye", icon: "🦅", name: "Eagle Eye", desc: "Flawless unmasking with 100% first-guess accuracy" },
   { id: "streak_master", icon: "🔥", name: "Streak Master", desc: "Maintain a 3-day active daily streak" },
-  { id: "top_detective", icon: "🏆", name: "Top Detective", desc: "Score 450+ points in a single daily case" },
+  { id: "top_detective", icon: "🏆", name: "Top Detective", desc: "Score 600+ points in a single daily case" },
   { id: "case_veteran", icon: "🎖️", name: "Case Veteran", desc: "Solve 7 daily mystery cases" }
 ];
 
@@ -3578,11 +3145,10 @@ function closeDossierModal() {
 
 function renderDossier() {
   const rank = getRankForXp(playerCareer.xp);
-  const callsign = (userProfile && userProfile.callsign) ? userProfile.callsign.toUpperCase() : "AGENT PHANTOM";
 
   $("dossierAvatarIcon").textContent = rank.icon;
   $("dossierModalRankTitle").textContent = rank.title;
-  $("dossierModalCallsign").textContent = `${callsign} · LEVEL ${rank.level}`;
+  $("dossierModalCallsign").textContent = `DETECTIVE · LEVEL ${rank.level}`;
 
   const xpIntoLevel = playerCareer.xp - rank.minXp;
   const xpNeeded = Math.max(1, rank.nextMin - rank.minXp);
@@ -3711,6 +3277,7 @@ function showAlreadyCompletedToday(record) {
   $("starsRow").textContent = "⭐⭐⭐⭐";
   $("resultTitle").textContent = "Today's Case Complete! 🕵️";
   $("resultDesc").textContent = "You already solved today's mystery. Come back tonight at midnight for the next case!";
+  renderResultsExtras(score, time);
   startMidnightCountdown();
 }
 
@@ -3740,12 +3307,49 @@ function resetDailyChallenge() {
 }
 
 // --- Initialization ---
+let friendChallenge = null; // { s: number, t: number } when a valid link for today's case
+
+function clearStaleLeaderboardKeys() {
+  try {
+    const stale = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && (k === "imposter_leaderboard" || k.startsWith("imposter_leaderboard_v2_") || k === "imposter_user" || k === "imposter_callsign")) stale.push(k);
+    }
+    stale.forEach(k => localStorage.removeItem(k));
+  } catch (_) {}
+}
+
+function readChallengeParams() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("c") && !params.has("s") && !params.has("t")) return;
+    const c = params.get("c"), sc = params.get("s"), t = params.get("t");
+    ["c", "s", "t"].forEach(k => params.delete(k));
+    const qs = params.toString();
+    window.history.replaceState({}, document.title, window.location.pathname + (qs ? "?" + qs : "") + window.location.hash);
+    if (!/^\d{1,6}$/.test(c || "") || !/^\d{1,5}$/.test(sc || "")) return;
+    if (!dailyCaseData || Number(c) !== Number(dailyCaseData.caseNumber)) return;
+    const tNum = /^\d{1,5}(\.\d{1,2})?$/.test(t || "") ? Number(t) : null;
+    friendChallenge = { s: Number(sc), t: tNum };
+  } catch (_) {}
+}
+
+function renderChallengeBanner() {
+  const el = $("cdChallenge");
+  if (!el) return;
+  if (!friendChallenge) { el.hidden = true; return; }
+  const timePart = friendChallenge.t !== null ? ` in ${friendChallenge.t.toFixed(1)}s` : "";
+  el.textContent = `Your friend scored ${friendChallenge.s} pts${timePart}. Can you beat them?`;
+  el.hidden = false;
+}
+
 async function init() {
+  clearStaleLeaderboardKeys();
   loadStats();
   loadCareer();
   updateSoundButton();
   $("btnSound").onclick = toggleSound;
-  if ($("btnLeaderboard")) $("btnLeaderboard").onclick = openLeaderboardModal;
 
   // Handle URL reset/replay query parameter (?reset=1 or ?replay=1)
   try {
@@ -3759,24 +3363,13 @@ async function init() {
     }
   } catch (_) {}
 
-  // Load saved profile or initialize active callsign
-  try {
-    const saved = localStorage.getItem("imposter_user");
-    if (saved) {
-      userProfile = JSON.parse(saved);
-    }
-  } catch (_) {}
-  const activeCallsign = getDetectiveCallsign();
-  if ($("btnUserAccount")) {
-    $("btnUserAccount").textContent = "🕵️";
-    $("btnUserAccount").title = `Detective Dossier: ${activeCallsign}`;
-  }
-
   // Fetch 4-round cases
   try {
     const res = await fetch("cases.json");
     allCases = await res.json();
     dailyCaseData = getDailyCaseForToday() || allCases[0];
+    readChallengeParams();
+    renderChallengeBanner();
 
     if ($("caseTag")) {
       $("caseTag").textContent = dailyCaseData.eventBadge || `CASE #${dailyCaseData.caseNumber}`;
@@ -3801,7 +3394,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.8').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.9').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3864,7 +3457,8 @@ function loadRound(rIndex) {
 }
 
 function selectCard(id) {
-  if (isCurrentRoundOver) return;
+  if (isCurrentRoundOver || prerollShowing) return;
+  if (prerollNeeded() && !caseStartTime) { dismissCountdown(); return; }
 
   // If user clicks a card while countdown is running, dismiss countdown instantly and start timer!
   dismissCountdown();
@@ -4062,23 +3656,21 @@ function showFinalResults() {
     `;
   }).join("");
 
-  // Submit to Leaderboard (Zero-friction for all detectives)
-  const myRank = submitScoreToLeaderboard(finalScore, finalSecs, firstTryCount, totalWon);
-  if (myRank) {
-    showToast(`🏆 Score submitted! You are Rank #${myRank} on the Daily Leaderboard!`);
-  }
-
   // Update & Save Player Stats
   playerStats.played++;
   if (totalWon >= Math.ceil(totalRounds * 0.6) || firstTryCount === totalRounds) {
     playerStats.won++;
-    playerStats.currentStreak++;
-    if (playerStats.currentStreak > playerStats.maxStreak) {
-      playerStats.maxStreak = playerStats.currentStreak;
-    }
-  } else {
-    playerStats.currentStreak = 0;
   }
+
+  // Save official daily completion record first: the streak is derived from it
+  const todayStr = utcDayStr();
+  try {
+    const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
+    records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, date: new Date().toISOString() };
+    localStorage.setItem("imposter_daily_records", JSON.stringify(records));
+    checkDailyStatus();
+  } catch (_) {}
+  refreshStreak();
   playerStats.aces += firstTryCount;
   playerStats.catches2 += secondTryCount;
   playerStats.catches3 += thirdTryCount;
@@ -4101,52 +3693,8 @@ function showFinalResults() {
   if (playerStats.won >= 7) unlockBadge("case_veteran");
   if (finalSecs < 20.0 && firstTryCount >= (totalRounds - 1)) unlockBadge("lightning_instinct");
 
-  // Save official daily completion record
-  const todayStr = new Date().toISOString().slice(0, 10);
-  try {
-    const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
-    records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, date: new Date().toISOString() };
-    localStorage.setItem("imposter_daily_records", JSON.stringify(records));
-    checkDailyStatus();
-  } catch (_) {}
-
+  renderResultsExtras(finalScore, finalSecs);
   startMidnightCountdown();
-}
-
-function renderArchiveList() {
-  const archiveList = document.querySelector(".archive-list");
-  if (!archiveList) return;
-
-  archiveList.innerHTML = allCases.map(c => {
-    const isCurrent = c.id === dailyCaseData.id;
-    const badgeText = c.eventBadge ? `<span style="color:#ffaa00;font-size:10px;font-weight:800;margin-left:6px;">${c.eventBadge}</span>` : '';
-    return `
-      <div class="archive-item ${isCurrent ? 'active-case' : ''}">
-        <div class="arch-info">
-          <h4>${c.title} ${badgeText}</h4>
-          <p>${c.rounds.map(r => r.shortName).join(' · ')}</p>
-        </div>
-        <div>
-          ${isCurrent ? '<span style="font-size:11px;color:#00f0ff;font-weight:700;">PLAYING NOW</span>' : `<button class="archive-play-btn" onclick="switchCase('${c.id}')">▶ Play Pack</button>`}
-        </div>
-      </div>
-    `;
-  }).join("") + `
-    <div class="archive-item" onclick="openAuthModal('1920s Vintage Archives')">
-      <div class="arch-info">
-        <h4>Pack #08 · 1920s Historical Archives</h4>
-        <p>Historical photographic forensics across 4 vintage rounds</p>
-      </div>
-      <div class="arch-lock">🔒 Unlock</div>
-    </div>
-    <div class="archive-item" onclick="openAuthModal('Macro Optics')">
-      <div class="arch-info">
-        <h4>Pack #09 · Microscopic & Insect Optics</h4>
-        <p>Extreme macro photography vs procedural AI textures</p>
-      </div>
-      <div class="arch-lock">🔒 Unlock</div>
-    </div>
-  `;
 }
 
 // Lightbox full inspection
@@ -4167,25 +3715,136 @@ $("lightboxStage").onclick = () => {
 };
 
 // Social Sharing
-function getDailyShareText() {
-  const totalWon = roundResults.filter(r => r.solved).length;
-  const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
-  const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
-  const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
-  const finalScore = baseScore + speedBonus;
+function buildEmojiGrid(results) {
+  return results.map(r => {
+    if (r.solved && r.attempts === 1) return "🟩";
+    if (r.solved && r.attempts === 2) return "🟨";
+    if (r.solved) return "🟦";
+    return "🟥";
+  }).join("");
+}
 
-  const rows = roundResults.map(r => {
-    if (r.solved && r.attempts === 1) return `R${r.roundIndex} · ${r.theme}: 🟩 (1st try)`;
-    if (r.solved && r.attempts === 2) return `R${r.roundIndex} · ${r.theme}: 🟨 (2nd try)`;
-    if (r.solved) return `R${r.roundIndex} · ${r.theme}: 🟦 (3rd try)`;
-    return `R${r.roundIndex} · ${r.theme}: 🟥 (fooled)`;
-  }).join("\n");
-
+// Today's finished result: from this session's rounds, or from the saved daily record
+function getTodayResult() {
   const totalRounds = dailyCaseData?.rounds?.length || 6;
-  const maxScore = (totalRounds * 100) + 100;
-  const grade = firstTryCount === totalRounds ? `FLAWLESS ${totalRounds}/${totalRounds} ⭐⭐⭐⭐⭐ (${finalScore}/${maxScore} PTS)` : `${totalWon}/${totalRounds} Imposters Caught (${finalScore}/${maxScore} PTS)`;
+  if (roundResults.length > 0 && roundResults.length === totalRounds) {
+    const firstTry = roundResults.filter(r => r.solved && r.attempts === 1).length;
+    const base = (firstTry * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
+    return { won: roundResults.filter(r => r.solved).length, total: totalRounds, score: base + calculateSpeedBonus(elapsedSeconds, roundResults), time: elapsedSeconds, grid: buildEmojiGrid(roundResults) };
+  }
+  try {
+    const rec = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}")[utcDayStr()];
+    if (rec && rec.solved) return { won: rec.won || 0, total: rec.total || totalRounds, score: rec.score || 0, time: typeof rec.time === "number" ? rec.time : 0, grid: rec.grid || "" };
+  } catch (_) {}
+  return null;
+}
 
-  return `Imposter Case #${dailyCaseData.caseNumber} ${dailyCaseData.eventBadge || ''}\n${grade}\n⚡ Time: ${elapsedSeconds.toFixed(1)}s (+${speedBonus} Speed Bonus)\n\n${rows}\n\nCan you spot which photo is AI?\nPlay: ${window.location.origin}`;
+function getChallengeLink(res) {
+  return `${window.location.origin}/?c=${encodeURIComponent(dailyCaseData.caseNumber)}&s=${res.score}&t=${res.time.toFixed(1)}`;
+}
+
+function getDailyShareText() {
+  const res = getTodayResult();
+  if (!res) return `Can you spot the AI fake? Play Imposter: ${window.location.origin}`;
+  const badgeEmoji = ((dailyCaseData.eventBadge || "").match(/^\p{Extended_Pictographic}\uFE0F?/u) || [""])[0];
+  const lines = [
+    `Imposter #${dailyCaseData.caseNumber}${badgeEmoji ? " " + badgeEmoji : ""}`,
+    `${res.won}/${res.total} · ${res.score} pts · ${res.time.toFixed(1)}s`
+  ];
+  if (res.grid) lines.push(res.grid);
+  if (playerStats.currentStreak >= 2) lines.push(`🔥 ${playerStats.currentStreak} day streak`);
+  lines.push(getChallengeLink(res));
+  return lines.join("\n");
+}
+
+// Results-screen extras: streak, friend comparison, ad slot
+function renderResultsExtras(score, time) {
+  const streakEl = $("resultsStreak");
+  if (streakEl) {
+    const n = playerStats.currentStreak || 0;
+    streakEl.textContent = n >= 1 ? `🔥 ${n} day streak` : "";
+    streakEl.hidden = n < 1;
+  }
+  const cmp = $("challengeResult");
+  if (cmp) {
+    if (friendChallenge) {
+      const beat = score > friendChallenge.s || (score === friendChallenge.s && friendChallenge.t !== null && time < friendChallenge.t);
+      const tie = score === friendChallenge.s && (friendChallenge.t === null || time === friendChallenge.t);
+      cmp.textContent = tie ? `You tied your friend's ${friendChallenge.s} pts` : `You ${beat ? "beat" : "didn't beat"} your friend's ${friendChallenge.s} pts`;
+      cmp.className = "challenge-result " + (beat ? "won" : "lost");
+      cmp.hidden = false;
+    } else {
+      cmp.hidden = true;
+    }
+  }
+  renderResultsAd();
+}
+
+let resultsAdRendered = false;
+function renderResultsAd() {
+  const slot = $("resultsAdSlot");
+  if (!slot || resultsAdRendered) return;
+  if (!(ADS.enabled && ADS.adsenseClient && ADS.resultsSlot)) { slot.hidden = true; return; }
+  resultsAdRendered = true;
+  slot.hidden = false;
+  const s = document.createElement("script");
+  s.async = true;
+  s.crossOrigin = "anonymous";
+  s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(ADS.adsenseClient)}`;
+  document.head.appendChild(s);
+  const ins = document.createElement("ins");
+  ins.className = "adsbygoogle";
+  ins.style.cssText = "display:block;width:100%;height:100px;";
+  ins.setAttribute("data-ad-client", ADS.adsenseClient);
+  ins.setAttribute("data-ad-slot", ADS.resultsSlot);
+  ins.setAttribute("data-full-width-responsive", "false");
+  slot.querySelector(".ad-slot-inner").appendChild(ins);
+  try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (_) {}
+}
+
+// Pre-roll sponsor video: shown once per page load, before the countdown/timer
+let prerollDone = false;
+let prerollShowing = false;
+function prerollNeeded() {
+  return !prerollDone && !!(ADS.video && ADS.video.enabled && ADS.video.src);
+}
+function runPreroll(next) {
+  if (prerollShowing) return;
+  prerollShowing = true;
+  const ov = document.createElement("div");
+  ov.className = "preroll-overlay";
+  ov.innerHTML = `<div class="preroll-label">Sponsored</div><video class="preroll-video" muted autoplay playsinline preload="auto"></video><button class="preroll-skip" disabled></button>`;
+  document.body.appendChild(ov);
+  const video = ov.querySelector("video");
+  const skip = ov.querySelector(".preroll-skip");
+  video.src = ADS.video.src;
+  let left = Math.max(0, Number(ADS.video.skipAfter) || 0);
+  const tick = () => {
+    if (left > 0) { skip.textContent = `Skip in ${left}`; skip.disabled = true; }
+    else { skip.textContent = "Skip ▶"; skip.disabled = false; }
+  };
+  tick();
+  const iv = setInterval(() => { left--; tick(); if (left <= 0) clearInterval(iv); }, 1000);
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    clearInterval(iv);
+    try { video.pause(); } catch (_) {}
+    ov.remove();
+    prerollShowing = false;
+    prerollDone = true;
+    next();
+  };
+  video.addEventListener("ended", finish);
+  video.addEventListener("error", finish);
+  skip.addEventListener("click", e => { e.stopPropagation(); if (!skip.disabled) finish(); });
+  if (ADS.video.clickUrl) {
+    video.style.cursor = "pointer";
+    video.addEventListener("click", () => window.open(ADS.video.clickUrl, "_blank", "noopener,noreferrer"));
+  }
+  const p = video.play();
+  if (p && p.catch) p.catch(() => { left = 0; tick(); });
 }
 
 $("btnCopyGrid").onclick = async () => {
@@ -4396,19 +4055,12 @@ function getInviteShareData() {
   const totalRounds = dailyCaseData?.rounds?.length || 6;
   const hasFinished = roundResults.length > 0 && roundResults.length === totalRounds;
 
-  if (hasFinished) {
-    const totalWon = roundResults.filter(r => r.solved).length;
-    const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
-    const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
-    const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
-    const finalScore = baseScore + speedBonus;
-    const maxScore = (totalRounds * 100) + 100;
-    const caseNum = dailyCaseData?.caseNumber || "66";
-
+  const todayRes = getTodayResult();
+  if (todayRes) {
     return {
-      url: url,
+      url: getChallengeLink(todayRes),
       title: "Think you can beat my Imposter score?",
-      text: `🕵️ I scored ${finalScore}/${maxScore} PTS on today's Imposter case (#${caseNum}) in ${elapsedSeconds.toFixed(1)}s!\n\nCan you spot which photos are real vs synthetic AI fakes? Play today's case:\n${url}`
+      text: getDailyShareText()
     };
   }
 
@@ -4516,47 +4168,6 @@ $("cardPreviewModal").addEventListener("click", e => {
 $("inviteModal").addEventListener("click", e => {
   if (e.target === $("inviteModal")) closeInviteModal();
 });
-
-// Auth Modal
-function openAuthModal(packName) {
-  playSound("tap");
-  $("authModal").classList.add("open");
-}
-function closeAuthModal() {
-  $("authModal").classList.remove("open");
-}
-$("btnUserAccount").onclick = () => openDossierModal();
-
-function simulateAuth(provider) {
-  playSound("tap");
-  const email = $("authEmail").value || "detective@example.com";
-  const callsign = email.split("@")[0];
-  userProfile = { email, provider, callsign, streak: 3, casesSolved: 14 };
-  localStorage.setItem("imposter_user", JSON.stringify(userProfile));
-  $("btnUserAccount").textContent = "🕵️";
-  $("btnUserAccount").title = `Detective Dossier: ${callsign}`;
-  closeAuthModal();
-  showToast(`Signed in as ${callsign}! Full leaderboard & archives unlocked.`);
-
-  // If user completed a game in this session, submit score now
-  if ($("viewResults").style.display !== "none" && roundResults.length > 0) {
-    const totalWon = roundResults.filter(r => r.solved).length;
-    const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
-    const secondTryCount = roundResults.filter(r => r.solved && r.attempts === 2).length;
-    const thirdTryCount = roundResults.filter(r => r.solved && r.attempts === 3).length;
-    const baseScore = (firstTryCount * 100) + (secondTryCount * 45) + (thirdTryCount * 15);
-    const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
-    const myRank = submitScoreToLeaderboard(baseScore + speedBonus, elapsedSeconds, firstTryCount, totalWon);
-    if (myRank) {
-      showToast(`🏆 Score submitted! Rank #${myRank} on the Daily Leaderboard!`);
-    }
-  }
-
-  // Refresh leaderboard if open
-  if ($("leaderboardModal").classList.contains("open")) {
-    renderLeaderboard();
-  }
-}
 
 function showToast(msg) {
   const t = $("toast");
