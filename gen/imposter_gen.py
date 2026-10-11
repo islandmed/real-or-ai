@@ -733,9 +733,10 @@ def choose_theme(date, slot, season, state, day, tried=()):
         if nd and nd["rounds"][slot]:
             neighbours.add(nd["rounds"][slot]["theme"])
     order = [want] + [k for k in theme_perm(season, date.year) if k != want]
+    dropped = {t["key"] for t in season["themes"] if t.get("dropped")}
     for strict in (True, False):
         for k in order:
-            if k in taken or k in tried or (strict and k in neighbours):
+            if k in taken or k in tried or k in dropped or (strict and k in neighbours):
                 continue
             if available(tk[k], state) >= 3:
                 return tk[k]
@@ -1115,6 +1116,34 @@ def upload_review(state, seasons, secret):
     log(f"review: {len(show)} upcoming day(s) listed, {put} uploaded, {gone} removed")
 
 
+def replace_dropped(state, seasons, secret):
+    """Rebuild every round from tomorrow (UTC) on that uses a theme marked
+    "dropped" in seasons.json. Today is already live and is left alone."""
+    first = (utc_today() + dt.timedelta(days=1)).isoformat()
+    n = left = 0
+    for key in sorted(state["days"]):
+        if key < first:
+            continue
+        day = state["days"][key]
+        season = next(x for x in seasons if x["id"] == day["season"])
+        dropped = {t["key"] for t in season["themes"] if t.get("dropped")}
+        for slot, rnd in enumerate(day["rounds"]):
+            if not rnd or rnd["theme"] not in dropped:
+                continue
+            res = rebuild_slot(dt.date.fromisoformat(key), slot, state, season, secret,
+                               random.Random(secrets.randbits(64)), rnd["theme"])
+            if res is True:
+                n += 1
+            else:
+                left += 1
+                if res == "budget":
+                    break
+        if left and res == "budget":
+            break
+    save_json(STATE_PATH, state)
+    log(f"dropped themes: {n} round(s) rebuilt, {left} still to do")
+
+
 def prefetch(seasons, dates):
     """Fetch (or refresh) the Commons pools of every season the dates touch,
     e.g. Christmas once December is inside the window."""
@@ -1184,6 +1213,7 @@ def main():
     secret = (os.environ.get("IMPOSTER_GEN_SECRET") or (PRIV / "gen_secret.txt").read_text()).strip()
     if a.apply_vetoes:
         apply_vetoes(state, seasons, secret)
+        replace_dropped(state, seasons, secret)
         return 0
     if a.upload_review:
         upload_review(state, seasons, secret)

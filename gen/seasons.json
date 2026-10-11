@@ -1,5 +1,5 @@
 {
- "_doc": "Date-ranged seasons. start/end are MM-DD (inclusive) and repeat every year. Each theme: key, name, short, queries (Wikimedia Commons search terms), match (regex that a photo's title, categories or description must hit), prompts (scene ideas for the AI imposter). Add a season or a theme here; nothing else needs to change. Optional vision: what the automatic photo check must see (defaults to the name plus the prompts).",
+ "_doc": "Date-ranged seasons. start/end are MM-DD (inclusive) and repeat every year. Each theme: key, name, short, queries (Wikimedia Commons search terms), match (regex that a photo's title, categories or description must hit), prompts (scene ideas for the AI imposter). Add a season or a theme here; nothing else needs to change. Optional vision: what the automatic photo check must see (defaults to the name plus the prompts). \"dropped\": true retires a theme: it is never picked again and the nightly run rebuilds its rounds from tomorrow on.",
  "seasons": [
   {
    "id": "halloween",
@@ -212,7 +212,8 @@
       "Witch costumes",
       "Witches in popular culture"
      ],
-     "vision": "a witch's pointed hat, a witch's broomstick, or a person dressed as a witch. Not a 'witches' broom' tree growth, not a plant, not a mushroom, not a statue of a saint."
+     "vision": "a witch's pointed hat, a witch's broomstick, or a person dressed as a witch. Not a 'witches' broom' tree growth, not a plant, not a mushroom, not a statue of a saint.",
+     "dropped": true
     },
     {
      "key": "bats",
