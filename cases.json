@@ -1,0 +1,310 @@
+[
+  {
+    "id": "daily_halloween_2026",
+    "caseNumber": 66,
+    "isSpecialEvent": true,
+    "eventBadge": "🎃 HALLOWEEN SPECIAL",
+    "title": "Halloween Special Case #66",
+    "totalRounds": 4,
+    "rounds": [
+      {
+        "roundIndex": 1,
+        "theme": "Round 1 of 4 · Haunted Mansions",
+        "tagline": "3 authentic Victorian Gothic houses built in reality. 1 synthetic haunted manor hallucinated by AI.",
+        "shortName": "MANSIONS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/r1_mansion_carson.jpg",
+            "isAi": false,
+            "title": "Carson Victorian Mansion",
+            "details": "AUTHENTIC ARCHITECTURE. Real 1880s Queen Anne redwood craftsmanship, physically accurate porch columns, and natural daylighting."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/r1_mansion_lyndhurst.jpg",
+            "isAi": false,
+            "title": "Lyndhurst Gothic Manor",
+            "details": "AUTHENTIC ARCHITECTURE. Genuine Gothic Revival limestone masonry, historic mortar joints, and true parkland perspective."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/r1_mansion_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative diffusion. Look closely at the fence pickets melting irregularly into the lawn, inconsistent window pane mullions on the upper gables, and surreal non-functional geometry in the gingerbread trim."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/r1_mansion_winchester.jpg",
+            "isAi": false,
+            "title": "Winchester Mystery House",
+            "details": "AUTHENTIC ARCHITECTURE. Physically verified Victorian exterior, authentic California palm trees, and genuine architectural framing."
+          }
+        ]
+      },
+      {
+        "roundIndex": 2,
+        "theme": "Round 2 of 4 · Carved Jack-o'-Lanterns",
+        "tagline": "3 real pumpkins carved by human hands. 1 synthetic pumpkin hallucinated by mathematical pixels.",
+        "shortName": "PUMPKINS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/r2_pumpkin_real1.jpg",
+            "isAi": false,
+            "title": "Front Porch Jack-o'-Lantern",
+            "details": "AUTHENTIC PHOTO. Serrated knife cut marks on the rind, real dripping candle wax pooling inside, and natural pumpkin string fibers."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/r2_pumpkin_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative model. Under close inspection, note the unnaturally clean carved rind bevels, candle flame floating without a distinct wick base, and overly uniform internal light diffusion."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/r2_pumpkin_real2.jpg",
+            "isAi": false,
+            "title": "Carved Pumpkin Duo",
+            "details": "AUTHENTIC PHOTO. Knife carving bevels, genuine dried pumpkin stems, and authentic dark camera background falloff."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/r2_pumpkin_real3.jpg",
+            "isAi": false,
+            "title": "Glowing Lantern Trio",
+            "details": "AUTHENTIC PHOTO. Natural candle flame flicker, organic pumpkin rind pores, and physically accurate tabletop reflections."
+          }
+        ]
+      },
+      {
+        "roundIndex": 3,
+        "theme": "Round 3 of 4 · Midnight Black Cats",
+        "tagline": "Organic fur and whiskers are a nightmare for AI models. 3 real cats; 1 synthetic machine.",
+        "shortName": "BLACK CATS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/r3_cat_real1.jpg",
+            "isAi": false,
+            "title": "Black Cat on Porch",
+            "details": "AUTHENTIC FELINE. Genuine double-coat fur layering, authentic paw claw anatomy, and natural sunlight coat sheen."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/r3_cat_real2.jpg",
+            "isAi": false,
+            "title": "Lisbon Black Cat",
+            "details": "AUTHENTIC FELINE. Individual organic whisker follicles, genuine iris capillary lines, and real wood plank deck perspective."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/r3_cat_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Diffusion model. Inspect the whisker follicle roots: individual whiskers blend unnaturally into cheek fur without distinct pores, deck wood grain lines warp subtly near paw claws, and corneal reflections lack a true environment."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/r3_cat_real3.jpg",
+            "isAi": false,
+            "title": "Feline Profile Portrait",
+            "details": "AUTHENTIC FELINE. Real ear tuft hairs, physically accurate cornea light reflection, and organic micro-fur texture."
+          }
+        ]
+      },
+      {
+        "roundIndex": 4,
+        "theme": "Round 4 of 4 · Skull Costumes & Makeup",
+        "tagline": "Elaborate human Halloween makeup. 3 real costumed humans; 1 neural synthesis.",
+        "shortName": "COSTUMES",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/halloween/r4_skull_real1.jpg",
+            "isAi": false,
+            "title": "Dama de la Muerte Skull Paint",
+            "details": "AUTHENTIC HUMAN. Real cosmetic greasepaint brushstrokes, organic skin pores under the pigment, and natural hand-drawn bone contours."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/halloween/r4_skull_ai.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative portrait. Look closely at the painted teeth lines across the lip margin: algorithmic symmetry merges unnaturally into cheek bone contouring, and marigold petals blend smoothly into hair strands without distinct stems."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/halloween/r4_skull_real2.jpg",
+            "isAi": false,
+            "title": "Catrina Skull Costume",
+            "details": "AUTHENTIC HUMAN. Painted collarbone anatomy, authentic textile weave in embroidered shawl, and genuine optical lens festival bokeh."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/halloween/r4_skull_real3.jpg",
+            "isAi": false,
+            "title": "Sugar Skull Close-up",
+            "details": "AUTHENTIC HUMAN. Authentic hand-painted cosmetic crack lines, genuine skin pore micro-details, and natural fingernail cuticle anatomy."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "archive_case_65",
+    "caseNumber": 65,
+    "isSpecialEvent": false,
+    "eventBadge": "CASE #65",
+    "title": "Master Forensics Case #65",
+    "totalRounds": 4,
+    "rounds": [
+      {
+        "roundIndex": 1,
+        "theme": "Round 1 of 4 · Street & Studio Portraits",
+        "tagline": "3 authentic human portraits photographed in 35mm. 1 synthetic neural face hallucinated by AI.",
+        "shortName": "PORTRAITS",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/c1_real_a.jpg",
+            "isAi": false,
+            "title": "Natural Light 35mm Film",
+            "details": "AUTHENTIC HUMAN. Natural eye asymmetry, genuine optical lens bokeh, and organic skin pore distribution."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/c1_real_b.jpg",
+            "isAi": false,
+            "title": "Urban Candid Portrait",
+            "details": "AUTHENTIC HUMAN. Natural shadow falloff, realistic shirt collar fabric weave, and micro-imperfections."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/c1_imposter.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generated by StyleGAN. Notice the blurry earring artifact on the left, slightly melted hair strands blending into the background, and uncanny pupil reflections."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/c1_real_c.jpg",
+            "isAi": false,
+            "title": "Golden Hour Sidewalk",
+            "details": "AUTHENTIC HUMAN. Natural sunlight rim lighting, authentic facial symmetry variations, and genuine lens chromatic aberration."
+          }
+        ]
+      },
+      {
+        "roundIndex": 2,
+        "theme": "Round 2 of 4 · Wildlife & Biological Optics",
+        "tagline": "Nature creates organic perfection. 3 real animal photos; 1 AI animal synthesis.",
+        "shortName": "WILDLIFE",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/c2_real_a.jpg",
+            "isAi": false,
+            "title": "Lion in Masai Mara",
+            "details": "AUTHENTIC PHOTO. Kenya wildlife photography with genuine optical whisker depth and natural savanna dust."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/c2_real_b.jpg",
+            "isAi": false,
+            "title": "Red Fox in Winter",
+            "details": "AUTHENTIC PHOTO. Individual fur hairs, authentic eye moisture glint, and real snow crystal reflections."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/c2_real_c.jpg",
+            "isAi": false,
+            "title": "Eagle in Flight",
+            "details": "AUTHENTIC PHOTO. Aerodynamic feather separation captured with high-speed mechanical shutter optics."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/c2_imposter.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Diffusion predator render. Look closely at the uncanny paw claw counts, unnaturally uniform fur strokes, and lack of true optical depth of field."
+          }
+        ]
+      },
+      {
+        "roundIndex": 3,
+        "theme": "Round 3 of 4 · Metropolitan Architecture",
+        "tagline": "Complex perspectives and architectural physics. 3 real buildings; 1 generative hallucination.",
+        "shortName": "CITIES",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/c3_real_a.jpg",
+            "isAi": false,
+            "title": "Modern Interior Atrium",
+            "details": "AUTHENTIC ARCHITECTURE. Physically verified cantilevered stairways, genuine daylight shafts, and true building load paths."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/c3_real_b.jpg",
+            "isAi": false,
+            "title": "Glass Skyscraper Facade",
+            "details": "AUTHENTIC ARCHITECTURE. Real optical reflections of adjacent buildings in mirrored glass panels and expansion joint seams."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/c3_imposter.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative architectural concept. Look at the impossible curved non-Euclidean surfaces, railings leading to nowhere, and non-structural column physics."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/c3_real_c.jpg",
+            "isAi": false,
+            "title": "Metropolitan Streetway",
+            "details": "AUTHENTIC PHOTO. Real asphalt road wear, authentic street lamp wiring, and genuine vehicle optical scale."
+          }
+        ]
+      },
+      {
+        "roundIndex": 4,
+        "theme": "Round 4 of 4 · Culinary & Food Optics",
+        "tagline": "Organic food textures, melting cheese, and glazes. 3 real dishes; 1 AI food render.",
+        "shortName": "CUISINE",
+        "cards": [
+          {
+            "id": "A",
+            "image": "assets/cases/c4_real_a.jpg",
+            "isAi": false,
+            "title": "Neapolitan Wood-Fired Pizza",
+            "details": "AUTHENTIC FOOD. Natural wood fire char leopard spots on the crust, genuine melted mozzarella whey separation, and fresh basil cell texture."
+          },
+          {
+            "id": "B",
+            "image": "assets/cases/c4_real_b.jpg",
+            "isAi": false,
+            "title": "Buttermilk Pancake Stack",
+            "details": "AUTHENTIC FOOD. Real maple syrup viscosity, organic pancake pore bubbles from baking powder, and melting butter physics."
+          },
+          {
+            "id": "C",
+            "image": "assets/cases/c4_real_c.jpg",
+            "isAi": false,
+            "title": "Gourmet Cheeseburger",
+            "details": "AUTHENTIC FOOD. Authentic sesame seed distribution on the brioche bun, genuine griddle sear crust, and natural tomato slice moisture."
+          },
+          {
+            "id": "D",
+            "image": "assets/cases/c4_imposter.jpg",
+            "isAi": true,
+            "title": "The Neural Imposter",
+            "details": "SYNTHETIC AI. Generative food model. Look closely at the plastic hyper-glossy reflections, impossible noodle merging, and unnatural sauce specular highlights."
+          }
+        ]
+      }
+    ]
+  }
+]

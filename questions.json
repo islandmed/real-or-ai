@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "type": "portrait",
+    "image": "assets/images/real_01.jpg",
+    "isAi": false,
+    "title": "Natural Light Studio Portrait",
+    "details": "100% Real human. Photographed naturally without neural retouching. Notice the natural asymmetry of the eyelashes, authentic skin pores, and real optical lens bokeh.",
+    "fooledPct": 54
+  },
+  {
+    "id": 2,
+    "type": "portrait",
+    "image": "assets/images/ai_face_01.jpg",
+    "isAi": true,
+    "title": "Synthetic Neural Human",
+    "details": "This person does not exist. Generated completely by an AI GAN model. Look closely at the background artifacts, unnatural ear geometry, and slightly misaligned pupils.",
+    "fooledPct": 78
+  },
+  {
+    "id": 3,
+    "type": "animal",
+    "image": "assets/images/real_02.jpg",
+    "isAi": false,
+    "title": "Lion in Masai Mara",
+    "details": "Real wildlife photo taken in Kenya by Geran de Klerk. The sharp whisker detail and cinematic natural rim light often trick players into guessing it's AI CGI.",
+    "fooledPct": 67
+  },
+  {
+    "id": 4,
+    "type": "portrait",
+    "image": "assets/images/ai_face_02.jpg",
+    "isAi": true,
+    "title": "AI Generated Man",
+    "details": "Completely synthetic human face created by StyleGAN. Notice the strange halo blurring on the ear and the surreal melted pattern on the collar.",
+    "fooledPct": 82
+  },
+  {
+    "id": 5,
+    "type": "human",
+    "image": "assets/images/real_03.jpg",
+    "isAi": false,
+    "title": "Chef in Commercial Kitchen",
+    "details": "Real photo taken on location. The organic fabric wrinkles, natural sweat sheen, and authentic stainless steel reflections are genuine real-world optics.",
+    "fooledPct": 61
+  }
+]

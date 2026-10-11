@@ -1,0 +1,17 @@
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Node & Python
+node_modules/
+__pycache__/
+*.pyc
+
+# Local Test Outputs
+test-results/
+EOF
