@@ -1,4 +1,4 @@
-const CACHE_NAME = 'imposter-v3.9-share';
+const CACHE_NAME = 'imposter-v3.9-remind';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './favicon.svg',
@@ -57,4 +57,27 @@ self.addEventListener('fetch', event => {
       });
     })
   );
+});
+
+// Daily reminder: the imposter-push Worker sends an empty push, so the text lives here.
+self.addEventListener('push', event => {
+  event.waitUntil(self.registration.showNotification('🕵️ New case is live', {
+    body: 'Can AI fool you today? 6 new photos are waiting.',
+    icon: './assets/icons/icon-192.png',
+    badge: './assets/icons/icon-192.png',
+    tag: 'daily-case',
+    renotify: false,
+    data: { url: './' }
+  }));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = new URL((event.notification.data && event.notification.data.url) || './', self.registration.scope).href;
+  event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+    for (const c of list) {
+      if (c.url.startsWith(self.registration.scope) && 'focus' in c) return c.focus();
+    }
+    return clients.openWindow(target);
+  }));
 });

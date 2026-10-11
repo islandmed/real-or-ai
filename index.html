@@ -2177,6 +2177,42 @@
   .share-label { font-size: 10px; letter-spacing: .14em; color: var(--fg-muted); text-transform: uppercase; text-align: center; margin: 2px 0 -2px; }
   .invite-preview-box #invitePreviewText { white-space: pre-wrap; }
   @media (max-width: 430px) { .cd-badge { font-size: 11px; letter-spacing: 0.05em; padding: 7px 12px; white-space: nowrap; } }
+
+  /* ===== DAILY REMINDER (remind branch) ===== */
+  .remind-box { position: relative; display: flex; justify-content: center; margin: -4px 0 14px; width: 100%; }
+  .remind-btn {
+    font: 700 0.82rem var(--mono-font); color: var(--accent); background: rgb(var(--accent-rgb) / 0.08);
+    border: 1.5px solid rgb(var(--accent-rgb) / 0.4); border-radius: 999px; padding: 8px 16px; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .remind-btn:hover, .remind-btn[aria-expanded="true"] { background: rgb(var(--accent-rgb) / 0.16); border-color: var(--accent); }
+  .remind-btn.on { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+  .remind-pop {
+    position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 50;
+    width: min(320px, calc(100vw - 32px)); padding: 14px; text-align: left;
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 12px;
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.5), 0 0 18px rgb(var(--accent-rgb) / 0.15);
+    color: var(--fg); font-family: var(--mono-font); font-size: 0.8rem;
+  }
+  .remind-pop[hidden] { display: none; }
+  .remind-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .remind-row select {
+    font: inherit; color: var(--fg); background: var(--stage); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 8px; min-width: 120px;
+  }
+  .remind-actions { display: flex; flex-direction: column; gap: 8px; }
+  .remind-act {
+    font: 700 0.8rem var(--mono-font); padding: 9px 12px; border-radius: 9px; cursor: pointer; text-align: center;
+    color: var(--fg); background: var(--stage); border: 1px solid var(--border);
+  }
+  .remind-act:hover { border-color: var(--accent); color: var(--accent); }
+  .remind-act.primary { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+  .remind-act.primary:hover { color: var(--on-accent); filter: brightness(1.08); }
+  .remind-act[hidden] { display: none; }
+  .remind-hint { margin-top: 10px; color: var(--fg-muted); font-size: 0.72rem; line-height: 1.4; }
+  .remind-hint:empty { display: none; }
+  .how-remind-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .how-remind-actions .remind-act { flex: 1 1 140px; }
 </style>
 </head>
 <body>
@@ -2267,6 +2303,18 @@
       <div class="next-case-label">NEXT DAILY MYSTERY IN</div>
       <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
       <div class="next-case-sub">A brand new forensic case with 6 unique themes drops every day at midnight.</div>
+    </div>
+    <!-- Daily reminder (remind branch): calendar everywhere, web push where supported -->
+    <div class="remind-box" id="remindBox">
+      <button class="remind-btn" id="remindBtn" type="button" aria-expanded="false" aria-controls="remindPop" onclick="toggleRemindPop(event)">🔔 Remind me daily</button>
+      <div class="remind-pop" id="remindPop" role="dialog" aria-label="Daily reminder" hidden>
+        <div class="remind-row"><label for="remindHour">Remind me at</label><select id="remindHour" onchange="remindHourChanged()"></select></div>
+        <div class="remind-actions">
+          <button class="remind-act primary js-remind-push" type="button" onclick="remindPushToggle()">🔔 Turn on notifications</button>
+          <button class="remind-act" type="button" onclick="remindCalendar()">📅 Add to calendar</button>
+        </div>
+        <div class="remind-hint js-remind-hint"></div>
+      </div>
     </div>
 
     <!-- Display ad (see ADS config). Hidden = zero space, nothing loaded. -->
@@ -2486,6 +2534,16 @@
         <div class="score-pill highlight"><span>Speed Bonus</span><strong>+100 PTS</strong></div>
       </div>
       <p class="score-note">⚠️ <strong>False Accusation Penalty:</strong> Accusing a real photo adds an immediate <strong>+3.0s time penalty</strong> to your clock and slashes stage points. Spamming wrong cards destroys your score!</p>
+    </div>
+
+    <div class="how-section">
+      <div class="how-sec-badge">DAILY REMINDER</div>
+      <p>A new case drops every day. Get a nudge at a time that suits you, either as a notification or as a repeating event in your calendar. Pick the time from the 🔔 button under the countdown.</p>
+      <div class="how-remind-actions">
+        <button class="remind-act primary js-remind-push" type="button" onclick="remindPushToggle()">🔔 Turn on notifications</button>
+        <button class="remind-act" type="button" onclick="remindCalendar()">📅 Add to calendar</button>
+      </div>
+      <div class="remind-hint js-remind-hint"></div>
     </div>
 
     <button class="how-play-btn" onclick="closeHowModal()">Got it, Let's Play!</button>
@@ -3561,7 +3619,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.9-share').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.9-remind').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4388,6 +4446,159 @@ function showToast(msg) {
   t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2800);
 }
+
+/* ===== DAILY REMINDER (remind branch) =====
+   Calendar: a local .ics with a daily RRULE, works everywhere, no server.
+   Push: subscription goes to the imposter-push Worker (push-worker/), which
+   sends an empty push at the chosen hour; sw.js shows the notification.
+   Never prompts for permission on its own: only on a click. */
+const REMIND_API = 'https://imposter-push.human-number.workers.dev';
+const REMIND_VAPID = 'BD7PbiC_PAJysOwmqJVyikrzsLK2wdBy5NtE4C4IFlJmJhYm7WBRXaAd0LrX7wvZV_C1tFVVnDjtYadnn10SK0A';
+const REMIND_LS = 'imposterRemind';
+const REMIND_URL = 'https://playimposter.pages.dev';
+const remindIsIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const remindStandalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+const remindPushOK = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+
+function remindState() { try { return JSON.parse(localStorage.getItem(REMIND_LS)) || {}; } catch (e) { return {}; } }
+function remindSave(patch) { const s = Object.assign(remindState(), patch); try { localStorage.setItem(REMIND_LS, JSON.stringify(s)); } catch (e) {} return s; }
+function remindHour() { const h = remindState().hour; return Number.isInteger(h) && h >= 0 && h < 24 ? h : 8; }
+function remindHourLabel(h) { const d = new Date(2000, 0, 1, h); return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+
+function remindRender() {
+  const s = remindState(), on = !!s.push, h = remindHour();
+  const btn = $('remindBtn');
+  if (btn) { btn.classList.toggle('on', on); btn.textContent = on ? '🔔 Daily at ' + remindHourLabel(h) : '🔔 Remind me daily'; }
+  let hint = '';
+  const pushAvail = remindPushOK && (!remindIsIOS || remindStandalone);
+  if (remindIsIOS && !remindStandalone) hint = 'Add to Home Screen for notifications.';
+  else if (!remindPushOK) hint = 'Notifications are not supported in this browser. The calendar works everywhere.';
+  else if (Notification.permission === 'denied' && !on) hint = 'Notifications are blocked for this site in your browser settings.';
+  document.querySelectorAll('.js-remind-push').forEach(b => {
+    b.hidden = !pushAvail;
+    b.textContent = on ? '🔕 Turn off notifications' : '🔔 Turn on notifications';
+    b.classList.toggle('primary', !on);
+  });
+  document.querySelectorAll('.js-remind-hint').forEach(el => { el.textContent = hint; });
+}
+
+function remindInit() {
+  const sel = $('remindHour');
+  if (sel && !sel.options.length) {
+    for (let h = 0; h < 24; h++) sel.add(new Option(remindHourLabel(h), h));
+  }
+  if (sel) sel.value = String(remindHour());
+  // If the browser dropped the subscription or permission, show it as off.
+  if (remindState().push && remindPushOK) {
+    if (Notification.permission !== 'granted') remindSave({ push: false });
+    else navigator.serviceWorker.getRegistration().then(reg => reg && reg.pushManager.getSubscription())
+      .then(sub => { if (sub === null) { remindSave({ push: false }); remindRender(); } }).catch(() => {});
+  }
+  remindRender();
+}
+
+function toggleRemindPop(ev) {
+  if (ev) ev.stopPropagation();
+  const pop = $('remindPop'), btn = $('remindBtn');
+  const open = pop.hidden;
+  pop.hidden = !open;
+  btn.setAttribute('aria-expanded', String(open));
+  if (open) remindRender();
+}
+document.addEventListener('click', e => {
+  const pop = $('remindPop');
+  if (pop && !pop.hidden && !$('remindBox').contains(e.target)) { pop.hidden = true; $('remindBtn').setAttribute('aria-expanded', 'false'); }
+});
+document.addEventListener('keydown', e => {
+  const pop = $('remindPop');
+  if (e.key === 'Escape' && pop && !pop.hidden) { pop.hidden = true; $('remindBtn').setAttribute('aria-expanded', 'false'); $('remindBtn').focus(); }
+});
+
+function remindHourChanged() {
+  const h = parseInt($('remindHour').value, 10);
+  remindSave({ hour: h });
+  remindRender();
+  if (remindState().push) remindSubscribe(true);
+}
+
+function remindCalendar() {
+  const h = remindHour(), now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, 0, 0);
+  if (start <= now) start.setDate(start.getDate() + 1);
+  const p = n => String(n).padStart(2, '0');
+  const local = d => `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
+  const utc = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const ics = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Imposter Game//Daily Reminder//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    'UID:daily-case-' + Date.now() + '@playimposter.pages.dev',
+    'DTSTAMP:' + utc(now),
+    'DTSTART:' + local(start),   // floating time: the device's own time zone
+    'DURATION:PT10M',
+    'RRULE:FREQ=DAILY',
+    'SUMMARY:🕵️ Imposter Game: new case is live',
+    'DESCRIPTION:Can AI fool you today? Play at ' + REMIND_URL,
+    'URL:' + REMIND_URL,
+    'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:New Imposter Game case', 'TRIGGER:PT0M', 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR', ''
+  ].join('\r\n');
+  const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = 'imposter-game-daily.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  showToast('📅 Calendar event downloaded. Open it to add.');
+}
+
+function remindKey(b64) {
+  const pad = '='.repeat((4 - b64.length % 4) % 4);
+  const raw = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
+  return Uint8Array.from(raw, c => c.charCodeAt(0));
+}
+function remindReg() {
+  return Promise.race([navigator.serviceWorker.ready,
+    new Promise((_, rej) => setTimeout(() => rej(new Error('sw timeout')), 8000))]);
+}
+
+async function remindSubscribe(quiet) {
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') { remindSave({ push: false }); remindRender(); showToast('Notifications not allowed. Try the calendar instead.'); return; }
+    const reg = await remindReg();
+    const sub = (await reg.pushManager.getSubscription()) ||
+      await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: remindKey(REMIND_VAPID) });
+    const res = await fetch(REMIND_API + '/subscribe', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub.toJSON(), hour: remindHour(), tzOffsetMinutes: new Date().getTimezoneOffset() })
+    });
+    if (!res.ok) throw new Error('subscribe ' + res.status);
+    remindSave({ push: true, endpoint: sub.endpoint });
+    remindRender();
+    showToast(quiet ? '🔔 Reminder moved to ' + remindHourLabel(remindHour()) : '🔔 You will get a nudge daily at ' + remindHourLabel(remindHour()));
+  } catch (err) {
+    console.log('remind subscribe error', err);
+    showToast('Could not turn on notifications. Try the calendar instead.');
+  }
+}
+
+async function remindUnsubscribe() {
+  const endpoint = remindState().endpoint;
+  remindSave({ push: false });
+  remindRender();
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    const sub = reg && await reg.pushManager.getSubscription();
+    const ep = (sub && sub.endpoint) || endpoint;
+    if (sub) await sub.unsubscribe();
+    if (ep) await fetch(REMIND_API + '/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: ep }) });
+  } catch (err) { console.log('remind unsubscribe error', err); }
+  showToast('🔕 Daily notifications off');
+}
+
+function remindPushToggle() { return remindState().push ? remindUnsubscribe() : remindSubscribe(false); }
+
+remindInit();
+/* ===== END DAILY REMINDER ===== */
 
 window.onload = init;
 </script>
