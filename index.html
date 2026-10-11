@@ -483,46 +483,138 @@
     cursor: grab;
   }
 
-  /* Final 4-Round Game Summary View */
+  /* Final Solved Game Summary View */
   .case-results {
     display: none;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 20px 0 30px;
+    padding: 14px 0 30px;
     width: 100%;
     max-width: 520px;
     margin: 0 auto;
     animation: fadeIn 0.15s;
+    box-sizing: border-box;
+  }
+  @media (min-width: 768px) {
+    .case-results {
+      max-width: 660px;
+      padding: 18px 0 36px;
+    }
+  }
+
+  /* Clean, Premium Solved Hero Card */
+  .results-hero-card {
+    width: 100%;
+    background: linear-gradient(180deg, #12182c 0%, #0d1222 100%);
+    border: 1.5px solid #28375c;
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .hero-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    gap: 8px;
   }
   .summary-score-badge {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 800;
-    font-size: 32px;
+    font-size: 11px;
     color: #ffde59;
-    text-shadow: 0 0 16px rgba(255, 222, 89, 0.4);
-    margin-bottom: 4px;
-    letter-spacing: -0.02em;
+    background: rgba(255, 222, 89, 0.12);
+    border: 1px solid rgba(255, 222, 89, 0.35);
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .summary-score-badge.flawless {
+    color: #39ff14;
+    background: rgba(57, 255, 20, 0.12);
+    border-color: rgba(57, 255, 20, 0.35);
   }
   .stars-row {
-    font-size: 22px;
-    margin-bottom: 8px;
-    letter-spacing: 6px;
+    font-size: 14px;
+    letter-spacing: 2px;
+    line-height: 1;
   }
   .result-title {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 800;
-    font-size: 18px;
-    margin-bottom: 6px;
+    font-size: 19px;
     color: #ffffff;
+    margin: 4px 0 4px;
+    letter-spacing: -0.01em;
   }
   .result-desc {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-size: 13px;
-    color: #a6b5dc;
-    max-width: 440px;
-    line-height: 1.45;
-    margin-bottom: 16px;
+    font-size: 12.5px;
+    color: #92a4ce;
+    line-height: 1.4;
+    margin: 0 0 14px;
+  }
+  .results-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .r-stat-box {
+    background: #0a0e1c;
+    border: 1px solid #1f2a46;
+    border-radius: 8px;
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .r-stat-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .r-stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #7d8ea7;
+    letter-spacing: 0.06em;
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+
+  /* Responsive Bottom Row (Stacked on Mobile, Side-by-Side on Desktop) */
+  .results-bottom-row {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
+  }
+  @media (min-width: 768px) {
+    .results-bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .share-grid {
+      margin-bottom: 0;
+    }
+    .round-breakdown {
+      margin-bottom: 0;
+    }
   }
 
   /* 4-Round Breakdown Table */
@@ -884,13 +976,13 @@
   }
   .btn-preview-download:hover { color: #fff; border-color: #8b97bc; }
 
-  /* Next Case Countdown Box (Pure Daily Game Cycle) */
+  /* Centerpiece Next Case Countdown Box (Smack in the Middle) */
   .next-case-box {
-    margin: 16px auto;
+    margin: 0 0 14px;
     padding: 16px 20px;
-    background: #0f1424;
-    border: 1.5px solid #232d4b;
-    border-radius: 12px;
+    background: radial-gradient(circle at center, #141d3b 0%, #0c1020 100%);
+    border: 2px solid rgba(0, 240, 255, 0.45);
+    border-radius: 14px;
     text-align: center;
     width: 100%;
     box-sizing: border-box;
@@ -898,30 +990,32 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    box-shadow: 0 0 28px rgba(0, 240, 255, 0.18), inset 0 0 15px rgba(0, 240, 255, 0.05);
   }
   .next-case-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
+    font-size: 10.5px;
     font-weight: 800;
-    color: #8b97bc;
-    letter-spacing: 0.12em;
+    color: #9bb1de;
+    letter-spacing: 0.14em;
     margin-bottom: 4px;
     text-transform: uppercase;
   }
   .next-case-countdown {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 28px;
+    font-size: 34px;
     font-weight: 900;
-    color: var(--neon-cyan);
-    letter-spacing: 0.05em;
-    text-shadow: 0 0 16px rgba(0, 240, 255, 0.45);
+    color: #00f0ff;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
     margin: 4px 0 6px;
+    line-height: 1;
   }
   .next-case-sub {
     font-size: 11px;
-    color: #8fa0cb;
+    color: #7f95c4;
     line-height: 1.35;
+    margin: 0;
   }
   .btn-copy:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
   .btn-copy:active { transform: translateY(1px); }
@@ -2284,43 +2378,67 @@
     </div>
   </main>
 
-  <!-- 4-Round Solved Summary View (Pure Daily Puzzle Loop) -->
+  <!-- Solved Summary View (Pure Daily Puzzle Loop) -->
   <section class="case-results" id="viewResults">
-    <div class="summary-score-badge" id="summaryScoreBadge">4 / 4</div>
-    <div class="speed-summary-row" id="speedSummaryRow">
-      <div class="speed-stat-pill">⏱️ Time: <span id="summaryTimeVal">00.0s</span></div>
-      <div class="speed-stat-pill">⚡ Speed Bonus: <span id="summarySpeedBonusVal">+0 pts</span></div>
-    </div>
-    <div class="stars-row" id="starsRow">⭐⭐⭐⭐</div>
-    <h2 class="result-title" id="resultTitle">Daily Mystery Solved!</h2>
-    <p class="result-desc" id="resultDesc">You caught all 4 synthetic machine imposters today.</p>
+    <!-- 1. Top: Clean, Premium Solved Hero Card -->
+    <div class="results-hero-card">
+      <div class="hero-status-row">
+        <span class="summary-score-badge" id="summaryScoreBadge">6 / 6 CLEARED</span>
+        <span class="stars-row" id="starsRow">⭐⭐⭐⭐</span>
+      </div>
+      <h2 class="result-title" id="resultTitle">Daily Mystery Solved!</h2>
+      <p class="result-desc" id="resultDesc">You unmasked all 6 AI imposters today.</p>
 
-    <!-- Round by Round Breakdown -->
-    <div class="round-breakdown" id="roundBreakdown">
-      <!-- Dynamically generated rows -->
+      <!-- 4-Box Stats Grid (Wordle / NYT style) -->
+      <div class="results-stats-grid" id="speedSummaryRow">
+        <div class="r-stat-box">
+          <div class="r-stat-val" id="statScoreVal">--</div>
+          <div class="r-stat-label">TOTAL PTS</div>
+        </div>
+        <div class="r-stat-box">
+          <div class="r-stat-val" id="statCaughtVal">--</div>
+          <div class="r-stat-label">CAUGHT</div>
+        </div>
+        <div class="r-stat-box">
+          <div class="r-stat-val" id="summaryTimeVal">00.0s</div>
+          <div class="r-stat-label">TIME</div>
+        </div>
+        <div class="r-stat-box">
+          <div class="r-stat-val" id="summarySpeedBonusVal">+0</div>
+          <div class="r-stat-label">SPEED PTS</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Next Daily Mystery Countdown (Middle of Results) -->
+    <!-- 2. SMACK IN THE MIDDLE: Centerpiece Next Case Countdown -->
     <div class="next-case-box" id="nextCaseBox">
       <div class="next-case-label">NEXT DAILY MYSTERY IN</div>
       <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
       <div class="next-case-sub">A brand new forensic case with 6 unique themes drops every day at midnight.</div>
     </div>
 
-    <!-- Social Viral Share Buttons & Replay -->
-    <div class="share-grid">
-      <button class="btn-share" id="btnShareStory">
-        <span>📸 Share Result Card</span>
-      </button>
-      <button class="btn-copy" id="btnCopyGrid">
-        <span>📋 Copy Daily Score</span>
-      </button>
-      <button class="btn-invite-friend" id="btnInviteFriend" onclick="openInviteModal()">
-        <span>👥 Challenge a Friend</span>
-      </button>
-      <button class="btn-replay" id="btnReplayDaily" onclick="resetDailyChallenge()">
-        <span>🔄 Play Case Again (Reset)</span>
-      </button>
+    <!-- 3. Bottom: Responsive Share Grid & Round Breakdown -->
+    <div class="results-bottom-row">
+      <!-- Social Viral Share Buttons & Replay -->
+      <div class="share-grid">
+        <button class="btn-share" id="btnShareStory">
+          <span>📸 Share Result Card</span>
+        </button>
+        <button class="btn-copy" id="btnCopyGrid">
+          <span>📋 Copy Daily Score</span>
+        </button>
+        <button class="btn-invite-friend" id="btnInviteFriend" onclick="openInviteModal()">
+          <span>👥 Challenge a Friend</span>
+        </button>
+        <button class="btn-replay" id="btnReplayDaily" onclick="resetDailyChallenge()">
+          <span>🔄 Play Case Again (Reset)</span>
+        </button>
+      </div>
+
+      <!-- Round by Round Breakdown -->
+      <div class="round-breakdown" id="roundBreakdown">
+        <!-- Dynamically generated rows -->
+      </div>
     </div>
   </section>
 </div>
@@ -3556,9 +3674,16 @@ function showAlreadyCompletedToday(record) {
   const totalRounds = dailyCaseData?.rounds?.length || 6;
   const score = record.score || (totalRounds * 100);
   const time = typeof record.time === "number" ? record.time : 35.0;
-  $("summaryScoreBadge").innerHTML = `${record.won || totalRounds} / ${totalRounds} <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${score} PTS · ⚡ ${time.toFixed(1)}s</span>`;
-  $("summaryTimeVal").textContent = `${time.toFixed(1)}s`;
-  $("summarySpeedBonusVal").textContent = `${score} PTS`;
+  const won = record.won || totalRounds;
+
+  if ($("statScoreVal")) $("statScoreVal").textContent = `${score}`;
+  if ($("statCaughtVal")) $("statCaughtVal").textContent = `${won}/${totalRounds}`;
+  if ($("summaryTimeVal")) $("summaryTimeVal").textContent = `${time.toFixed(1)}s`;
+  if ($("summarySpeedBonusVal")) $("summarySpeedBonusVal").textContent = `+${Math.max(0, score - (won * 100))}`;
+
+  $("summaryScoreBadge").textContent = `CASE #${dailyCaseData?.caseNumber || '66'} COMPLETE · ${score} PTS`;
+  $("summaryScoreBadge").className = "summary-score-badge";
+  $("starsRow").textContent = "⭐⭐⭐⭐";
   $("resultTitle").textContent = "Today's Case Complete! 🕵️";
   $("resultDesc").textContent = "You already solved today's mystery. Come back tonight at midnight for the next case!";
   startMidnightCountdown();
@@ -3651,7 +3776,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=3.4').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=3.5').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3852,35 +3977,42 @@ function showFinalResults() {
   const speedBonus = calculateSpeedBonus(finalSecs, roundResults);
   const finalScore = baseScore + speedBonus;
 
-  $("summaryTimeVal").textContent = `${finalSecs.toFixed(1)}s`;
-  $("summarySpeedBonusVal").textContent = `+${speedBonus} pts`;
+  if ($("statScoreVal")) $("statScoreVal").textContent = `${finalScore}`;
+  if ($("statCaughtVal")) $("statCaughtVal").textContent = `${totalWon}/${totalRounds}`;
+  if ($("summaryTimeVal")) $("summaryTimeVal").textContent = `${finalSecs.toFixed(1)}s`;
+  if ($("summarySpeedBonusVal")) $("summarySpeedBonusVal").textContent = `+${speedBonus}`;
 
   let stars = "⭐⭐⭐⭐";
   let title = "Grand Detective 🕵️‍♂️";
   let desc = `You unmasked ${totalWon} of ${totalRounds} AI imposters in ${finalSecs.toFixed(1)}s today.`;
 
   if (firstTryCount === totalRounds) {
-    $("summaryScoreBadge").innerHTML = `FLAWLESS ${totalRounds}/${totalRounds} <span style="font-size:16px;color:#39ff14;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+    $("summaryScoreBadge").textContent = `FLAWLESS · ${finalScore} PTS`;
+    $("summaryScoreBadge").className = "summary-score-badge flawless";
     stars = "⭐⭐⭐⭐⭐";
     title = "Master Detective · Flawless Run 🏆";
-    desc = `Incredible forensics in ${finalSecs.toFixed(1)}s! You aced all ${totalRounds} rounds on your first guess (+${speedBonus} speed bonus)!`;
+    desc = `Incredible forensics! You aced all ${totalRounds} rounds on your first guess (+${speedBonus} speed bonus).`;
   } else if (totalWon === totalRounds) {
-    $("summaryScoreBadge").innerHTML = `${totalRounds} / ${totalRounds} CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+    $("summaryScoreBadge").textContent = `${totalRounds}/${totalRounds} CLEARED · ${finalScore} PTS`;
+    $("summaryScoreBadge").className = "summary-score-badge";
     stars = "⭐⭐⭐⭐";
     title = `All ${totalRounds} Imposters Caught 🎯`;
     desc = `You caught every single AI imposter in ${finalSecs.toFixed(1)}s! (${firstTryCount} on 1st guess, +${speedBonus} speed bonus).`;
   } else if (totalWon >= Math.ceil(totalRounds * 0.75)) {
-    $("summaryScoreBadge").innerHTML = `${totalWon} / ${totalRounds} CLEARED <span style="font-size:16px;color:#ffde59;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+    $("summaryScoreBadge").textContent = `${totalWon}/${totalRounds} CLEARED · ${finalScore} PTS`;
+    $("summaryScoreBadge").className = "summary-score-badge";
     stars = "⭐⭐⭐";
     title = "Sharp Sleuth 🔍";
     desc = `${totalWon} out of ${totalRounds} AI imposters caught in ${finalSecs.toFixed(1)}s (+${speedBonus} speed bonus).`;
   } else if (totalWon >= Math.ceil(totalRounds * 0.5)) {
-    $("summaryScoreBadge").innerHTML = `${totalWon} / ${totalRounds} CLEARED <span style="font-size:16px;color:#ffaa00;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+    $("summaryScoreBadge").textContent = `${totalWon}/${totalRounds} CLEARED · ${finalScore} PTS`;
+    $("summaryScoreBadge").className = "summary-score-badge";
     stars = "⭐⭐";
     title = "Keen Observer 👀";
     desc = `${totalWon} out of ${totalRounds} AI imposters detected in ${finalSecs.toFixed(1)}s.`;
   } else {
-    $("summaryScoreBadge").innerHTML = `${totalWon} / ${totalRounds} CLEARED <span style="font-size:16px;color:#ff3344;display:block;margin-top:4px;">${finalScore} / ${maxScore} PTS · ⚡ ${finalSecs.toFixed(1)}s</span>`;
+    $("summaryScoreBadge").textContent = `${totalWon}/${totalRounds} CLEARED · ${finalScore} PTS`;
+    $("summaryScoreBadge").className = "summary-score-badge";
     stars = "💀";
     title = "Tricked by AI 🤖";
     desc = `AI diffusion artifacts fooled your eye today. Come back tomorrow for a fresh daily case!`;
