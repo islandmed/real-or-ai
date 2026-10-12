@@ -2225,7 +2225,8 @@
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
     font-size: 14px; padding: 15px; border-radius: 12px; letter-spacing: 0.04em; }
   .btn-share svg { width: 18px; height: 18px; }
-  .share-icons { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .share-icons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  @media (min-width: 420px) { .share-icons { grid-template-columns: repeat(8, 1fr); } }
   .share-ico { all: unset; box-sizing: border-box; cursor: pointer; height: 46px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     background: var(--card); border: 1px solid var(--border); color: var(--fg);
@@ -2397,6 +2398,8 @@
           <button class="share-ico" data-net="x" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24"><path d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.77L17.75 3zm-1.08 16.17h1.7L7.4 4.73H5.58l11.09 14.44z"/></svg></button>
           <button class="share-ico" data-net="facebook" aria-label="Share on Facebook" title="Facebook"><svg viewBox="0 0 24 24"><path d="M13.5 21v-7.5h2.53l.38-2.94H13.5V8.69c0-.85.24-1.43 1.46-1.43h1.56V4.63A21 21 0 0 0 14.25 4.5c-2.25 0-3.79 1.37-3.79 3.9v2.16H7.92v2.94h2.54V21h3.04z"/></svg></button>
           <button class="share-ico" data-net="whatsapp" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24"><path d="M12.04 2.5a9.45 9.45 0 0 0-8.13 14.27L2.5 21.5l4.86-1.38A9.45 9.45 0 1 0 12.04 2.5zm0 17.2a7.74 7.74 0 0 1-3.95-1.08l-.28-.17-2.88.82.83-2.8-.18-.29a7.75 7.75 0 1 1 6.46 3.52zm4.25-5.8c-.23-.12-1.38-.68-1.6-.76-.21-.08-.37-.12-.52.12-.16.23-.6.76-.74.92-.13.15-.27.17-.5.06a6.33 6.33 0 0 1-3.15-2.76c-.24-.41.24-.38.68-1.27.08-.15.04-.29-.02-.4-.06-.12-.52-1.26-.72-1.72-.19-.45-.38-.39-.52-.4h-.45a.86.86 0 0 0-.62.3 2.6 2.6 0 0 0-.81 1.93 4.5 4.5 0 0 0 .95 2.4 10.3 10.3 0 0 0 3.95 3.49c1.47.63 2.04.69 2.78.58.45-.07 1.38-.57 1.57-1.11.2-.55.2-1.02.14-1.12-.06-.1-.21-.16-.44-.27z"/></svg></button>
+          <button class="share-ico" data-net="instagram" aria-label="Share to Instagram" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.81s0 3.54-.07 4.8c-.05 1.17-.25 1.81-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.8.07s-3.54 0-4.81-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.2 15.54 2.2 15.16 2.2 12s0-3.54.07-4.81c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.46 2.2 8.84 2.2 12 2.2zm0 1.8c-3.12 0-3.48.01-4.71.07-.97.04-1.5.21-1.85.34-.46.18-.8.4-1.15.75-.35.35-.57.69-.75 1.15-.13.35-.3.88-.34 1.85C3.14 8.52 3.13 8.88 3.13 12s.01 3.48.07 4.71c.04.97.21 1.5.34 1.85.18.46.4.8.75 1.15.35.35.69.57 1.15.75.35.13.88.3 1.85.34 1.23.06 1.59.07 4.71.07s3.48-.01 4.71-.07c.97-.04 1.5-.21 1.85-.34.46-.18.8-.4 1.15-.75.35-.35.57-.69.75-1.15.13-.35.3-.88.34-1.85.06-1.23.07-1.59.07-4.71s-.01-3.48-.07-4.71c-.04-.97-.21-1.5-.34-1.85a3.08 3.08 0 0 0-.75-1.15 3.08 3.08 0 0 0-1.15-.75c-.35-.13-.88-.3-1.85-.34C15.48 4.01 15.12 4 12 4zm0 3.05a4.95 4.95 0 1 1 0 9.9 4.95 4.95 0 0 1 0-9.9zm0 1.8a3.15 3.15 0 1 0 0 6.3 3.15 3.15 0 0 0 0-6.3zm5.15-3.17a1.16 1.16 0 1 1 0 2.32 1.16 1.16 0 0 1 0-2.32z"/></svg></button>
+          <button class="share-ico" data-net="tiktok" aria-label="Share to TikTok" title="TikTok"><svg viewBox="0 0 24 24"><path d="M16.6 2h-3.23v13.36a2.86 2.86 0 1 1-2.86-2.86c.3 0 .58.05.85.13V9.33a6.1 6.1 0 1 0 5.24 6.03V8.63a7.9 7.9 0 0 0 4.4 1.35V6.75A4.65 4.65 0 0 1 16.6 2z"/></svg></button>
           <button class="share-ico" data-net="threads" aria-label="Share on Threads" title="Threads"><svg viewBox="0 0 24 24"><path d="M16.7 11.13a6.6 6.6 0 0 0-.25-.11c-.15-2.72-1.64-4.28-4.13-4.3h-.03c-1.49 0-2.73.64-3.49 1.8l1.37.94c.57-.86 1.46-1.05 2.12-1.05h.02c.82.01 1.44.25 1.84.71.29.34.49.81.58 1.4a10.4 10.4 0 0 0-2.35-.11c-2.36.14-3.88 1.51-3.78 3.42.05.97.53 1.8 1.36 2.35.7.46 1.6.69 2.54.64 1.24-.07 2.21-.54 2.89-1.4.52-.66.84-1.5.99-2.57.59.36 1.03.83 1.27 1.4.41.97.44 2.56-.86 3.86-1.14 1.14-2.51 1.63-4.58 1.64-2.3-.02-4.03-.75-5.16-2.19C6.01 16.2 5.46 14.3 5.44 12c.02-2.3.57-4.2 1.62-5.55 1.13-1.44 2.86-2.17 5.16-2.19 2.31.02 4.08.76 5.25 2.2.57.71 1 1.6 1.29 2.64l1.6-.43a8.3 8.3 0 0 0-1.6-3.25C17.27 3.6 15.1 2.67 12.23 2.65h-.01c-2.86.02-5.06.96-6.53 2.8C4.38 7.08 3.7 9.36 3.68 12v.01c.02 2.64.7 4.92 2.01 6.56 1.47 1.84 3.67 2.78 6.53 2.8h.01c2.54-.02 4.33-.68 5.81-2.16 1.93-1.93 1.88-4.35 1.24-5.84-.46-1.07-1.33-1.93-2.58-2.24zm-4.39 4.13c-1.04.06-2.12-.41-2.17-1.4-.04-.74.52-1.56 2.23-1.66l.59-.02c.62 0 1.2.06 1.73.18-.2 2.46-1.35 2.84-2.38 2.9z"/></svg></button>
           <button class="share-ico" data-net="reddit" aria-label="Share on Reddit" title="Reddit"><svg viewBox="0 0 24 24"><path d="M22 12.1a2.2 2.2 0 0 0-3.73-1.57 10.8 10.8 0 0 0-5.79-1.83l.99-4.65 3.23.68a1.57 1.57 0 1 0 .16-.76l-3.6-.76a.39.39 0 0 0-.46.3l-1.1 5.19a10.8 10.8 0 0 0-5.87 1.83A2.2 2.2 0 1 0 3.4 14.1a4.3 4.3 0 0 0-.05.66c0 3.37 3.92 6.1 8.75 6.1s8.75-2.73 8.75-6.1c0-.22-.02-.44-.05-.65A2.2 2.2 0 0 0 22 12.1zM7 13.67a1.57 1.57 0 1 1 3.14 0 1.57 1.57 0 0 1-3.14 0zm8.77 4.15a5.76 5.76 0 0 1-3.7 1.15 5.76 5.76 0 0 1-3.7-1.15.41.41 0 0 1 .58-.58 4.94 4.94 0 0 0 3.12.92 4.94 4.94 0 0 0 3.12-.92.41.41 0 1 1 .58.58zm-.29-2.58a1.57 1.57 0 1 1 0-3.14 1.57 1.57 0 0 1 0 3.14z"/></svg></button>
           <button class="share-ico" id="btnCopyGrid" data-net="copy" aria-label="Copy result" title="Copy"><svg viewBox="0 0 24 24"><path d="M16 1H6a2 2 0 0 0-2 2v12h2V3h10V1zm3 4H10a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H10V7h9v14z"/></svg></button>
@@ -3657,7 +3660,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.13').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.14').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4345,11 +4348,33 @@ async function copyShareText() {
   }
 }
 
+// Instagram and TikTok have no web share link: copy the caption, then hand the card
+// to the phone's share sheet (both apps are listed there). Desktop saves the card.
+function shareToApp(appName) {
+  const text = getDailyShareText();
+  try { navigator.clipboard && navigator.clipboard.writeText(text).catch(() => {}); } catch (_) {}
+  if (navigator.share && shareCardFile && navigator.canShare && navigator.canShare({ files: [shareCardFile] })) {
+    showToast(`Caption copied. Pick ${appName}, then paste it.`);
+    navigator.share({ files: [shareCardFile] }).catch(() => {});
+    return;
+  }
+  if (shareCardFile) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(shareCardFile);
+    a.download = shareCardFile.name;
+    a.click();
+    showToast(`Card saved and caption copied. Post the card on ${appName} and paste the caption.`);
+    return;
+  }
+  showToast(`Caption copied. Paste it into ${appName}.`);
+}
+
 document.querySelectorAll(".share-ico[data-net]").forEach(btn => {
   btn.onclick = () => {
     playSound("tap");
     const net = btn.dataset.net;
     if (net === "copy") return copyShareText();
+    if (net === "instagram" || net === "tiktok") return shareToApp(net === "instagram" ? "Instagram" : "TikTok");
     const url = shareNetworkUrl(net);
     if (url) window.open(url, "_blank", net === "facebook" ? "width=600,height=520,noopener,noreferrer" : "noopener,noreferrer");
   };
