@@ -3529,6 +3529,24 @@ function startMidnightCountdown() {
   countdownTimerInterval = setInterval(updateNextCaseCountdown, 1000);
 }
 
+// Round-by-round rows, from this session or restored from the saved daily record
+function renderRoundBreakdown() {
+  const bd = $("roundBreakdown");
+  if (!bd) return;
+  bd.innerHTML = roundResults.map(r => {
+    let tag = `<span class="rb-res fail">❌ Fooled (3 Strikes)</span>`;
+    if (r.solved && r.attempts === 1) tag = `<span class="rb-res pass-flawless">🎯 Aced (1st Guess)</span>`;
+    else if (r.solved && r.attempts === 2) tag = `<span class="rb-res pass-great">⚡ Caught (2nd Guess)</span>`;
+    else if (r.solved) tag = `<span class="rb-res pass-close">🔍 Caught (3rd Guess)</span>`;
+    return `
+      <div class="rb-row">
+        <span class="rb-name">R${r.roundIndex} · ${r.theme}</span>
+        ${tag}
+      </div>
+    `;
+  }).join("");
+}
+
 function showAlreadyCompletedToday(record) {
   $("viewPlaying").style.display = "none";
   $("viewResults").style.display = "flex";
@@ -3537,6 +3555,12 @@ function showAlreadyCompletedToday(record) {
   if (overlay) overlay.classList.remove("open");
 
   const totalRounds = dailyCaseData?.rounds?.length || 6;
+  // Restore the rounds so the breakdown and the result card work after a reload
+  if (Array.isArray(record.rounds) && record.rounds.length === totalRounds && !roundResults.length) {
+    roundResults = record.rounds.map(r => Object.assign({}, r));
+    if (typeof record.time === "number") elapsedSeconds = record.time;
+    renderRoundBreakdown();
+  }
   const score = record.score || (totalRounds * 100);
   const time = typeof record.time === "number" ? record.time : 35.0;
   const won = record.won || totalRounds;
@@ -3632,7 +3656,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.10').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.11').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3941,20 +3965,7 @@ function showFinalResults() {
   $("resultTitle").textContent = title;
   $("resultDesc").textContent = desc;
 
-  // Breakdown
-  const bd = $("roundBreakdown");
-  bd.innerHTML = roundResults.map(r => {
-    let tag = `<span class="rb-res fail">❌ Fooled (3 Strikes)</span>`;
-    if (r.solved && r.attempts === 1) tag = `<span class="rb-res pass-flawless">🎯 Aced (1st Guess)</span>`;
-    else if (r.solved && r.attempts === 2) tag = `<span class="rb-res pass-great">⚡ Caught (2nd Guess)</span>`;
-    else if (r.solved) tag = `<span class="rb-res pass-close">🔍 Caught (3rd Guess)</span>`;
-    return `
-      <div class="rb-row">
-        <span class="rb-name">R${r.roundIndex} · ${r.theme}</span>
-        ${tag}
-      </div>
-    `;
-  }).join("");
+  renderRoundBreakdown();
 
   // Update & Save Player Stats
   playerStats.played++;
@@ -3968,7 +3979,7 @@ function showFinalResults() {
     const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
     const prior = records[todayStr];
     // First result stands: a finished day is never overwritten
-    if (!(prior && prior.solved && prior.caseNumber === dailyCaseData.caseNumber)) records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, speedBonus, stars, title, date: new Date().toISOString() };
+    if (!(prior && prior.solved && prior.caseNumber === dailyCaseData.caseNumber)) records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, speedBonus, stars, title, rounds: roundResults.map(r => ({ roundIndex: r.roundIndex, theme: r.theme, solved: r.solved, attempts: r.attempts })), date: new Date().toISOString() };
     localStorage.setItem("imposter_daily_records", JSON.stringify(records));
     checkDailyStatus();
   } catch (_) {}
@@ -4357,7 +4368,7 @@ $("btnShareMain").onclick = async () => {
 $("btnShareStory").onclick = async () => {
   playSound("tap");
   const blob = await renderStoryCard();
-  if (!blob) { showToast("Finish today's case to get your card."); return; }
+  if (!blob) { showToast(getTodayResult() ? "This game was played on an older version, so its card wasn't saved. It works from your next case." : "Finish today's case to get your card."); return; }
   $("cardPreviewImg").src = URL.createObjectURL(blob);
   $("cardPreviewModal").classList.add("open");
 };
