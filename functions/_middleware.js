@@ -45,9 +45,17 @@ function decodeShort(token) {
   return `/?c=${c}&s=${score}&t=${(tenths / 10).toFixed(1)}&w=${won}`;
 }
 
+// Scanners probing for leaked secrets (.env, .git, WordPress, PHP) and a design
+// scraper. Nothing like this exists on the site; answer 403 instead of the SPA shell.
+const PROBE = /(^|\/)\.(env|git|aws|ssh)|\/wp-|\.php$|\/xmlrpc|\/phpmyadmin/i;
+const BAD_UA = /CoinCreator/i;
+
 export async function onRequest(context) {
   const { request } = context;
   const url = new URL(request.url);
+  if (PROBE.test(url.pathname) || BAD_UA.test(request.headers.get("user-agent") || "")) {
+    return new Response("Forbidden", { status: 403, headers: { "cache-control": "no-store" } });
+  }
   const short = url.pathname.match(/^\/v\/([0-9a-z]+)\/?$/);
   if (short && (request.method === "GET" || request.method === "HEAD")) {
     const target = decodeShort(short[1]);
