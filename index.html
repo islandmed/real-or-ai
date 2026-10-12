@@ -1029,8 +1029,9 @@
   }
   .btn-preview-fb:hover { filter: brightness(1.15); }
   .card-share-main { width: 100%; margin: 0 0 12px; justify-content: center; }
-  .card-share-icons { margin: 8px 0 12px; grid-template-columns: repeat(4, 1fr) !important; }
-  @media (min-width: 420px) { .card-share-icons { grid-template-columns: repeat(6, 1fr) !important; } }
+  .card-share-icons { margin: 8px 0 12px; display: flex !important; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .card-share-icons .share-ico { flex: 0 0 calc((100% - 24px) / 4); }
+  @media (min-width: 420px) { .card-share-icons .share-ico { flex-basis: calc((100% - 40px) / 6); } }
 
   /* Centerpiece Next Case Countdown Box (Smack in the Middle) */
   .next-case-box {
@@ -2455,6 +2456,9 @@
       <button class="btn-preview-download" id="btnDownloadCardImage" onclick="downloadCardImage()">
         <span>💾 Save Image</span>
       </button>
+      <button class="btn-preview-download" onclick="playSound('tap'); copyShareText()">
+        <span>📝 Copy Text</span>
+      </button>
     </div>
   </div>
 </div>
@@ -3675,7 +3679,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.18').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.20').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4355,6 +4359,8 @@ function shareNetworkUrl(net) {
     case "linkedin": return `https://www.linkedin.com/sharing/share-offsite/?url=${e(link)}`;
     case "bluesky": return `https://bsky.app/intent/compose?text=${e(text)}`;
     case "telegram": return `https://t.me/share/url?url=${e(link)}&text=${e(text.replace(link, "").trim())}`;
+    // "sms:?&body=" is the form both iOS and Android Messages accept; Mac Messages too.
+    case "sms": return `sms:?&body=${e(text)}`;
     case "email": return `mailto:?subject=${e(parts ? parts.title : "Can you spot the AI fake?")}&body=${e(text)}`;
   }
   return null;
@@ -4481,8 +4487,8 @@ function downloadCardImage() {
 // goes to any app. Every browser also gets direct links; on those the card is copied
 // to the clipboard first, so it can be pasted into the post.
 const CARD_NETS = [
-  ["instagram", "Instagram"], ["tiktok", "TikTok"], ["x", "X"], ["facebook", "Facebook"], ["whatsapp", "WhatsApp"], ["threads", "Threads"], ["reddit", "Reddit"],
-  ["linkedin", "LinkedIn"], ["bluesky", "Bluesky"], ["telegram", "Telegram"], ["email", "Email"], ["more", "Copy caption"]
+  ["instagram", "Instagram"], ["tiktok", "TikTok"], ["sms", "Text message"], ["signal", "Signal"], ["x", "X"], ["facebook", "Facebook"], ["whatsapp", "WhatsApp"], ["threads", "Threads"], ["reddit", "Reddit"],
+  ["linkedin", "LinkedIn"], ["bluesky", "Bluesky"], ["telegram", "Telegram"], ["email", "Email"]
 ];
 function cardCanNativeShare() {
   return !!(navigator.share && shareCardFile && navigator.canShare && navigator.canShare({ files: [shareCardFile] }));
@@ -4493,7 +4499,8 @@ function setupCardShare() {
     const icon = net => {
       const src = document.querySelector(`.share-grid .share-ico[data-net="${net}"] svg`);
       if (src) return src.outerHTML;
-      const letters = { linkedin: "in", bluesky: "🦋", telegram: "✈", email: "✉", more: "📋" };
+      const letters = { linkedin: "in", bluesky: "🦋", telegram: "✈", email: "✉", sms: "💬" };
+      if (net === "signal") return `<svg viewBox="0 0 24 24"><path d="M12 2.2a9.8 9.8 0 0 0-8.4 14.85L2.4 21.6l4.6-1.15A9.8 9.8 0 1 0 12 2.2zm0 1.9a7.9 7.9 0 1 1-4.3 14.53l-.33-.21-2.4.6.62-2.32-.23-.36A7.9 7.9 0 0 1 12 4.1z"/></svg>`;
       return `<span style="font:800 15px 'JetBrains Mono',monospace">${letters[net] || "•"}</span>`;
     };
     box.innerHTML = CARD_NETS.map(([net, name]) => `<button class="share-ico" data-card-net="${net}" aria-label="${name}" title="${name}">${icon(net)}</button>`).join("");
@@ -4505,7 +4512,17 @@ function setupCardShare() {
 function shareCardTo(net) {
   playSound("tap");
   const text = getDailyShareText();
-  if (net === "more") return copyShareText();
+  // Signal has no web share link: the share sheet lists it on phones; on desktop
+  // the card is copied for pasting into Signal Desktop.
+  if (net === "signal") {
+    if (cardCanNativeShare()) return shareToApp("Signal");
+    if (currentCardBlob && navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([new ClipboardItem({ "image/png": currentCardBlob })])
+        .then(() => showToast("Card copied. Paste it into a Signal chat."))
+        .catch(() => copyShareText());
+    } else copyShareText();
+    return;
+  }
   if (net === "instagram" || net === "tiktok") {
     const name = net === "instagram" ? "Instagram" : "TikTok";
     if (cardCanNativeShare()) return shareToApp(name);
@@ -4520,9 +4537,9 @@ function shareCardTo(net) {
   if (currentCardBlob && navigator.clipboard && window.ClipboardItem) {
     try { navigator.clipboard.write([new ClipboardItem({ "image/png": currentCardBlob })]).catch(() => {}); copied = true; } catch (_) {}
   }
-  if (net === "email") location.href = url;
+  if (net === "email" || net === "sms") location.href = url;
   else if (url) window.open(url, "_blank", net === "facebook" ? "width=600,height=520,noopener,noreferrer" : "noopener,noreferrer");
-  if (copied && net !== "email") showToast("Card copied. Paste it into your post.");
+  if (copied && net !== "email" && net !== "sms") showToast("Card copied. Paste it into your post.");
 }
 $("btnCardShare").onclick = async () => {
   playSound("tap");
