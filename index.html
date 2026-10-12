@@ -1029,7 +1029,8 @@
   }
   .btn-preview-fb:hover { filter: brightness(1.15); }
   .card-share-main { width: 100%; margin: 0 0 12px; justify-content: center; }
-  .card-share-icons { margin: 8px 0 12px; grid-template-columns: repeat(5, 1fr) !important; }
+  .card-share-icons { margin: 8px 0 12px; grid-template-columns: repeat(4, 1fr) !important; }
+  @media (min-width: 420px) { .card-share-icons { grid-template-columns: repeat(6, 1fr) !important; } }
 
   /* Centerpiece Next Case Countdown Box (Smack in the Middle) */
   .next-case-box {
@@ -3674,7 +3675,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.17').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.18').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4480,7 +4481,7 @@ function downloadCardImage() {
 // goes to any app. Every browser also gets direct links; on those the card is copied
 // to the clipboard first, so it can be pasted into the post.
 const CARD_NETS = [
-  ["x", "X"], ["facebook", "Facebook"], ["whatsapp", "WhatsApp"], ["threads", "Threads"], ["reddit", "Reddit"],
+  ["instagram", "Instagram"], ["tiktok", "TikTok"], ["x", "X"], ["facebook", "Facebook"], ["whatsapp", "WhatsApp"], ["threads", "Threads"], ["reddit", "Reddit"],
   ["linkedin", "LinkedIn"], ["bluesky", "Bluesky"], ["telegram", "Telegram"], ["email", "Email"], ["more", "Copy caption"]
 ];
 function cardCanNativeShare() {
@@ -4505,6 +4506,14 @@ function shareCardTo(net) {
   playSound("tap");
   const text = getDailyShareText();
   if (net === "more") return copyShareText();
+  if (net === "instagram" || net === "tiktok") {
+    const name = net === "instagram" ? "Instagram" : "TikTok";
+    if (cardCanNativeShare()) return shareToApp(name);
+    // Desktop: neither has a share link, so save the card and open the site to upload it.
+    shareToApp(name);
+    window.open(net === "instagram" ? "https://www.instagram.com/" : "https://www.tiktok.com/upload", "_blank", "noopener,noreferrer");
+    return;
+  }
   const url = shareNetworkUrl(net);
   let copied = false;
   // The clipboard write has to start before the new tab steals focus.
