@@ -3657,7 +3657,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.12').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.13').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4057,7 +4057,13 @@ function getTodayResult() {
 }
 
 function getChallengeLink(res) {
-  return `${window.location.origin}/?c=${encodeURIComponent(dailyCaseData.caseNumber)}&s=${res.score}&t=${res.time.toFixed(1)}&w=${res.won}`;
+  // Short form /v/<base36>; functions/_middleware.js decodes it back to ?c=&s=&t=&w=
+  const c = Math.min(16383, Math.max(1, Number(dailyCaseData.caseNumber) || 1));
+  const sc = Math.min(4095, Math.max(0, Math.round(res.score)));
+  const tenths = Math.min(16383, Math.max(1, Math.round(res.time * 10)));
+  const won = Math.min(6, Math.max(0, res.won | 0));
+  const packed = ((c * 4096 + sc) * 16384 + tenths) * 8 + won;
+  return `${window.location.origin}/v/${packed.toString(36)}`;
 }
 
 // Result-dependent share copy. Older saved grids used 🟦/🟥; map them to the current set.

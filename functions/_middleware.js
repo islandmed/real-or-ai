@@ -30,10 +30,30 @@ class SetContent {
   element(el) { el.setAttribute("content", this.value); }
 }
 
+// Short challenge link /v/<base36>: case, score, tenths of a second and rounds won
+// packed into one number (see getChallengeLink in index.html). Redirects to the
+// query form, which the rewrite below and the page already understand.
+function decodeShort(token) {
+  if (!/^[0-9a-z]{1,11}$/.test(token)) return null;
+  let n = parseInt(token, 36);
+  if (!Number.isSafeInteger(n)) return null;
+  const won = n % 8; n = Math.floor(n / 8);
+  const tenths = n % 16384; n = Math.floor(n / 16384);
+  const score = n % 4096; n = Math.floor(n / 4096);
+  const c = n;
+  if (c < 1 || c > 16383 || won > 6 || tenths < 1) return null;
+  return `/?c=${c}&s=${score}&t=${(tenths / 10).toFixed(1)}&w=${won}`;
+}
+
 export async function onRequest(context) {
   const { request } = context;
-  if (request.method !== "GET") return context.next();
   const url = new URL(request.url);
+  const short = url.pathname.match(/^\/v\/([0-9a-z]+)\/?$/);
+  if (short && (request.method === "GET" || request.method === "HEAD")) {
+    const target = decodeShort(short[1]);
+    return Response.redirect(url.origin + (target || "/"), 302);
+  }
+  if (request.method !== "GET") return context.next();
   if (url.pathname !== "/" && url.pathname !== "/index.html") return context.next();
   const ch = parseChallenge(url.searchParams);
   if (!ch) return context.next();
