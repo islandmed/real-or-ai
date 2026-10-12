@@ -3679,7 +3679,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.20').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.21').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4487,7 +4487,7 @@ function downloadCardImage() {
 // goes to any app. Every browser also gets direct links; on those the card is copied
 // to the clipboard first, so it can be pasted into the post.
 const CARD_NETS = [
-  ["instagram", "Instagram"], ["tiktok", "TikTok"], ["sms", "Text message"], ["signal", "Signal"], ["x", "X"], ["facebook", "Facebook"], ["whatsapp", "WhatsApp"], ["threads", "Threads"], ["reddit", "Reddit"],
+  ["instagram", "Instagram"], ["tiktok", "TikTok"], ["sms", "Text message"], ["signal", "Signal"], ["x", "X"], ["facebook", "Facebook"], ["whatsapp", "WhatsApp"], ["reddit", "Reddit"],
   ["linkedin", "LinkedIn"], ["bluesky", "Bluesky"], ["telegram", "Telegram"], ["email", "Email"]
 ];
 function cardCanNativeShare() {
