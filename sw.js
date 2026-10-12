@@ -1,4 +1,4 @@
-const CACHE_NAME = 'imposter-v4.14';
+const CACHE_NAME = 'imposter-v4.15';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './favicon.svg',
