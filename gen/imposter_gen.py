@@ -423,7 +423,9 @@ def worker_call(method, path, secret, body=None, timeout=90):
 # safe for a family audience and (d) is a photograph. Any doubt, any parse
 # failure and any unexpected answer is a rejection.
 
-VISION_ON = True
+# Off until the filter's false-approval rate is measured on Tony's hand-judged
+# photos: IMPOSTER_VISION=on (repo variable for the Action) turns it on.
+VISION_ON = os.environ.get("IMPOSTER_VISION", "off").lower() == "on"
 
 VISION_SYSTEM = ("You are a strict photo editor for a family-friendly daily photo quiz. You look at one image and "
                  "answer only with the requested JSON. If you are unsure about anything, set confident to false.")
@@ -1170,12 +1172,13 @@ def main():
     ap.add_argument("--decide", action="append", default=[], help="POOL:bad,idx,list (others approved)")
     ap.add_argument("--rereal", action="append", default=[], help="DATE:R keep the AI, new real photos")
     ap.add_argument("--no-vision", action="store_true", help="only use human-approved photos")
+    ap.add_argument("--vision", action="store_true", help="approve new photos with the vision model")
     ap.add_argument("--apply-vetoes", action="store_true", help="swap the photos marked bad on the review page")
     ap.add_argument("--upload-review", action="store_true", help="refresh the review page's upcoming days")
     ap.add_argument("--prefetch", action="store_true", help="fetch pools for every season in the date range")
     a = ap.parse_args()
     global VISION_ON
-    VISION_ON = not a.no_vision
+    VISION_ON = (VISION_ON or a.vision) and not a.no_vision
 
     seasons = load_seasons()
     state = load_state()

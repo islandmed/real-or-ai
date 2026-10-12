@@ -40,6 +40,9 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       GH_TOKEN: ${{ github.token }}
+      # Vision approval of new photos: off (photos Tony approved by hand only)
+      # until its false-approval rate is measured. gh variable set IMPOSTER_VISION --body on
+      IMPOSTER_VISION: ${{ vars.IMPOSTER_VISION || 'off' }}
       WRANGLER: wrangler@4.149.0
     steps:
       - name: Check secrets
