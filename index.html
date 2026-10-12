@@ -1028,6 +1028,8 @@
     box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
   }
   .btn-preview-fb:hover { filter: brightness(1.15); }
+  .card-share-main { width: 100%; margin: 0 0 12px; justify-content: center; }
+  .card-share-icons { margin: 8px 0 12px; grid-template-columns: repeat(5, 1fr) !important; }
 
   /* Centerpiece Next Case Countdown Box (Smack in the Middle) */
   .next-case-box {
@@ -2442,12 +2444,12 @@
     <div class="card-preview-stage">
       <img id="cardPreviewImg" src="" alt="Scorecard Preview">
     </div>
+    <button class="btn-share card-share-main" id="btnCardShare" hidden><span>Share card…</span></button>
+    <div class="share-label" id="cardShareLabel">Post it to</div>
+    <div class="share-icons card-share-icons" id="cardShareIcons"></div>
     <div class="card-preview-actions">
       <button class="btn-preview-copy" id="btnCopyCardImage" onclick="copyCardImageToClipboard()">
         <span>📋 Copy Image</span>
-      </button>
-      <button class="btn-preview-fb" onclick="shareInviteFacebook()" title="Share to Facebook">
-        <span>📘 Share to FB</span>
       </button>
       <button class="btn-preview-download" id="btnDownloadCardImage" onclick="downloadCardImage()">
         <span>💾 Save Image</span>
@@ -3672,7 +3674,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.16').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.17').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4349,6 +4351,10 @@ function shareNetworkUrl(net) {
     case "whatsapp": return `https://api.whatsapp.com/send?text=${e(text)}`;
     case "threads": return `https://www.threads.net/intent/post?text=${e(text)}`;
     case "reddit": return `https://www.reddit.com/submit?url=${e(link)}&title=${e(parts ? parts.head.slice(0, 2).join(" ") : "Can you spot the AI fake?")}`;
+    case "linkedin": return `https://www.linkedin.com/sharing/share-offsite/?url=${e(link)}`;
+    case "bluesky": return `https://bsky.app/intent/compose?text=${e(text)}`;
+    case "telegram": return `https://t.me/share/url?url=${e(link)}&text=${e(text.replace(link, "").trim())}`;
+    case "email": return `mailto:?subject=${e(parts ? parts.title : "Can you spot the AI fake?")}&body=${e(text)}`;
   }
   return null;
 }
@@ -4420,6 +4426,8 @@ $("btnShareMain").onclick = async () => {
       try { await navigator.share({ text }); return; } catch (e2) { if (e2 && e2.name === "AbortError") return; }
     }
   }
+  // No system share sheet (Firefox, Linux): open the scorecard with every destination.
+  if (dailyCaseData && roundResults.length) return $("btnShareStory").onclick();
   window.open(shareNetworkUrl("x"), "_blank", "noopener,noreferrer");
 };
 
@@ -4428,6 +4436,8 @@ $("btnShareStory").onclick = async () => {
   const blob = await renderStoryCard();
   if (!blob) { showToast(getTodayResult() ? "This game was played on an older version, so its card wasn't saved. It works from your next case." : "Finish today's case to get your card."); return; }
   $("cardPreviewImg").src = URL.createObjectURL(blob);
+  if (!shareCardFile && dailyCaseData) shareCardFile = new File([blob], `imposter-case-${dailyCaseData.caseNumber}.png`, { type: "image/png" });
+  setupCardShare();
   $("cardPreviewModal").classList.add("open");
 };
 
@@ -4464,6 +4474,52 @@ function downloadCardImage() {
   a.click();
   showToast("Result card image downloaded!");
 }
+
+// Scorecard sharing. Where the browser can share files (phones, Windows/Mac Chrome,
+// Edge, Safari) one button opens the system sheet with the card and caption, so it
+// goes to any app. Every browser also gets direct links; on those the card is copied
+// to the clipboard first, so it can be pasted into the post.
+const CARD_NETS = [
+  ["x", "X"], ["facebook", "Facebook"], ["whatsapp", "WhatsApp"], ["threads", "Threads"], ["reddit", "Reddit"],
+  ["linkedin", "LinkedIn"], ["bluesky", "Bluesky"], ["telegram", "Telegram"], ["email", "Email"], ["more", "Copy caption"]
+];
+function cardCanNativeShare() {
+  return !!(navigator.share && shareCardFile && navigator.canShare && navigator.canShare({ files: [shareCardFile] }));
+}
+function setupCardShare() {
+  const box = $("cardShareIcons");
+  if (!box.childElementCount) {
+    const icon = net => {
+      const src = document.querySelector(`.share-grid .share-ico[data-net="${net}"] svg`);
+      if (src) return src.outerHTML;
+      const letters = { linkedin: "in", bluesky: "🦋", telegram: "✈", email: "✉", more: "📋" };
+      return `<span style="font:800 15px 'JetBrains Mono',monospace">${letters[net] || "•"}</span>`;
+    };
+    box.innerHTML = CARD_NETS.map(([net, name]) => `<button class="share-ico" data-card-net="${net}" aria-label="${name}" title="${name}">${icon(net)}</button>`).join("");
+    box.querySelectorAll("[data-card-net]").forEach(b => b.onclick = () => shareCardTo(b.dataset.cardNet));
+  }
+  $("btnCardShare").hidden = !cardCanNativeShare();
+  $("cardShareLabel").textContent = cardCanNativeShare() ? "Or post it to" : "Post it to";
+}
+function shareCardTo(net) {
+  playSound("tap");
+  const text = getDailyShareText();
+  if (net === "more") return copyShareText();
+  const url = shareNetworkUrl(net);
+  let copied = false;
+  // The clipboard write has to start before the new tab steals focus.
+  if (currentCardBlob && navigator.clipboard && window.ClipboardItem) {
+    try { navigator.clipboard.write([new ClipboardItem({ "image/png": currentCardBlob })]).catch(() => {}); copied = true; } catch (_) {}
+  }
+  if (net === "email") location.href = url;
+  else if (url) window.open(url, "_blank", net === "facebook" ? "width=600,height=520,noopener,noreferrer" : "noopener,noreferrer");
+  if (copied && net !== "email") showToast("Card copied. Paste it into your post.");
+}
+$("btnCardShare").onclick = async () => {
+  playSound("tap");
+  try { await navigator.share({ files: [shareCardFile], text: getDailyShareText() }); }
+  catch (err) { if (!err || err.name !== "AbortError") showToast("Couldn't open the share sheet. Use a button below."); }
+};
 
 // Invite & Challenge a Friend
 function getInviteShareData() {
