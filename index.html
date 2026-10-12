@@ -3551,6 +3551,7 @@ function showAlreadyCompletedToday(record) {
   $("viewPlaying").style.display = "none";
   $("viewResults").style.display = "flex";
   if ($("gameStatusBar")) $("gameStatusBar").style.display = "none";
+  setTimeout(prepareShareCard, 300);
   const overlay = $("countdownOverlay");
   if (overlay) overlay.classList.remove("open");
 
@@ -3656,7 +3657,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.11').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.12').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -3906,6 +3907,7 @@ function showFinalResults() {
   $("viewPlaying").style.display = "none";
   $("viewResults").style.display = "flex";
   if ($("gameStatusBar")) $("gameStatusBar").style.display = "none";
+  setTimeout(prepareShareCard, 300);
 
   const totalRounds = dailyCaseData.rounds.length;
   const maxScore = (totalRounds * 100) + 100;
@@ -4347,19 +4349,30 @@ document.querySelectorAll(".share-ico[data-net]").forEach(btn => {
   };
 });
 
+// The share sheet must open straight from the tap (iOS drops the gesture after an
+// await), so the card image is rendered ahead of time and reused here.
+let shareCardFile = null;
+function prepareShareCard() {
+  shareCardFile = null;
+  renderStoryCard().then(blob => {
+    if (blob && dailyCaseData) shareCardFile = new File([blob], `imposter-case-${dailyCaseData.caseNumber}.png`, { type: "image/png" });
+  }).catch(() => {});
+}
+
 $("btnShareMain").onclick = async () => {
   playSound("tap");
   const text = getDailyShareText();
-  if (navigator.share && navigator.canShare) {
+  if (navigator.share) {
     try {
-      const blob = await renderStoryCard();
-      const file = blob && new File([blob], `imposter-case-${dailyCaseData.caseNumber}.png`, { type: "image/png" });
-      if (file && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], text });
-        return;
+      if (shareCardFile && navigator.canShare && navigator.canShare({ files: [shareCardFile] })) {
+        await navigator.share({ files: [shareCardFile], text });
+      } else {
+        await navigator.share({ text });
       }
+      return;
     } catch (err) {
       if (err && err.name === "AbortError") return;
+      try { await navigator.share({ text }); return; } catch (e2) { if (e2 && e2.name === "AbortError") return; }
     }
   }
   window.open(shareNetworkUrl("x"), "_blank", "noopener,noreferrer");
