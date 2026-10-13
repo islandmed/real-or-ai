@@ -7,6 +7,11 @@ on:
   schedule:
     - cron: "7 * * * *"
   workflow_dispatch:
+    inputs:
+      check:
+        description: "Only check the X keys (posts nothing)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # commits social/posted.json
@@ -27,7 +32,11 @@ jobs:
       X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
     steps:
       - uses: actions/checkout@v4
+      - name: Check X keys
+        if: ${{ inputs.check }}
+        run: python3 social/post_x.py --whoami
       - name: Post next due item
+        if: ${{ !inputs.check }}
         run: python3 social/post_x.py
       - name: Record what posted
         run: |

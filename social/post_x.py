@@ -120,9 +120,21 @@ def post(item, keys):
     return r["data"]["id"]
 
 
+def whoami():
+    keys = {"ck": os.environ.get("X_API_KEY", ""), "cs": os.environ.get("X_API_SECRET", ""),
+            "at": os.environ.get("X_ACCESS_TOKEN", ""), "as": os.environ.get("X_ACCESS_SECRET", "")}
+    print("key lengths:", {k: len(v) for k, v in keys.items()})
+    if not all(keys.values()):
+        raise SystemExit("one or more X secrets are empty")
+    me = request("GET", "https://api.x.com/2/users/me", keys)
+    print("authenticated as @" + me["data"]["username"])
+
+
 def main():
     if "--push" in sys.argv:
         return push()
+    if "--whoami" in sys.argv:
+        return whoami()
     dry = "--dry-run" in sys.argv
     posted = json.loads(POSTED.read_text()) if POSTED.exists() else {}
     now = dt.datetime.now(dt.timezone.utc)
