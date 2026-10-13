@@ -2273,6 +2273,9 @@
   .remind-btn.fb-follow { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: #fff; background: #1877f2; border-color: #1877f2; }
   .remind-btn.fb-follow:hover { background: #2d86ff; border-color: #2d86ff; }
   .remind-btn.fb-follow svg { width: 16px; height: 16px; fill: currentColor; }
+  .remind-btn.x-follow { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: #fff; background: #000; border-color: #444; }
+  .remind-btn.x-follow:hover { border-color: #888; }
+  .remind-btn.x-follow svg { width: 14px; height: 14px; fill: currentColor; }
   .remind-pop {
     position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 50;
     width: min(320px, calc(100vw - 32px)); padding: 14px; text-align: left;
@@ -2393,6 +2396,7 @@
     </div>
     <div class="remind-box" id="remindBox">
       <a class="remind-btn fb-follow" href="https://www.facebook.com/profile.php?id=61595152297634" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-7.5h2.53l.38-2.94H13.5V8.69c0-.85.24-1.43 1.46-1.43h1.56V4.63A21 21 0 0 0 14.25 4.5c-2.25 0-3.79 1.37-3.79 3.9v2.16H7.92v2.94h2.54V21h3.04z"/></svg>Follow for tomorrow's case</a>
+      <a class="remind-btn x-follow" href="https://x.com/PlayImposterAI" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.77L17.75 3zm-1.08 16.17h1.7L7.4 4.73H5.58l11.09 14.44z"/></svg>Follow on X</a>
       <button class="remind-btn" id="installBtn" type="button" onclick="installApp()" hidden>📲 Install app</button>
     </div>
 
@@ -3680,7 +3684,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.23').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.24').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
