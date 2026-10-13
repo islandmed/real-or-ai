@@ -34,7 +34,21 @@ PUBLIC = ["index.html", "sw.js", "manifest.json", "favicon.svg", "og-image.png",
           "og-christmas.png", "robots.txt", "ads.txt", "privacy/index.html", "about/index.html", "contact/index.html",
           "how-to-spot-ai-images/index.html",
           "sitemap.xml", "_headers", "assets/icons/apple-touch-icon.png", "assets/icons/icon-192.png",
-          "assets/icons/icon-512.png", "assets/icons/favicon.svg", "assets/icons/og-image.png"]
+          "assets/icons/icon-512.png", "assets/icons/favicon.svg", "assets/icons/og-image.png",
+          "assets/promo/cats/a.webp", "assets/promo/cats/b.webp", "assets/promo/cats/c.webp", "assets/promo/cats/d.webp"]
+
+
+def shrink_card(src, dst):
+    """Cards show at ~170px on a phone, so 960px at q80 is mostly wasted bytes on
+    the first screen. Re-encode at 720px, q70 (about a third of the size); every
+    card gets the same treatment, real or AI."""
+    if dst.exists() and dst.stat().st_mtime >= src.stat().st_mtime:
+        return
+    from PIL import Image
+    im = Image.open(src)
+    if im.width > 720:
+        im = im.resize((720, round(im.height * 720 / im.width)), Image.LANCZOS)
+    im.save(dst, "WEBP", quality=70, method=6)
 
 
 def main():
@@ -73,7 +87,7 @@ def main():
             t = tk[rnd["theme"]]
             cards = []
             for c in rnd["cards"]:
-                shutil.copy2(g.IMG / c["file"], DIST / "img" / c["file"])
+                shrink_card(g.IMG / c["file"], DIST / "img" / c["file"])
                 n_img += 1
                 card = {"id": c["id"], "image": f"img/{c['file']}", "ai": c["ai"]}
                 if not c["ai"]:

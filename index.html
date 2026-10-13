@@ -2628,6 +2628,7 @@
 
 <!-- HTML5 Big Cyber Countdown Overlay -->
 <div class="countdown-overlay open" id="countdownOverlay" onclick="handleOverlayClick(event)">
+  <script>/* ad visitors land on the warm-up round, not the intro */ if (/[?&]r=cats(&|$)/.test(location.search)) { document.getElementById("countdownOverlay").classList.remove("open"); document.getElementById("roundCountLabel").textContent = "WARM-UP"; }</script>
   <div class="cd-laser-sweep"></div>
   <button class="cd-skip-btn" onclick="dismissCountdown(event)">Skip to Game ✕</button>
 
@@ -3664,14 +3665,9 @@ async function init() {
       badgeEl.textContent = dailyCaseData.eventBadge || `DAILY CASE #${dailyCaseData.caseNumber}`;
     }
 
-    // A finished day stays finished (only a record for THIS case counts)
-    const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
-    const rec = records[todayStr];
-    if (rec && rec.solved && (!rec.caseNumber || rec.caseNumber === dailyCaseData.caseNumber)) {
-      showAlreadyCompletedToday(rec);
-    } else {
-      loadRound(0);
-    }
+    const wk = readWarmupParam();
+    if (wk) startWarmup(wk);
+    else startDailyFlow();
   } catch (err) {
     console.error("Failed to load case", err);
     showToast("Today's case could not be loaded. Check your connection and refresh.");
@@ -3679,10 +3675,111 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.21').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.22').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
+}
+
+// A finished day stays finished (only a record for THIS case counts)
+function startDailyFlow(skipIntro) {
+  const todayStr = localDayStr();
+  const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
+  const rec = records[todayStr];
+  if (rec && rec.solved && (!rec.caseNumber || rec.caseNumber === dailyCaseData.caseNumber)) {
+    showAlreadyCompletedToday(rec);
+  } else {
+    loadRound(0);
+    if (skipIntro) dismissCountdown();
+  }
+}
+
+// ===== Warm-up round (?r=cats) =====
+// The puzzle from the Facebook ad, playable the moment an ad visitor lands, before
+// any intro. It is not a daily case and is never scored or saved, so its answer
+// living in the page gives nothing away about the real game.
+const CC_BY = "https://creativecommons.org/licenses/by/2.0/", CC_BY_SA = "https://creativecommons.org/licenses/by-sa/2.0/";
+const WARMUPS = {
+  cats: {
+    name: "Black cats", ai: "C",
+    credits: {
+      A: { artist: "Jennifer C. (cropped, brightened)", license: "CC BY 2.0", licenseUrl: CC_BY, source: "https://commons.wikimedia.org/wiki/File:Halloween_(5137685458).jpg" },
+      B: { artist: "Marathon (cropped, brightened)", license: "CC BY-SA 2.0", licenseUrl: CC_BY_SA, source: "https://commons.wikimedia.org/wiki/File:Cat_and_a_pumpkin_-_geograph.org.uk_-_5184956.jpg" },
+      D: { artist: "Jennifer C. (cropped, brightened)", license: "CC BY 2.0", licenseUrl: CC_BY, source: "https://commons.wikimedia.org/wiki/File:Kitten_(5238962607).jpg" }
+    }
+  }
+};
+let warmup = null;
+function readWarmupParam() {
+  try { const k = new URLSearchParams(location.search).get("r"); return WARMUPS[k] ? k : null; } catch (_) { return null; }
+}
+function startWarmup(key) {
+  const w = WARMUPS[key];
+  warmup = { key, ai: w.ai, credits: w.credits, attempts: 0, over: false };
+  const overlay = $("countdownOverlay");
+  if (overlay) overlay.classList.remove("open", "closing");
+  $("roundCountLabel").textContent = "WARM-UP";
+  $("themeName").textContent = `${w.name} · tap the AI fake`;
+  for (let i = 1; i <= 3; i++) { const dot = $(`dot${i}`); if (dot) { dot.className = "heart-pip"; dot.textContent = "❤️"; } }
+  $("btnNextRound").classList.remove("show");
+  const creditsEl = $("roundCredits");
+  if (creditsEl) { creditsEl.innerHTML = ""; creditsEl.hidden = true; }
+  $("gridWrap").innerHTML = ["A", "B", "C", "D"].map(id => `
+    <div class="imposter-card" id="card_${id}" onclick="selectCard('${id}')">
+      <div class="card-letter">${id}</div>
+      <div class="card-img-wrap"><img src="assets/promo/${key}/${id.toLowerCase()}.webp" alt="Photo ${id}" loading="eager" fetchpriority="high"></div>
+      <div class="card-status-badge" id="badge_${id}">
+        <div class="badge-icon" id="badgeIcon_${id}">🧑</div>
+        <div class="badge-title" id="badgeTitle_${id}">AUTHENTIC</div>
+        <div class="badge-desc" id="badgeDesc_${id}"></div>
+      </div>
+    </div>`).join("");
+  // Today's first round loads behind it, so the case starts instantly afterwards
+  dailyCaseData.rounds[0].cards.forEach(c => { const img = new Image(); img.src = c.image; });
+}
+function warmupMarkAI(id, caught) {
+  $(`card_${id}`).classList.add("caught");
+  $(`badgeIcon_${id}`).textContent = "🤖";
+  $(`badgeTitle_${id}`).textContent = caught ? "AI IMPOSTER CAUGHT" : "AI IMPOSTER";
+  $(`badgeDesc_${id}`).innerHTML = `<div style="margin-top:4px;">Generated by AI (FLUX.1 schnell).</div>`;
+}
+function warmupGuess(id) {
+  const w = warmup, el = $(`card_${id}`);
+  if (w.over || !el || el.classList.contains("eliminated")) return;
+  w.attempts++;
+  if (id === w.ai) {
+    playSound("caught");
+    warmupMarkAI(id, true);
+    const pip = $(`dot${w.attempts}`); if (pip) { pip.className = "heart-pip solved"; pip.textContent = "🎯"; }
+    return endWarmupRound(true);
+  }
+  playSound("strike");
+  el.classList.add("eliminated");
+  $(`badgeIcon_${id}`).textContent = "🏛️";
+  $(`badgeTitle_${id}`).textContent = "100% REAL";
+  $(`badgeDesc_${id}`).innerHTML = `<div style="margin-top:4px;">A real photograph.</div>`;
+  const pip = $(`dot${w.attempts}`); if (pip) { pip.className = "heart-pip lost"; pip.textContent = "💔"; }
+  if (w.attempts < 3) { showToast(`Card ${id} is real! ${3 - w.attempts} ${w.attempts === 2 ? "try" : "tries"} left.`); return; }
+  warmupMarkAI(w.ai, false);
+  endWarmupRound(false);
+}
+function endWarmupRound(won) {
+  warmup.over = true;
+  roundCredits = { ...warmup.credits };
+  renderRoundCredits();
+  const btn = $("btnNextRound");
+  btn.textContent = `${won ? (warmup.attempts === 1 ? "First try! 🎯" : "Got it!") : "Tricky one."} Now today's case: 6 rounds →`;
+  btn.classList.add("show");
+}
+function endWarmup() {
+  warmup = null;
+  roundCredits = {};
+  try {
+    const params = new URLSearchParams(location.search); params.delete("r");
+    const qs = params.toString();
+    history.replaceState({}, document.title, location.pathname + (qs ? "?" + qs : "") + location.hash);
+  } catch (_) {}
+  startDailyFlow(true);
 }
 
 function loadRound(rIndex) {
@@ -3804,6 +3901,7 @@ function markImposter(cardId, caughtByPlayer) {
 }
 
 async function selectCard(id) {
+  if (warmup) return warmupGuess(id);
   if (isCurrentRoundOver || prerollShowing || guessInFlight) return;
   if (prerollNeeded() && !caseStartTime) { dismissCountdown(); return; }
 
@@ -3905,6 +4003,7 @@ function finishRoundUI(didWin) {
 }
 
 function advanceToNextStage() {
+  if (warmup) { if (warmup.over) endWarmup(); return; }
   if (autoAdvanceTimeout) {
     clearTimeout(autoAdvanceTimeout);
     autoAdvanceTimeout = null;
