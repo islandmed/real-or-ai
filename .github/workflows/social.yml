@@ -1,0 +1,40 @@
+# Hourly social poster: posts the next due item from the encrypted queue to X.
+# No LLM involved. Secrets: STATE_KEY, X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN,
+# X_ACCESS_SECRET. Without the X keys it logs a notice and does nothing.
+name: Social poster
+
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # commits social/posted.json
+
+concurrency:
+  group: social-poster
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      STATE_KEY: ${{ secrets.STATE_KEY }}
+      X_API_KEY: ${{ secrets.X_API_KEY }}
+      X_API_SECRET: ${{ secrets.X_API_SECRET }}
+      X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+      X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Post next due item
+        run: python3 social/post_x.py
+      - name: Record what posted
+        run: |
+          if ! git diff --quiet -- social/posted.json 2>/dev/null || [ -n "$(git status --porcelain social/posted.json)" ]; then
+            git config user.name "imposter-social"
+            git config user.email "actions@users.noreply.github.com"
+            git add social/posted.json
+            git commit -m "social: posted $(date -u +%FT%H:%MZ)"
+            git pull --rebase --autostash && git push
+          fi
