@@ -686,6 +686,27 @@
   .rb-res.fail { color: #ff3344; text-shadow: 0 0 6px rgba(255, 51, 68, 0.4); }
 
   /* Social Share Buttons */
+  .results-hero-card .result-title { margin: 2px 0 8px; }
+  .result-grid { font-size: 30px; letter-spacing: 4px; margin: 16px 0 6px; line-height: 1.2; }
+  .career-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 14px 0 4px; }
+  .career-stats b { display: block; font-size: 24px; font-weight: 800; color: #fff; }
+  .career-stats span { display: block; font-size: 10px; color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
+  .results-hero-card .share-main-row { margin-top: 16px; }
+  .next-case-line { margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
+  .next-case-line span { color: var(--accent); font-weight: 800; }
+  .rounds-fold { margin-top: 12px; text-align: left; }
+  .rounds-fold > summary { cursor: pointer; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); list-style: none; }
+  .rounds-fold > summary::-webkit-details-marker { display: none; }
+  .rounds-fold > summary::after { content: " ▾"; }
+  .rounds-fold[open] > summary::after { content: " ▴"; }
+  .rounds-fold .round-breakdown { margin-top: 10px; }
+  .results-links { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; margin: 4px 0 16px;
+    color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
+  .results-links a, .results-links .link-btn { color: #fff; }
+  .link-btn { all: unset; cursor: pointer; }
+  .results-links .link-btn:not([hidden])::before { content: "·"; margin: 0 6px; color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
   .share-main-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .btn-challenge {
     all: unset; cursor: pointer; box-sizing: border-box;
@@ -2374,53 +2395,53 @@
 
   <!-- Solved Summary View (Pure Daily Puzzle Loop) -->
   <section class="case-results" id="viewResults">
-    <!-- 1. Top: Clean, Premium Solved Hero Card -->
+    <!-- Wordle-style: one card. Result, grid, career stats, level, share, next case. -->
     <div class="results-hero-card">
-      <div class="hero-status-row">
-        <span class="summary-score-badge" id="summaryScoreBadge">6 / 6 CLEARED</span>
-        <span class="stars-row" id="starsRow">⭐⭐⭐⭐</span>
-      </div>
       <h2 class="result-title" id="resultTitle">Case Closed!</h2>
-      <p class="result-desc" id="resultDesc">You unmasked all 6 AI imposters today.</p>
-      <div class="results-streak" id="resultsStreak" hidden></div>
+      <span class="summary-score-badge" id="summaryScoreBadge">6 / 6 CLEARED</span>
       <div class="challenge-result" id="challengeResult" hidden></div>
-
-      <!-- 4-Box Stats Grid (Wordle / NYT style) -->
-      <div class="results-stats-grid" id="speedSummaryRow">
-        <div class="r-stat-box">
-          <div class="r-stat-val" id="statScoreVal">--</div>
-          <div class="r-stat-label">TOTAL PTS</div>
-        </div>
-        <div class="r-stat-box">
-          <div class="r-stat-val" id="statCaughtVal">--</div>
-          <div class="r-stat-label">CAUGHT</div>
-        </div>
-        <div class="r-stat-box">
-          <div class="r-stat-val" id="summaryTimeVal">00.0s</div>
-          <div class="r-stat-label">TIME</div>
-        </div>
-        <div class="r-stat-box">
-          <div class="r-stat-val" id="summarySpeedBonusVal">+0</div>
-          <div class="r-stat-label">SPEED PTS</div>
-        </div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div class="career-stats">
+        <div><b id="cPlayed">0</b><span>Played</span></div>
+        <div><b id="cWinPct">0</b><span>Win %</span></div>
+        <div><b id="cStreak">0</b><span>Streak</span></div>
+        <div><b id="cMaxStreak">0</b><span>Max streak</span></div>
       </div>
       <button class="results-level" id="resultsLevel" type="button" onclick="openDossierModal()">
         <div class="xp-label-row"><span id="resultsLevelTitle">🎖️ CADET · LEVEL 1</span><span id="resultsXpGain"></span></div>
         <div class="xp-bar-bg"><div class="xp-bar-fill" id="resultsXpFill" style="width: 0%;"></div></div>
         <div class="results-level-next" id="resultsLevelNext"></div>
       </button>
-    </div>
-
-      <!-- Share: right under the score, where the urge to share is -->
-      <div class="share-grid">
-        <div class="share-main-row">
-          <button class="btn-share" id="btnShareMain">
+      <div class="share-main-row">
+        <button class="btn-share" id="btnShareMain">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
           <span>Share result</span>
         </button>
-          <button class="btn-challenge" id="btnChallenge" type="button" onclick="openInviteModal()"><span>👥 Challenge a friend</span></button>
-        </div>
-        <div class="share-icons">
+        <button class="btn-challenge" id="btnChallenge" type="button" onclick="openInviteModal()"><span>👥 Challenge</span></button>
+      </div>
+      <div class="next-case-line">Next case in <span id="nextCaseCountdown">--:--:--</span></div>
+      <details class="rounds-fold">
+        <summary>See rounds</summary>
+        <div class="round-breakdown" id="roundBreakdown"></div>
+        <details class="photo-credits" id="photoCredits" hidden>
+          <summary>Photo credits</summary>
+          <div id="photoCreditsList"></div>
+        </details>
+      </details>
+    </div>
+    <div class="results-links">
+      Follow: <a href="https://www.facebook.com/profile.php?id=61595152297634" target="_blank" rel="noopener">Facebook</a> · <a href="https://x.com/PlayImposterAI" target="_blank" rel="noopener">X</a><button class="link-btn" id="installBtn" type="button" onclick="installApp()" hidden>Install app</button>
+    </div>
+    <!-- Display ad (see ADS config). Hidden = zero space, nothing loaded. -->
+    <div class="ad-slot" id="resultsAdSlot" hidden>
+      <div class="ad-slot-label">Advertisement</div>
+      <div class="ad-slot-inner"></div>
+    </div>
+    <!-- Still written by the game, no longer shown: kept so nothing that sets them breaks -->
+    <div hidden>
+      <span id="starsRow"></span><p id="resultDesc"></p><div id="resultsStreak"></div>
+      <span id="statScoreVal"></span><span id="statCaughtVal"></span><span id="summaryTimeVal"></span><span id="summarySpeedBonusVal"></span>
+      <div class="share-icons">
           <button class="share-ico" data-net="x" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24"><path d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.77L17.75 3zm-1.08 16.17h1.7L7.4 4.73H5.58l11.09 14.44z"/></svg></button>
           <button class="share-ico" data-net="facebook" aria-label="Share on Facebook" title="Facebook"><svg viewBox="0 0 24 24"><path d="M13.5 21v-7.5h2.53l.38-2.94H13.5V8.69c0-.85.24-1.43 1.46-1.43h1.56V4.63A21 21 0 0 0 14.25 4.5c-2.25 0-3.79 1.37-3.79 3.9v2.16H7.92v2.94h2.54V21h3.04z"/></svg></button>
           <button class="share-ico" data-net="whatsapp" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24"><path d="M12.04 2.5a9.45 9.45 0 0 0-8.13 14.27L2.5 21.5l4.86-1.38A9.45 9.45 0 1 0 12.04 2.5zm0 17.2a7.74 7.74 0 0 1-3.95-1.08l-.28-.17-2.88.82.83-2.8-.18-.29a7.75 7.75 0 1 1 6.46 3.52zm4.25-5.8c-.23-.12-1.38-.68-1.6-.76-.21-.08-.37-.12-.52.12-.16.23-.6.76-.74.92-.13.15-.27.17-.5.06a6.33 6.33 0 0 1-3.15-2.76c-.24-.41.24-.38.68-1.27.08-.15.04-.29-.02-.4-.06-.12-.52-1.26-.72-1.72-.19-.45-.38-.39-.52-.4h-.45a.86.86 0 0 0-.62.3 2.6 2.6 0 0 0-.81 1.93 4.5 4.5 0 0 0 .95 2.4 10.3 10.3 0 0 0 3.95 3.49c1.47.63 2.04.69 2.78.58.45-.07 1.38-.57 1.57-1.11.2-.55.2-1.02.14-1.12-.06-.1-.21-.16-.44-.27z"/></svg></button>
@@ -2430,40 +2451,7 @@
           <button class="share-ico" data-net="reddit" aria-label="Share on Reddit" title="Reddit"><svg viewBox="0 0 24 24"><path d="M22 12.1a2.2 2.2 0 0 0-3.73-1.57 10.8 10.8 0 0 0-5.79-1.83l.99-4.65 3.23.68a1.57 1.57 0 1 0 .16-.76l-3.6-.76a.39.39 0 0 0-.46.3l-1.1 5.19a10.8 10.8 0 0 0-5.87 1.83A2.2 2.2 0 1 0 3.4 14.1a4.3 4.3 0 0 0-.05.66c0 3.37 3.92 6.1 8.75 6.1s8.75-2.73 8.75-6.1c0-.22-.02-.44-.05-.65A2.2 2.2 0 0 0 22 12.1zM7 13.67a1.57 1.57 0 1 1 3.14 0 1.57 1.57 0 0 1-3.14 0zm8.77 4.15a5.76 5.76 0 0 1-3.7 1.15 5.76 5.76 0 0 1-3.7-1.15.41.41 0 0 1 .58-.58 4.94 4.94 0 0 0 3.12.92 4.94 4.94 0 0 0 3.12-.92.41.41 0 1 1 .58.58zm-.29-2.58a1.57 1.57 0 1 1 0-3.14 1.57 1.57 0 0 1 0 3.14z"/></svg></button>
           <button class="share-ico" id="btnCopyGrid" data-net="copy" aria-label="Copy result" title="Copy"><svg viewBox="0 0 24 24"><path d="M16 1H6a2 2 0 0 0-2 2v12h2V3h10V1zm3 4H10a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H10V7h9v14z"/></svg></button>
         </div>
-        <div class="share-secondary" style="grid-template-columns:1fr">
-          <button class="btn-copy" id="btnShareStory"><span>📸 Result card</span></button>
-        </div>
-      </div>
-
-    <!-- 2. SMACK IN THE MIDDLE: Centerpiece Next Case Countdown -->
-    <div class="next-case-box" id="nextCaseBox">
-      <div class="next-case-label">NEXT CASE DROPS IN</div>
-      <div class="next-case-countdown" id="nextCaseCountdown">--:--:--</div>
-      <div class="next-case-sub">A brand new forensic case with 6 unique themes drops every day at midnight.</div>
-    </div>
-    <div class="remind-box" id="remindBox">
-      <a class="remind-btn fb-follow" href="https://www.facebook.com/profile.php?id=61595152297634" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-7.5h2.53l.38-2.94H13.5V8.69c0-.85.24-1.43 1.46-1.43h1.56V4.63A21 21 0 0 0 14.25 4.5c-2.25 0-3.79 1.37-3.79 3.9v2.16H7.92v2.94h2.54V21h3.04z"/></svg>Follow on Facebook</a>
-      <a class="remind-btn x-follow" href="https://x.com/PlayImposterAI" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.77L17.75 3zm-1.08 16.17h1.7L7.4 4.73H5.58l11.09 14.44z"/></svg>Follow on X</a>
-      <button class="remind-btn" id="installBtn" type="button" onclick="installApp()" hidden>📲 Install app</button>
-    </div>
-
-    <!-- Display ad (see ADS config). Hidden = zero space, nothing loaded. -->
-    <div class="ad-slot" id="resultsAdSlot" hidden>
-      <div class="ad-slot-label">Advertisement</div>
-      <div class="ad-slot-inner"></div>
-    </div>
-
-    <!-- 3. Bottom: Responsive Share Grid & Round Breakdown -->
-    <div class="results-bottom-row">
-
-      <!-- Round by Round Breakdown -->
-      <div class="round-breakdown" id="roundBreakdown">
-        <!-- Dynamically generated rows -->
-      </div>
-      <details class="photo-credits" id="photoCredits" hidden>
-        <summary>Photo credits</summary>
-        <div id="photoCreditsList"></div>
-      </details>
+      <button id="btnShareStory"></button>
     </div>
   </section>
   <footer class="site-foot">
@@ -4283,6 +4271,13 @@ function getDailyShareText() {
 
 // Results-screen extras: streak, friend comparison, ad slot
 function renderResultsExtras(score, time) {
+  const res = getTodayResult();
+  if ($("resultGrid")) $("resultGrid").textContent = res ? (res.grid || "").replace(/🟦/g, "🟧").replace(/🟥/g, "🤖") : "";
+  const played = playerStats.played || 0;
+  $("cPlayed").textContent = played;
+  $("cWinPct").textContent = played ? Math.round(100 * (playerStats.won || 0) / played) : 0;
+  $("cStreak").textContent = playerStats.currentStreak || 0;
+  $("cMaxStreak").textContent = Math.max(playerStats.maxStreak || 0, playerStats.currentStreak || 0);
   const streakEl = $("resultsStreak");
   if (streakEl) {
     const n = playerStats.currentStreak || 0;
@@ -4602,7 +4597,7 @@ $("btnShareMain").onclick = async () => {
     }
   }
   // No system share sheet (Firefox, Linux): open the scorecard with every destination.
-  if (dailyCaseData && roundResults.length) return $("btnShareStory").onclick();
+  if (dailyCaseData && getTodayResult()) return $("btnShareStory").onclick();
   window.open(shareNetworkUrl("x"), "_blank", "noopener,noreferrer");
 };
 
