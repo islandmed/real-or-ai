@@ -893,6 +893,8 @@
     letter-spacing: 0.05em;
     margin-bottom: 6px;
   }
+  .invite-link-row .invite-btn-copy-link { flex: 1; justify-content: center; text-align: center; }
+  .channel-btn.email { grid-column: 1 / -1; }
   .invite-link-row {
     display: flex;
     gap: 8px;
@@ -2508,9 +2510,9 @@
 
     <!-- Quick link copy -->
     <div class="invite-link-row">
-      <input type="text" class="invite-link-input" id="inviteShareLink" readonly value="https://play-imposter.lol">
+      <input type="text" class="invite-link-input" id="inviteShareLink" readonly value="https://play-imposter.lol" hidden>
       <button class="invite-btn-copy-link" id="btnCopyInviteLink" onclick="copyInviteLink()">
-        <span>📋 Copy Link</span>
+        <span>📋 Copy message</span>
       </button>
     </div>
 
@@ -2533,9 +2535,6 @@
       </button>
       <button class="channel-btn email" onclick="shareInviteEmail()">
         <span>✉️ Email</span>
-      </button>
-      <button class="channel-btn" onclick="copyInviteMessage()">
-        <span>📋 Copy Text</span>
       </button>
     </div>
   </div>
@@ -4773,14 +4772,11 @@ async function copyInviteLink() {
   playSound("tap");
   const data = getInviteShareData();
   try {
-    await navigator.clipboard.writeText(data.url);
-    showToast("📋 Game link copied to clipboard!");
+    // The whole message, squares included: a link preview can only show a title
+    await navigator.clipboard.writeText(data.text);
+    showToast("📋 Challenge copied. Paste it anywhere.");
   } catch (_) {
-    const input = $("inviteShareLink");
-    if (input) {
-      input.select();
-      showToast("Selected! Press Ctrl+C / Cmd+C to copy");
-    }
+    showToast("Couldn't copy here. Use a button below.");
   }
 }
 
