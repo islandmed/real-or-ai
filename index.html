@@ -883,7 +883,6 @@
     line-height: 1.45;
     color: #e0e8ff;
     position: relative;
-    white-space: pre-wrap;
     word-break: break-word;
   }
   .invite-preview-label {
@@ -2495,9 +2494,7 @@
       <span class="invite-icon">👥</span>
       <h3 class="invite-title">Challenge a Friend</h3>
     </div>
-    <p class="invite-desc">
-      Send today's case to your friends or group chat. See who has the sharper eye to spot the synthetic AI imposter!
-    </p>
+    <p class="invite-desc">Send today's case to a friend or your group chat. Who has the sharper eye?</p>
 
     <!-- Message preview -->
     <div class="invite-preview-box">
@@ -4737,7 +4734,7 @@ function getInviteShareData() {
       url: getChallengeLink(todayRes),
       title: "Think you can beat my Imposter score?",
       // A direct dare, unlike the public grid that Share result posts
-      text: `🕵️ I scored ${Math.round(todayRes.score)} pts on today's Imposter: ${todayRes.won}/${todayRes.total} AI fakes caught in ${todayRes.time.toFixed(1)}s. Think you can beat me?\n${getChallengeLink(todayRes)}`
+      text: `🕵️ I caught ${todayRes.won} of ${todayRes.total} AI fakes in ${todayRes.time.toFixed(1)}s on today's Imposter. Can you beat me?\n${getChallengeLink(todayRes)}`
     };
   }
 
