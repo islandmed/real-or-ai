@@ -1,10 +1,12 @@
-const CACHE_NAME = 'imposter-v4.25';
+const CACHE_NAME = 'imposter-v4.26';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './favicon.svg',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
-  './assets/icons/apple-touch-icon.png'
+  './assets/icons/icon-192-v2.png',
+  './assets/icons/icon-512-v2.png',
+  './assets/icons/apple-touch-icon-v2.png',
+  './assets/icons/icon-192-maskable-v2.png',
+  './assets/icons/icon-512-maskable-v2.png'
 ];
 
 self.addEventListener('install', event => {
@@ -66,8 +68,8 @@ self.addEventListener('fetch', event => {
 self.addEventListener('push', event => {
   event.waitUntil(self.registration.showNotification('🕵️ New case is live', {
     body: 'Can AI fool you today? 6 new photos are waiting.',
-    icon: './assets/icons/icon-192.png',
-    badge: './assets/icons/icon-192.png',
+    icon: './assets/icons/icon-192-v2.png',
+    badge: './assets/icons/icon-192-v2.png',
     tag: 'daily-case',
     renotify: false,
     data: { url: './' }

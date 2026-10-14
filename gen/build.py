@@ -33,8 +33,8 @@ AHEAD_DAYS = int(os.environ.get("IMPOSTER_AHEAD_DAYS", "3"))
 PUBLIC = ["index.html", "sw.js", "manifest.json", "favicon.svg", "og-image.png", "og-thanksgiving.png",
           "og-christmas.png", "robots.txt", "ads.txt", "privacy/index.html", "about/index.html", "contact/index.html",
           "how-to-spot-ai-images/index.html",
-          "sitemap.xml", "_headers", "assets/icons/apple-touch-icon.png", "assets/icons/icon-192.png",
-          "assets/icons/icon-512.png", "assets/icons/favicon.svg", "assets/icons/og-image.png",
+          "sitemap.xml", "_headers", "assets/icons/apple-touch-icon-v2.png", "assets/icons/icon-192-v2.png",
+          "assets/icons/icon-512-v2.png", "assets/icons/icon-192-maskable-v2.png", "assets/icons/icon-512-maskable-v2.png", "assets/icons/favicon.svg", "assets/icons/favicon-v2.svg", "assets/icons/og-image.png",
           "assets/promo/cats/a.webp", "assets/promo/cats/b.webp", "assets/promo/cats/c.webp", "assets/promo/cats/d.webp"]
 
 

@@ -6,9 +6,9 @@
 <title>Imposter Game · Spot the AI Fake · New Case Daily</title>
 <meta name="description" content="6 themed rounds. 4 photos each. Exactly 1 synthetic AI imposter per round. Can you spot all 6?">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="alternate icon" href="assets/icons/icon-192.png">
-<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+<link rel="alternate icon" href="assets/icons/icon-192-v2.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon-v2.png">
 <meta property="og:site_name" content="Imposter Game">
 <meta property="og:title" content="Imposter Game · {{SEASON_LABEL}} Edition · Can You Spot the AI Fake?">
 <meta property="og:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
@@ -3684,7 +3684,7 @@ async function init() {
 
   // Register PWA Service Worker (Network-First)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=4.25').then(reg => {
+    navigator.serviceWorker.register('./sw.js?v=4.26').then(reg => {
       reg.update();
     }).catch(err => console.log('SW reg error:', err));
   }
@@ -4596,7 +4596,7 @@ function downloadCardImage() {
 // to the clipboard first, so it can be pasted into the post.
 const CARD_NETS = [
   ["instagram", "Instagram"], ["tiktok", "TikTok"], ["sms", "Text message"], ["signal", "Signal"], ["x", "X"], ["facebook", "Facebook"], ["whatsapp", "WhatsApp"], ["reddit", "Reddit"],
-  ["linkedin", "LinkedIn"], ["bluesky", "Bluesky"], ["telegram", "Telegram"], ["email", "Email"]
+  ["linkedin", "LinkedIn"], ["bluesky", "Bluesky"], ["slack", "Slack"], ["email", "Email"]
 ];
 function cardCanNativeShare() {
   return !!(navigator.share && shareCardFile && navigator.canShare && navigator.canShare({ files: [shareCardFile] }));
@@ -4608,6 +4608,7 @@ function setupCardShare() {
       const src = document.querySelector(`.share-grid .share-ico[data-net="${net}"] svg`);
       if (src) return src.outerHTML;
       const letters = { linkedin: "in", bluesky: "🦋", telegram: "✈", email: "✉", sms: "💬" };
+      if (net === "slack") return `<svg viewBox="0 0 24 24"><path d="M5.04 15.17a2.53 2.53 0 1 1-2.52-2.52h2.52v2.52zm1.27 0a2.52 2.52 0 0 1 5.04 0v6.31a2.52 2.52 0 1 1-5.04 0v-6.31zM8.83 5.04a2.53 2.53 0 1 1 2.52-2.52v2.52H8.83zm0 1.27a2.52 2.52 0 0 1 0 5.04H2.52a2.52 2.52 0 1 1 0-5.04h6.31zm10.13 2.52a2.52 2.52 0 1 1 2.52 2.52h-2.52V8.83zm-1.27 0a2.52 2.52 0 0 1-5.04 0V2.52a2.52 2.52 0 1 1 5.04 0v6.31zm-2.52 10.13a2.52 2.52 0 1 1-2.52 2.52v-2.52h2.52zm0-1.27a2.52 2.52 0 0 1 0-5.04h6.31a2.52 2.52 0 1 1 0 5.04h-6.31z"/></svg>`;
       if (net === "signal") return `<svg viewBox="0 0 24 24"><path d="M12 2.2a9.8 9.8 0 0 0-8.4 14.85L2.4 21.6l4.6-1.15A9.8 9.8 0 1 0 12 2.2zm0 1.9a7.9 7.9 0 1 1-4.3 14.53l-.33-.21-2.4.6.62-2.32-.23-.36A7.9 7.9 0 0 1 12 4.1z"/></svg>`;
       return `<span style="font:800 15px 'JetBrains Mono',monospace">${letters[net] || "•"}</span>`;
     };
@@ -4622,6 +4623,17 @@ function shareCardTo(net) {
   const text = getDailyShareText();
   // Signal has no web share link: the share sheet lists it on phones; on desktop
   // the card is copied for pasting into Signal Desktop.
+  // Slack has no public share link either: share sheet on phones, otherwise copy
+  // the card and open Slack so it can be pasted into a channel.
+  if (net === "slack") {
+    if (cardCanNativeShare()) return shareToApp("Slack");
+    if (currentCardBlob && navigator.clipboard && window.ClipboardItem) {
+      try { navigator.clipboard.write([new ClipboardItem({ "image/png": currentCardBlob })]).catch(() => {}); } catch (_) {}
+    }
+    window.open("https://app.slack.com/client", "_blank", "noopener,noreferrer");
+    showToast("Card copied. Paste it into a Slack channel.");
+    return;
+  }
   if (net === "signal") {
     if (cardCanNativeShare()) return shareToApp("Signal");
     if (currentCardBlob && navigator.clipboard && window.ClipboardItem) {
