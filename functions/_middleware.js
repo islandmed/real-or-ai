@@ -6,9 +6,9 @@ const ALT = "Imposter: 3 photos are real. 1 is AI. Can you spot the fake?";
 function seasonOg(date) {
   // Mirrors SEASON_TABLE in index.html (UTC here: crawlers have no local date).
   const m = date.getUTCMonth() + 1;
-  if (m === 11) return "og-thanksgiving.png";
-  if (m === 12) return "og-christmas.png";
-  return "og-image.png";
+  if (m === 11) return "og-thanksgiving.png?v=2";
+  if (m === 12) return "og-christmas.png?v=2";
+  return "og-image.png?v=2";
 }
 
 function parseChallenge(sp) {
