@@ -3864,6 +3864,8 @@ const WARMUPS = {
     }
   }
 };
+// Same cats round for Facebook group posts, counted separately in the funnel
+WARMUPS.fbg = { ...WARMUPS.cats, dir: "cats" };
 let warmup = null;
 function readWarmupParam() {
   try { const k = new URLSearchParams(location.search).get("r"); return WARMUPS[k] ? k : null; } catch (_) { return null; }
@@ -3883,7 +3885,7 @@ function startWarmup(key) {
   $("gridWrap").innerHTML = ["A", "B", "C", "D"].map(id => `
     <div class="imposter-card" id="card_${id}" onclick="selectCard('${id}')">
       <div class="card-letter">${id}</div>
-      <div class="card-img-wrap"><img src="assets/promo/${key}/${id.toLowerCase()}.webp" alt="Photo ${id}" loading="eager" fetchpriority="high"></div>
+      <div class="card-img-wrap"><img src="assets/promo/${w.dir || key}/${id.toLowerCase()}.webp" alt="Photo ${id}" loading="eager" fetchpriority="high"></div>
       <div class="card-status-badge" id="badge_${id}">
         <div class="badge-icon" id="badgeIcon_${id}">🧑</div>
         <div class="badge-title" id="badgeTitle_${id}">AUTHENTIC</div>
