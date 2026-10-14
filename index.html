@@ -939,6 +939,7 @@
   .channel-btn.facebook:hover { border-color: #1877f2; color: #1877f2; }
   .channel-btn.whatsapp:hover { border-color: #25d366; color: #25d366; }
   .channel-btn.twitter:hover { border-color: #1da1f2; color: #1da1f2; }
+  .channel-btn.slack:hover { border-color: #e01e5a; color: #e01e5a; }
   .channel-btn.email:hover { border-color: #ea4335; color: #ea4335; }
 
   /* Result Card Preview Modal (Desktop Share) */
@@ -2511,6 +2512,9 @@
       </button>
       <button class="channel-btn twitter" onclick="shareInviteTwitter()">
         <span>🐦 X / Twitter</span>
+      </button>
+      <button class="channel-btn slack" onclick="shareInviteSlack()">
+        <span>💼 Slack</span>
       </button>
       <button class="channel-btn email" onclick="shareInviteEmail()">
         <span>✉️ Email</span>
@@ -4792,6 +4796,19 @@ function shareInviteTwitter() {
   const data = getInviteShareData();
   const twUrl = `https://x.com/intent/post?text=${encodeURIComponent(data.text)}`;
   window.open(twUrl, "_blank", "noopener,noreferrer");
+}
+
+// Slack has no share link: share sheet on phones, otherwise copy the message and
+// open Slack so it can be pasted into a channel or DM.
+async function shareInviteSlack() {
+  playSound("tap");
+  const data = getInviteShareData();
+  if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+    try { await navigator.share({ text: data.text }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(data.text); } catch (_) {}
+  window.open("https://app.slack.com/client", "_blank", "noopener,noreferrer");
+  showToast("Challenge copied. Paste it into Slack.");
 }
 
 function shareInviteEmail() {
