@@ -14,6 +14,13 @@ export async function onRequestPost({ request }) {
   const r = Number.isInteger(round) ? c.rounds[round] : null;
   const k = r && r.cards.find(x => x.id === card);
   if (!k) return json({ error: "no such card" }, 400);
+  // One-guess clients send reveal: a wrong pick ends their round, so name the fake
+  // and credit every real photo. Older three-try clients never send it.
+  if (!k.ai && body.reveal === true) {
+    const credits = {};
+    for (const x of r.cards) if (!x.ai) credits[x.id] = x.credit;
+    return json({ correct: false, credit: k.credit, ai: r.cards.find(x => x.ai).id, credits });
+  }
   if (!k.ai) return json({ correct: false, credit: k.credit });
   const credits = {};
   for (const x of r.cards) if (!x.ai) credits[x.id] = x.credit;

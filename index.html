@@ -259,6 +259,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+  #dot2, #dot3 { display: none; }
   .lives-hearts {
     display: flex;
     gap: 2px;
@@ -2666,14 +2667,13 @@
 
     <div class="how-section">
       <div class="how-sec-badge">SCORING</div>
-      <h4>Accuracy & Live Speed Bonus (500 PTS Max)</h4>
+      <h4>One Guess Per Round (700 PTS Max)</h4>
       <div class="how-score-grid">
-        <div class="score-pill"><span>1st Try</span><strong>+100 PTS</strong></div>
-        <div class="score-pill"><span>2nd Try</span><strong>+45 PTS</strong></div>
-        <div class="score-pill"><span>3rd Try</span><strong>+15 PTS</strong></div>
+        <div class="score-pill"><span>Spotted</span><strong>+100 PTS</strong></div>
+        <div class="score-pill"><span>Fooled</span><strong>0 PTS</strong></div>
         <div class="score-pill highlight"><span>Speed Bonus</span><strong>+100 PTS</strong></div>
       </div>
-      <p class="score-note">⚠️ <strong>False Accusation Penalty:</strong> Accusing a real photo adds an immediate <strong>+3.0s time penalty</strong> to your clock and slashes stage points. Spamming wrong cards destroys your score!</p>
+      <p class="score-note">🎯 <strong>One shot:</strong> tap the photo you think is AI. Pick a real one and the round is lost, so look before you tap.</p>
     </div>
 
     <button class="how-play-btn" onclick="closeHowModal()">Got it, Let's Play!</button>
@@ -2690,11 +2690,11 @@
   <div class="cd-briefing" id="cdBriefing">
     <div class="cd-badge" id="cdBadge">{{SEASON_BADGE}}</div>
     <h1 class="cd-hero-title">IMPOSTER</h1>
-    <div class="cd-hero-tagline">THE DAILY AI DETECTIVE GAME</div>
+    <div class="cd-hero-tagline">SPOT THE AI</div>
     
     <div class="cd-hook-box">
       <div class="cd-hook-heading">3 Real Photos · 1 Synthetic AI Fake</div>
-      <div class="cd-hook-sub">6 themed rounds daily. Exactly 1 synthetic AI imposter per round. Tap to accuse. Faster and sharper means more points.</div>
+      <div class="cd-hook-sub">6 rounds a day, 1 AI fake in each. You get one guess per round. Faster means more points.</div>
     </div>
 
     <div class="cd-challenge" id="cdChallenge" hidden></div>
@@ -3623,7 +3623,7 @@ function renderRoundBreakdown() {
   const bd = $("roundBreakdown");
   if (!bd) return;
   bd.innerHTML = roundResults.map(r => {
-    let tag = `<span class="rb-res fail">❌ Fooled (3 Strikes)</span>`;
+    let tag = `<span class="rb-res fail">❌ Fooled</span>`;
     if (r.solved && r.attempts === 1) tag = `<span class="rb-res pass-flawless">🎯 Aced (1st Guess)</span>`;
     else if (r.solved && r.attempts === 2) tag = `<span class="rb-res pass-great">⚡ Caught (2nd Guess)</span>`;
     else if (r.solved) tag = `<span class="rb-res pass-close">🔍 Caught (3rd Guess)</span>`;
@@ -3910,8 +3910,7 @@ function warmupGuess(id) {
   $(`badgeIcon_${id}`).textContent = "🏛️";
   $(`badgeTitle_${id}`).textContent = "100% REAL";
   $(`badgeDesc_${id}`).innerHTML = `<div style="margin-top:4px;">A real photograph.</div>`;
-  const pip = $(`dot${w.attempts}`); if (pip) { pip.className = "heart-pip lost"; pip.textContent = "💔"; }
-  if (w.attempts < 3) { showToast(`Card ${id} is real! ${3 - w.attempts} ${w.attempts === 2 ? "try" : "tries"} left.`); return; }
+  const pip = $("dot1"); if (pip) { pip.className = "heart-pip lost"; pip.textContent = "💔"; }
   warmupMarkAI(w.ai, false);
   endWarmupRound(false);
 }
@@ -4038,7 +4037,7 @@ async function postGuess(round, card) {
   const res = await fetch("/api/guess", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ date: dailyCaseData.date, round, card })
+    body: JSON.stringify({ date: dailyCaseData.date, round, card, reveal: true })
   });
   if (!res.ok) throw new Error(`guess ${res.status}`);
   return res.json();
@@ -4103,37 +4102,21 @@ async function selectCard(id) {
     roundResults.push({ roundIndex: roundIdx + 1, theme, solved: true, attempts: attemptsUsedThisRound });
     finishRoundUI(true);
   } else {
-    // Wrong guess: Eliminated authentic card
+    // Wrong guess: one guess per round, so the round is lost and the fake revealed
     playSound("strike");
-    applyFalseAccusationPenalty();
+    isCurrentRoundOver = true;
     cardEl.classList.add("eliminated");
+    roundCredits = { ...roundCredits, ...(result.credits || {}) };
     if (result.credit) roundCredits[id] = result.credit;
     $(`badgeIcon_${id}`).textContent = "🏛️";
     $(`badgeTitle_${id}`).textContent = "100% REAL";
     $(`badgeDesc_${id}`).innerHTML = `<div class="badge-deception">👥 ${getDeceptionRate(id, false)}% of detectives were tricked by this photo</div><div style="margin-top:4px;">A real photograph.</div>`;
-
-    const lostPip = $(`dot${attemptsUsedThisRound}`);
-    if (lostPip) {
-      lostPip.className = "heart-pip lost";
-      lostPip.textContent = "💔";
-    }
-
-    if (attemptsUsedThisRound === 1) {
-      showToast(`Card ${id} is authentic! +3.0s Penalty. 2 attempts left.`);
-    } else if (attemptsUsedThisRound === 2) {
-      showToast(`Card ${id} is authentic! +3.0s Penalty. 1 attempt left.`);
-    } else {
-      // 3 strikes: the one card left is the imposter, by elimination
-      isCurrentRoundOver = true;
-      const left = round.cards.find(c => {
-        const el = $(`card_${c.id}`);
-        return el && !el.classList.contains("eliminated");
-      });
-      if (left) markImposter(left.id, false);
-      renderRoundCredits();
-      roundResults.push({ roundIndex: roundIdx + 1, theme, solved: false, attempts: 3 });
-      finishRoundUI(false);
-    }
+    const lostPip = $("dot1");
+    if (lostPip) { lostPip.className = "heart-pip lost"; lostPip.textContent = "💔"; }
+    if (result.ai) markImposter(result.ai, false);
+    renderRoundCredits();
+    roundResults.push({ roundIndex: roundIdx + 1, theme, solved: false, attempts: 1 });
+    finishRoundUI(false);
   }
 }
 
@@ -4143,7 +4126,7 @@ function finishRoundUI(didWin) {
 
   const totalRounds = dailyCaseData.rounds.length;
   if (currentRoundIndex < totalRounds - 1) {
-    btnNext.textContent = `Stage ${currentRoundIndex + 1} Cleared · Next (or tap) →`;
+    btnNext.textContent = didWin ? `Spotted it! · Next (or tap) →` : `Fooled! · Next (or tap) →`;
   } else {
     btnNext.textContent = `Case Complete! Opening Scorecard...`;
   }
