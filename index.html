@@ -3650,6 +3650,17 @@ function renderChallengeBanner() {
   el.hidden = false;
 }
 
+// ===== Funnel pings =====
+// One anonymous GET per step per page load, counted from Cloudflare's request logs
+// by path (gen/funnel.py). Source is the ?r= ad tag, or "none".
+const EV_SRC = (() => { try { const r = new URLSearchParams(location.search).get("r") || ""; return /^[a-z0-9-]{1,20}$/.test(r) ? r : "none"; } catch (_) { return "none"; } })();
+const evSent = new Set();
+function ev(step) {
+  if (evSent.has(step)) return;
+  evSent.add(step);
+  try { fetch(`/api/ev/${EV_SRC}/${step}`, { keepalive: true }).catch(() => {}); } catch (_) {}
+}
+
 async function init() {
   clearStaleLeaderboardKeys();
   loadStats();
@@ -3663,6 +3674,7 @@ async function init() {
     const res = await fetch(`/api/case?date=${todayStr}`);
     if (!res.ok) throw new Error(`case ${res.status}`);
     dailyCaseData = await res.json();
+    ev("load");
     readChallengeParams();
     renderChallengeBanner();
 
@@ -3696,6 +3708,7 @@ function startDailyFlow(skipIntro) {
   const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
   const rec = records[todayStr];
   if (rec && rec.solved && (!rec.caseNumber || rec.caseNumber === dailyCaseData.caseNumber)) {
+    ev("already");
     showAlreadyCompletedToday(rec);
   } else {
     loadRound(0);
@@ -3725,6 +3738,7 @@ function readWarmupParam() {
 function startWarmup(key) {
   const w = WARMUPS[key];
   warmup = { key, ai: w.ai, credits: w.credits, attempts: 0, over: false };
+  ev("w-shown");
   const overlay = $("countdownOverlay");
   if (overlay) overlay.classList.remove("open", "closing");
   $("roundCountLabel").textContent = "WARM-UP";
@@ -3756,6 +3770,7 @@ function warmupGuess(id) {
   const w = warmup, el = $(`card_${id}`);
   if (w.over || !el || el.classList.contains("eliminated")) return;
   w.attempts++;
+  ev("w-guess");
   if (id === w.ai) {
     playSound("caught");
     warmupMarkAI(id, true);
@@ -3781,6 +3796,7 @@ function endWarmupRound(won) {
   btn.classList.add("show");
 }
 function endWarmup() {
+  ev("w-next");
   warmup = null;
   roundCredits = {};
   try {
@@ -3922,6 +3938,7 @@ async function selectCard(id) {
 
   const roundIdx = currentRoundIndex;
   const round = dailyCaseData.rounds[roundIdx];
+  ev(`r${roundIdx + 1}`);
   guessInFlight = true;
   cardEl.classList.add("checking");
   let result;
@@ -4031,6 +4048,7 @@ $("btnNextRound").onclick = () => {
 };
 
 function showFinalResults() {
+  ev("done");
   playSound("victory");
   const finalSecs = stopSpeedTimer();
 
