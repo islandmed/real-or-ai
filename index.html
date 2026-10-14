@@ -707,6 +707,22 @@
   .results-links a, .results-links .link-btn { color: #fff; }
   .link-btn { all: unset; cursor: pointer; }
   .results-links .link-btn:not([hidden])::before { content: "·"; margin: 0 6px; color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
+  .board { margin: 14px 0 4px; text-align: left; }
+  .board-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 6px; text-align: center; }
+  .board-rows { list-style: none; margin: 0; padding: 0; }
+  .board-rows li { display: grid; grid-template-columns: 18px 1fr auto auto; gap: 8px; align-items: center;
+    padding: 6px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #fff; }
+  .board-rows li.me { background: rgb(var(--accent-rgb) / 0.15); }
+  .board-rows li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .board-rows li .g { letter-spacing: 1px; font-size: 11px; }
+  .board-rows li .s { font-weight: 800; }
+  .board-name { display: flex; gap: 8px; margin-top: 8px; }
+  .board-name input { flex: 1; min-width: 0; padding: 9px 10px; border-radius: 8px; font: inherit; font-size: 13px; color: #fff;
+    background: hsl(calc(var(--h) + 1) calc(var(--sk) * 42%) 14.1%); border: 1px solid hsl(calc(var(--h) + -2) calc(var(--sk) * 40%) 26.3%); }
+  .board-name button { all: unset; cursor: pointer; padding: 9px 14px; border-radius: 8px; font-weight: 800; font-size: 12px;
+    font-family: 'JetBrains Mono', monospace; color: var(--on-accent); background: var(--accent); }
+  .invite-name { margin: 0 0 10px; }
   .share-main-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .btn-challenge {
     all: unset; cursor: pointer; box-sizing: border-box;
@@ -2412,6 +2428,14 @@
         <div><b id="cStreak">0</b><span>Streak</span></div>
         <div><b id="cMaxStreak">0</b><span>Max streak</span></div>
       </div>
+      <div class="board" id="friendsBoard" hidden>
+        <div class="board-title">Today's board</div>
+        <ol class="board-rows" id="boardRows"></ol>
+        <form class="board-name" id="boardNameForm" hidden onsubmit="saveBoardName(event, 'boardNameInput')">
+          <input id="boardNameInput" maxlength="20" placeholder="Add your name" autocomplete="nickname">
+          <button type="submit">Save</button>
+        </form>
+      </div>
       <button class="results-level" id="resultsLevel" type="button" onclick="openDossierModal()">
         <div class="xp-label-row"><span id="resultsLevelTitle">🎖️ CADET · LEVEL 1</span><span id="resultsXpGain"></span></div>
         <div class="xp-bar-bg"><div class="xp-bar-fill" id="resultsXpFill" style="width: 0%;"></div></div>
@@ -2509,6 +2533,9 @@
     </div>
 
     <!-- Quick link copy -->
+    <form class="board-name invite-name" onsubmit="saveBoardName(event, 'inviteNameInput')">
+      <input id="inviteNameInput" maxlength="20" placeholder="Your name (friends see it)" autocomplete="nickname" onchange="saveBoardName(event, 'inviteNameInput')">
+    </form>
     <div class="invite-link-row">
       <input type="text" class="invite-link-input" id="inviteShareLink" readonly value="https://play-imposter.lol" hidden>
       <button class="invite-btn-copy-link" id="btnCopyInviteLink" onclick="copyInviteLink()">
@@ -3691,6 +3718,76 @@ function ev(step) {
   try { fetch(`/api/ev/${EV_SRC}/${step}`, { keepalive: true }).catch(() => {}); } catch (_) {}
 }
 
+// ===== Friends board =====
+// Everyone who plays from one challenge link lands on one board for the day,
+// forwarded links included. Your own board, until you open someone else's, is your id.
+const BOARD_ID = /^[a-z0-9]{6,12}$/;
+function playerId() {
+  try {
+    let id = localStorage.getItem("imposter_pid");
+    if (!BOARD_ID.test(id || "")) { id = Math.random().toString(36).slice(2, 12).padEnd(10, "0"); localStorage.setItem("imposter_pid", id); }
+    return id;
+  } catch (_) { return "guest00000"; }
+}
+function boardDay() { return dailyCaseData?.date || localDayStr(); }
+function boardToday() {
+  try { const x = JSON.parse(localStorage.getItem("imposter_board") || "null"); if (x && x.d === boardDay() && BOARD_ID.test(x.b)) return x.b; } catch (_) {}
+  return playerId();
+}
+function joinBoardFromUrl() {
+  try {
+    const b = new URLSearchParams(location.search).get("b");
+    const x = JSON.parse(localStorage.getItem("imposter_board") || "null");
+    if (BOARD_ID.test(b || "") && !(x && x.d === boardDay())) localStorage.setItem("imposter_board", JSON.stringify({ d: boardDay(), b }));
+  } catch (_) {}
+}
+function boardName() { try { return localStorage.getItem("imposter_name") || ""; } catch (_) { return ""; } }
+async function postBoard() {
+  const res = getTodayResult();
+  if (!res) return false;
+  const grid = (res.grid || "").replace(/🟦/g, "🟧").replace(/🟥/g, "🤖");
+  try {
+    const r = await fetch("/api/board", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ b: boardToday(), d: boardDay(), pid: playerId(), name: boardName(), score: res.score, time: res.time, won: res.won, grid }) });
+    return r.ok;
+  } catch (_) { return false; }
+}
+async function renderBoard() {
+  const box = $("friendsBoard");
+  if (!box) return;
+  let rows = [];
+  try { rows = (await (await fetch(`/api/board?b=${boardToday()}&d=${boardDay()}`)).json()).rows || []; } catch (_) {}
+  box.hidden = rows.length < 2;
+  if (box.hidden) return;
+  const me = playerId(), list = $("boardRows");
+  list.innerHTML = "";
+  rows.forEach((r, i) => {
+    const li = document.createElement("li");
+    if (r.pid === me) li.className = "me";
+    [["", `${i + 1}`], ["n", r.pid === me ? (r.name ? `${r.name} (you)` : "You") : (r.name || "Detective")], ["g", r.grid], ["s", `${r.score}`]].forEach(([c, t]) => {
+      const sp = document.createElement("span"); if (c) sp.className = c; sp.textContent = t; li.appendChild(sp);
+    });
+    list.appendChild(li);
+  });
+  $("boardNameForm").hidden = !!boardName();
+}
+async function saveBoardName(e, inputId) {
+  if (e) e.preventDefault();
+  const v = ($(inputId)?.value || "").trim().slice(0, 20);
+  if (!v) return;
+  try { localStorage.setItem("imposter_name", v); } catch (_) {}
+  if (await postBoard()) renderBoard();
+  if (inputId === "boardNameInput") showToast("Saved. Your friends will see it.");
+}
+// +25 XP for the first share or challenge each day
+function shareXpOnce() {
+  try {
+    if (localStorage.getItem("imposter_share_xp") === boardDay() || !getTodayResult()) return;
+    localStorage.setItem("imposter_share_xp", boardDay());
+  } catch (_) { return; }
+  awardCareerXp(25);
+}
+
 async function init() {
   clearStaleLeaderboardKeys();
   loadStats();
@@ -3705,6 +3802,7 @@ async function init() {
     if (!res.ok) throw new Error(`case ${res.status}`);
     dailyCaseData = await res.json();
     ev("load");
+    joinBoardFromUrl();
     readChallengeParams();
     renderChallengeBanner();
 
@@ -4241,7 +4339,7 @@ function getChallengeLink(res) {
   const tenths = Math.min(16383, Math.max(1, Math.round(res.time * 10)));
   const won = Math.min(6, Math.max(0, res.won | 0));
   const packed = ((c * 4096 + sc) * 16384 + tenths) * 8 + won;
-  return `${window.location.origin}/v/${packed.toString(36)}`;
+  return `${window.location.origin}/v/${packed.toString(36)}/${boardToday()}`;
 }
 
 // Result-dependent share copy. Older saved grids used 🟦/🟥; map them to the current set.
@@ -4271,6 +4369,7 @@ function getDailyShareText() {
 
 // Results-screen extras: streak, friend comparison, ad slot
 function renderResultsExtras(score, time) {
+  postBoard().then(renderBoard);
   const res = getTodayResult();
   if ($("resultGrid")) $("resultGrid").textContent = res ? (res.grid || "").replace(/🟦/g, "🟧").replace(/🟥/g, "🤖") : "";
   const played = playerStats.played || 0;
@@ -4582,6 +4681,7 @@ function prepareShareCard() {
 
 $("btnShareMain").onclick = async () => {
   playSound("tap");
+  shareXpOnce();
   const text = getDailyShareText();
   if (navigator.share) {
     try {
@@ -4750,6 +4850,8 @@ function getInviteShareData() {
 
 function openInviteModal() {
   playSound("tap");
+  shareXpOnce();
+  if ($("inviteNameInput")) $("inviteNameInput").value = boardName();
   const data = getInviteShareData();
   const linkInput = $("inviteShareLink");
   if (linkInput) linkInput.value = data.url;

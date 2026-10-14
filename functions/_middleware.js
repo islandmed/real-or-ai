@@ -56,10 +56,12 @@ export async function onRequest(context) {
   if (PROBE.test(url.pathname) || BAD_UA.test(request.headers.get("user-agent") || "")) {
     return new Response("Forbidden", { status: 403, headers: { "cache-control": "no-store" } });
   }
-  const short = url.pathname.match(/^\/v\/([0-9a-z]+)\/?$/);
+  // /v/<score>[/<board>]: the optional board puts everyone from one link on one friends board
+  const short = url.pathname.match(/^\/v\/([0-9a-z]+)(?:\/([a-z0-9]{6,12}))?\/?$/);
   if (short && (request.method === "GET" || request.method === "HEAD")) {
     const target = decodeShort(short[1]);
-    return Response.redirect(url.origin + (target || "/"), 302);
+    const board = target && short[2] ? `&b=${short[2]}` : "";
+    return Response.redirect(url.origin + (target ? target + board : "/"), 302);
   }
   if (request.method !== "GET") return context.next();
   if (url.pathname !== "/" && url.pathname !== "/index.html") return context.next();
