@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Imposter Game · Spot the AI Fake · New Case Daily</title>
+<title>Imposter: Spot the AI · The Daily AI Photo Game</title>
 <meta name="description" content="6 themed rounds. 4 photos each. Exactly 1 synthetic AI imposter per round. Can you spot all 6?">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
 <link rel="alternate icon" href="assets/icons/icon-192-v2.png">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon-v2.png">
-<meta property="og:site_name" content="Imposter Game">
-<meta property="og:title" content="Imposter Game · {{SEASON_LABEL}} Edition · Can You Spot the AI Fake?">
+<meta property="og:site_name" content="Imposter: Spot the AI">
+<meta property="og:title" content="Imposter: Spot the AI · {{SEASON_LABEL}} Edition · Can You Spot the AI Fake?">
 <meta property="og:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://play-imposter.lol/">
@@ -19,12 +19,12 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Imposter Game: four photos. Three are real, one is AI. Can you spot the fake?">
+<meta property="og:image:alt" content="Imposter: four photos. Three are real, one is AI. Can you spot the fake?">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Imposter Game · {{SEASON_LABEL}} Edition · Can You Spot the AI Fake?">
+<meta name="twitter:title" content="Imposter: Spot the AI · {{SEASON_LABEL}} Edition · Can You Spot the AI Fake?">
 <meta name="twitter:description" content="6 Themed Rounds · 4 Photos Each. Exactly 1 synthetic AI imposter per round. Can you spot the AI fakes?">
 <meta name="twitter:image" content="https://play-imposter.lol/og-image.png">
-<meta name="twitter:image:alt" content="Imposter Game: four photos. Three are real, one is AI. Can you spot the fake?">
+<meta name="twitter:image:alt" content="Imposter: four photos. Three are real, one is AI. Can you spot the fake?">
 <meta name="theme-color" content="#0d0f18">
 <meta name="google-adsense-account" content="ca-pub-2828356328766240">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2828356328766240" crossorigin="anonymous"></script>
@@ -2253,6 +2253,10 @@
     transform: skewX(-20deg);
     animation: badge-shine 4.5s ease-in-out 1s infinite;
   }
+  .logo-sub { display: inline-block; margin-left: 8px; vertical-align: middle; position: relative; top: -2px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+    -webkit-text-fill-color: var(--badge); color: var(--badge); }
+  @media (min-width: 600px) { .logo-sub { font-size: 13px; margin-left: 12px; } }
   @keyframes badge-shine { 0%, 70% { left: -60%; } 100% { left: 130%; } }
   @media (prefers-reduced-motion: reduce) { .halloween-badge::after { animation: none; display: none; } }
   @media (min-width: 600px) {
@@ -2348,7 +2352,7 @@
 <div class="app">
   <header class="app-header">
     <div class="header-brand">
-      <div class="logo-text">IMPOSTER GAME</div>
+      <div class="logo-text">IMPOSTER<span class="logo-sub">SPOT THE AI</span></div>
       <div class="halloween-badge" id="caseTag">{{SEASON_BADGE}}</div>
     </div>
     <div class="header-actions">
@@ -2454,7 +2458,7 @@
     </div>
   </section>
   <footer class="site-foot">
-    <p>Imposter Game is a free daily puzzle. Each case has 6 rounds of 4 photos: 3 real photographs and 1 AI-generated image. Spot the fake, beat your friends, and train your eye for AI images.</p>
+    <p>Imposter: Spot the AI is a free daily puzzle. Each case has 6 rounds of 4 photos: 3 real photographs and 1 AI-generated image. Spot the fake, beat your friends, and train your eye for AI images.</p>
     <nav><a href="/how-to-spot-ai-images/">How to spot AI images</a> · <a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/privacy/">Privacy</a></nav>
   </footer>
 </div>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Imposter Game daily case generator.
+"""Imposter: Spot the AI daily case generator.
 
 Builds one case per date: 6 rounds, each 3 real Wikimedia Commons photos plus
 1 AI imposter from the imposter-gen Worker (Workers AI flux-1-schnell).
