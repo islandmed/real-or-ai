@@ -4738,7 +4738,7 @@ function getInviteShareData() {
       url: getChallengeLink(todayRes),
       title: "Think you can beat my Imposter score?",
       // A direct dare, unlike the public grid that Share result posts
-      text: `🕵️ I caught ${todayRes.won} of ${todayRes.total} AI fakes in ${todayRes.time.toFixed(1)}s on today's Imposter. Can you beat me?\n${getChallengeLink(todayRes)}`
+      text: `🕵️ I caught ${todayRes.won} of ${todayRes.total} AI fakes in ${todayRes.time.toFixed(1)}s on today's Imposter. Can you beat me?\n${(todayRes.grid || "").replace(/🟦/g, "🟧").replace(/🟥/g, "🤖")}\n${getChallengeLink(todayRes)}`
     };
   }
 
