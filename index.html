@@ -172,7 +172,8 @@
     gap: 3px;
     line-height: 1.2;
   }
-  @media (min-width: 600px) {
+  /* The column only widens at 768px, so the one-row header waits for it too */
+  @media (min-width: 768px) {
     .header-brand {
       flex-direction: row;
       align-items: center;
@@ -2275,10 +2276,14 @@
   .logo-sub { display: inline-block; margin-left: 8px; vertical-align: middle; position: relative; top: -2px;
     font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
     -webkit-text-fill-color: var(--badge); color: var(--badge); }
-  @media (min-width: 600px) { .logo-sub { font-size: 13px; margin-left: 12px; } }
+  @media (min-width: 768px) { .logo-sub { font-size: 13px; margin-left: 12px; } }
+  .logo-text { white-space: nowrap; }
+  .header-actions { flex-shrink: 0; }
+  @media (max-width: 340px) { .logo-sub { display: none; } .app { padding-left: 8px; padding-right: 8px; } .app-header { padding: 8px; } .header-actions { gap: 3px; } .icon-btn.level-pill { padding: 0 5px; } }
+  @media (max-width: 380px) { .logo-text { font-size: 20px; } .logo-sub { font-size: 9px; margin-left: 6px; letter-spacing: 0.08em; } }
   @keyframes badge-shine { 0%, 70% { left: -60%; } 100% { left: 130%; } }
   @media (prefers-reduced-motion: reduce) { .halloween-badge::after { animation: none; display: none; } }
-  @media (min-width: 600px) {
+  @media (min-width: 768px) {
     .header-brand { gap: 14px; }
     .logo-text { font-size: 30px; }
     .halloween-badge { font-size: 12px; padding: 4px 12px; }
