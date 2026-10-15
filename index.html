@@ -4751,7 +4751,7 @@ function setupCardShare() {
   const box = $("cardShareIcons");
   if (!box.childElementCount) {
     const icon = net => {
-      const src = document.querySelector(`.share-grid .share-ico[data-net="${net}"] svg`);
+      const src = document.querySelector(`.share-ico[data-net="${net}"] svg`);
       if (src) return src.outerHTML;
       const letters = { linkedin: "in", bluesky: "🦋", telegram: "✈", email: "✉", sms: "💬" };
       if (net === "slack") return `<svg viewBox="0 0 24 24"><path d="M5.04 15.17a2.53 2.53 0 1 1-2.52-2.52h2.52v2.52zm1.27 0a2.52 2.52 0 0 1 5.04 0v6.31a2.52 2.52 0 1 1-5.04 0v-6.31zM8.83 5.04a2.53 2.53 0 1 1 2.52-2.52v2.52H8.83zm0 1.27a2.52 2.52 0 0 1 0 5.04H2.52a2.52 2.52 0 1 1 0-5.04h6.31zm10.13 2.52a2.52 2.52 0 1 1 2.52 2.52h-2.52V8.83zm-1.27 0a2.52 2.52 0 0 1-5.04 0V2.52a2.52 2.52 0 1 1 5.04 0v6.31zm-2.52 10.13a2.52 2.52 0 1 1-2.52 2.52v-2.52h2.52zm0-1.27a2.52 2.52 0 0 1 0-5.04h6.31a2.52 2.52 0 1 1 0 5.04h-6.31z"/></svg>`;
