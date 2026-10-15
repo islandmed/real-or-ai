@@ -3927,10 +3927,22 @@ function endWarmupRound(won) {
   roundCredits = { ...warmup.credits };
   renderRoundCredits();
   const btn = $("btnNextRound");
-  btn.textContent = `${won ? (warmup.attempts === 1 ? "First try! 🎯" : "Got it!") : "Tricky one."} Now today's case: 6 rounds →`;
+  // Most ad visitors left after seeing the answer, so the case now starts itself
+  const lead = won ? "Spotted it! Can you do 6 more?" : "Fooled! Get revenge.";
+  let n = 5;
+  const tick = () => { btn.textContent = `${lead} Today's case in ${n}… →`; };
+  tick();
   btn.classList.add("show");
+  warmup.timer = setInterval(() => {
+    if (!warmup) return;
+    if (document.hidden) return tick();
+    if (--n <= 0) return endWarmup();
+    tick();
+  }, 1000);
 }
 function endWarmup() {
+  if (!warmup) return;
+  clearInterval(warmup.timer);
   ev("w-next");
   warmup = null;
   roundCredits = {};
@@ -4512,7 +4524,7 @@ function renderStoryCard() {
 
     ctx.font = "700 36px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(`${totalRounds} / ${totalRounds} ACED ON 1ST TRY ⭐⭐⭐⭐⭐`, 540, 520);
+    ctx.fillText(`${totalRounds} / ${totalRounds} SPOTTED ⭐⭐⭐⭐⭐`, 540, 520);
 
     ctx.font = "700 32px 'JetBrains Mono', monospace";
     ctx.fillStyle = P.accent;
@@ -4555,7 +4567,7 @@ function renderStoryCard() {
     ctx.stroke();
 
     // Left side: Round number & Theme Name
-    const label = r.solved ? (r.attempts === 1 ? "ACED 🎯 1st Try" : (r.attempts === 2 ? "CAUGHT ⚡ 2nd Try" : "CAUGHT 🔍 3rd Try")) : "FOOLED ❌";
+    const label = r.solved ? "SPOTTED 🎯" : "FOOLED ❌";
     ctx.font = "800 30px 'JetBrains Mono', monospace";
     const room = boxW - 36 - 36 - 28 - ctx.measureText(label).width;
     ctx.textAlign = "left";
