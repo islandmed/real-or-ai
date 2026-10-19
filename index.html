@@ -705,6 +705,11 @@
   .rounds-fold > summary::after { content: " ▾"; }
   .rounds-fold[open] > summary::after { content: " ▴"; }
   .rounds-fold .round-breakdown { margin-top: 10px; }
+  .warmup-prompt { text-align: center; margin: 4px 0 12px; }
+  .warmup-prompt h2 { margin: 0; font-size: 24px; line-height: 1.2; color: #fff; }
+  .warmup-prompt h2 span { color: var(--accent); }
+  .warmup-prompt p { margin: 4px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
   .past-cases { margin-top: 16px; }
   .btn-past { display: block; box-sizing: border-box; width: 100%; padding: 14px 10px; border-radius: 8px; text-align: center;
     text-decoration: none; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 13px; color: #fff;
@@ -2420,6 +2425,11 @@
 
   <!-- Playing View -->
   <main id="viewPlaying">
+    <!-- Warm-up only: ad visitors land here with no intro, so say what to do -->
+    <div class="warmup-prompt" id="warmupPrompt" hidden>
+      <h2>1 of these 4 is <span>AI</span>.</h2>
+      <p>Tap the fake. You get one guess.</p>
+    </div>
     <!-- 2x2 Grid (Fills square cards with edge-to-edge photos) -->
     <div class="grid-wrap" id="gridWrap">
       <!-- 4 Cards populated dynamically -->
@@ -4032,6 +4042,12 @@ function startWarmup(key) {
         <div class="badge-desc" id="badgeDesc_${id}"></div>
       </div>
     </div>`).join("");
+  $("warmupPrompt").hidden = false;
+  // w-shown fires before the photos arrive; w-img says they all actually loaded,
+  // so a slow connection can be told apart from a visitor who chose to leave
+  const imgs = [...$("gridWrap").querySelectorAll("img")];
+  Promise.all(imgs.map(im => im.complete ? 1 : new Promise(r => { im.onload = r; im.onerror = r; })))
+    .then(() => { if (imgs.every(im => im.naturalWidth)) ev("w-img"); });
   // Today's first round loads behind it, so the case starts instantly afterwards
   dailyCaseData.rounds[0].cards.forEach(c => { const img = new Image(); img.src = c.image; });
 }
@@ -4082,6 +4098,7 @@ function endWarmupRound(won) {
 function endWarmup() {
   if (!warmup) return;
   clearInterval(warmup.timer);
+  $("warmupPrompt").hidden = true;
   ev("w-next");
   warmup = null;
   roundCredits = {};

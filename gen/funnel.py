@@ -16,7 +16,7 @@ from collections import defaultdict
 from pathlib import Path
 
 ZONE_NAME = "play-imposter.lol"
-STEPS = ["load", "already", "w-shown", "w-guess", "w-next",
+STEPS = ["load", "already", "w-shown", "w-img", "w-guess", "w-next",
          "r1", "r2", "r3", "r4", "r5", "r6", "done", "a-load", "a-r1", "a-done"]
 
 
