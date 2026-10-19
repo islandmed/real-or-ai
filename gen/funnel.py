@@ -11,19 +11,22 @@ so run it often if you want history.
 
 Token: CLOUDFLARE_API_TOKEN, else the local wrangler login.
 """
-import argparse, datetime as dt, json, os, re, urllib.request
+import argparse, datetime as dt, json, os, re, subprocess, urllib.request
 from collections import defaultdict
 from pathlib import Path
 
 ZONE_NAME = "play-imposter.lol"
 STEPS = ["load", "already", "w-shown", "w-guess", "w-next",
-         "r1", "r2", "r3", "r4", "r5", "r6", "done"]
+         "r1", "r2", "r3", "r4", "r5", "r6", "done", "a-load", "a-r1", "a-done"]
 
 
 def token():
     t = os.environ.get("CLOUDFLARE_API_TOKEN")
     if t:
         return re.findall(r"[A-Za-z0-9_-]{35,}", t)[-1]
+    # The wrangler OAuth token expires within hours; any wrangler command
+    # refreshes it, and a stale one gets a 403 from the zones API.
+    subprocess.run(["npx", "wrangler", "whoami"], capture_output=True, timeout=120)
     cfg = Path.home() / ".config/.wrangler/config/default.toml"
     m = re.search(r'oauth_token\s*=\s*"([^"]+)"', cfg.read_text())
     return m.group(1)

@@ -705,6 +705,18 @@
   .rounds-fold > summary::after { content: " ▾"; }
   .rounds-fold[open] > summary::after { content: " ▴"; }
   .rounds-fold .round-breakdown { margin-top: 10px; }
+  .past-cases { margin-top: 16px; }
+  .btn-past { display: block; box-sizing: border-box; width: 100%; padding: 14px 10px; border-radius: 8px; text-align: center;
+    text-decoration: none; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 13px; color: #fff;
+    background: hsl(calc(var(--h) + 2) calc(var(--sk) * 33%) 16.5%); border: 2px solid var(--accent2); }
+  .btn-past:active { transform: scale(0.98); }
+  .past-list { list-style: none; margin: 10px 0 0; padding: 0; }
+  .past-list a { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; padding: 8px;
+    border-radius: 6px; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #fff; }
+  .past-list a:hover { background: rgb(var(--accent2-rgb) / 0.12); }
+  .past-list .pd { color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
+  .past-list .pr { font-weight: 800; }
+  .past-list .pr.todo { color: var(--accent); font-weight: 700; }
   .results-links { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; margin: 4px 0 16px;
     color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
   .results-links a, .results-links .link-btn { color: #fff; }
@@ -2456,6 +2468,14 @@
         <button class="btn-challenge" id="btnChallenge" type="button" onclick="openInviteModal()"><span>👥 Challenge</span></button>
       </div>
       <div class="next-case-line">Next case in <span id="nextCaseCountdown">--:--:--</span></div>
+      <!-- Past cases (?d=YYYY-MM-DD): filled from /api/archive, never counted in stats -->
+      <div class="past-cases" id="pastCases" hidden>
+        <a class="btn-past" id="btnPastNext" href="/"></a>
+        <details class="rounds-fold past-fold" id="pastFold" hidden>
+          <summary>More past cases</summary>
+          <ol class="past-list" id="pastList"></ol>
+        </details>
+      </div>
       <details class="rounds-fold">
         <summary>See rounds</summary>
         <div class="round-breakdown" id="roundBreakdown"></div>
@@ -2967,12 +2987,15 @@ function showCountdownReadyState() {
   const activeTitle = $("cdActiveTitle");
 
   if (dailyCaseData) {
-    const badgeText = dailyCaseData.eventBadge 
+    const badgeText = ARCHIVE_DATE
+      ? `PAST CASE #${dailyCaseData.caseNumber} · ${shortDate(ARCHIVE_DATE).toUpperCase()}`
+      : dailyCaseData.eventBadge
       ? `${dailyCaseData.eventBadge} · CASE #${dailyCaseData.caseNumber}`
       : `CASE #${dailyCaseData.caseNumber} · DAILY SPECIAL`;
     if (badgeEl) badgeEl.textContent = badgeText;
     if (activeBadge) activeBadge.textContent = badgeText;
     if (activeTitle) activeTitle.textContent = `${dailyCaseData.title.toUpperCase()} · ${dailyCaseData.rounds.length} ROUNDS`;
+    if (ARCHIVE_DATE && $("cdStartBtn")) $("cdStartBtn").textContent = `▶ START CASE #${dailyCaseData.caseNumber}`;
   }
 
   if (briefing) briefing.style.display = "flex";
@@ -3718,7 +3741,110 @@ function renderChallengeBanner() {
 // by path (gen/funnel.py). Source is the ?r= ad tag, or "none".
 const EV_SRC = (() => { try { const r = new URLSearchParams(location.search).get("r") || ""; return /^[a-z0-9-]{1,20}$/.test(r) ? r : "none"; } catch (_) { return "none"; } })();
 const evSent = new Set();
+
+// ===== Past cases =====
+// ?d=YYYY-MM-DD plays an earlier day's case. Only dates before the player's local
+// today count, and nothing about it touches the daily record, streak, stats, XP,
+// badges or the friends board: today's case stays the one that matters.
+const ARCHIVE_DATE = (() => {
+  try {
+    const d = new URLSearchParams(location.search).get("d") || "";
+    return /^\d{4}-\d{2}-\d{2}$/.test(d) && d < localDayStr() ? d : null;
+  } catch (_) { return null; }
+})();
+const ARCHIVE_KEY = "imposter_archive_records";
+function archiveRecords() {
+  try { return JSON.parse(localStorage.getItem(ARCHIVE_KEY) || "{}"); } catch (_) { return {}; }
+}
+function shortDate(iso) {
+  const d = new Date(iso + "T12:00:00");
+  return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+}
+
+// "Play yesterday's case" plus a list of the rest, newest first. Your result shows
+// next to each: the day's own record if you played it live, else a replay record.
+async function renderPastCases() {
+  const box = $("pastCases");
+  if (!box) return;
+  let cases = [];
+  try {
+    const res = await fetch("/api/archive");
+    if (res.ok) cases = (await res.json()).cases || [];
+  } catch (_) {}
+  const today = localDayStr();
+  cases = cases.filter(c => c.date < today && c.date !== ARCHIVE_DATE).sort((a, b) => b.date.localeCompare(a.date));
+  if (!cases.length) { box.hidden = true; return; }
+  let daily = {};
+  try { daily = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}"); } catch (_) {}
+  const replays = archiveRecords();
+  const resultFor = c => {
+    const r = daily[c.date];
+    if (r && r.solved && (!r.caseNumber || r.caseNumber === c.caseNumber)) return r;
+    return replays[c.date] || null;
+  };
+  // The button goes to the newest past case you have not played
+  const next = cases.find(c => !resultFor(c)) || cases[0];
+  const btn = $("btnPastNext");
+  btn.href = `/?d=${next.date}`;
+  btn.textContent = next.date === localDayStr(-1) ? "▶ Play yesterday's case" : `▶ Play case #${next.caseNumber} (${shortDate(next.date)})`;
+  const rest = cases.filter(c => c !== next);
+  $("pastList").innerHTML = rest.map(c => {
+    const r = resultFor(c);
+    const tag = r ? `<span class="pr">${r.won}/${r.total || 6}</span>` : `<span class="pr todo">Play</span>`;
+    return `<li><a href="/?d=${c.date}"><span>#${c.caseNumber}</span><span class="pd">${shortDate(c.date)}</span>${tag}</a></li>`;
+  }).join("");
+  $("pastFold").hidden = !rest.length;
+  box.hidden = false;
+}
+
+function showArchiveResults() {
+  ev("done");
+  playSound("victory");
+  const finalSecs = stopSpeedTimer();
+  $("viewPlaying").style.display = "none";
+  $("viewResults").style.display = "flex";
+  if ($("gameStatusBar")) $("gameStatusBar").style.display = "none";
+
+  const total = dailyCaseData.rounds.length;
+  const won = roundResults.filter(r => r.solved).length;
+  const firstTry = roundResults.filter(r => r.solved && r.attempts === 1).length;
+  const score = firstTry * 100 + roundResults.filter(r => r.solved && r.attempts === 2).length * 45
+    + roundResults.filter(r => r.solved && r.attempts === 3).length * 15 + calculateSpeedBonus(finalSecs, roundResults);
+
+  $("resultTitle").textContent = `Case #${dailyCaseData.caseNumber} · ${shortDate(dailyCaseData.date)}`;
+  $("summaryScoreBadge").textContent = `${won}/${total} CAUGHT · ${score} PTS · ${finalSecs.toFixed(1)}s`;
+  $("summaryScoreBadge").className = "summary-score-badge" + (firstTry === total ? " flawless" : "");
+  $("resultGrid").textContent = buildEmojiGrid(roundResults);
+  renderRoundBreakdown();
+  renderPhotoCredits();
+
+  // First result for a past day stands, like the daily one
+  try {
+    const recs = archiveRecords();
+    if (!recs[dailyCaseData.date]) {
+      recs[dailyCaseData.date] = { won, total, score, time: finalSecs, caseNumber: dailyCaseData.caseNumber };
+      localStorage.setItem(ARCHIVE_KEY, JSON.stringify(recs));
+    }
+  } catch (_) {}
+  renderPastCases();
+  renderResultsAd();
+}
+
+// Results-screen pieces that belong to today's case only
+function hideDailyOnlyResults() {
+  document.body.classList.add("archive-mode");
+  [".career-stats", "#friendsBoard", "#resultsLevel", ".share-main-row", ".next-case-line", "#challengeResult"]
+    .forEach(sel => { const el = document.querySelector(sel); if (el) el.style.display = "none"; });
+  const back = document.createElement("a");
+  back.className = "btn-past";
+  back.href = "/";
+  back.textContent = "← Back to today's case";
+  back.style.marginTop = "10px";
+  $("pastCases").after(back);
+}
 function ev(step) {
+  // A past case is counted on its own: a-load, a-r1, a-done, nothing else
+  if (ARCHIVE_DATE) { step = "a-" + step; if (!["a-load", "a-r1", "a-done"].includes(step)) return; }
   if (evSent.has(step)) return;
   evSent.add(step);
   try { fetch(`/api/ev/${EV_SRC}/${step}`, { keepalive: true }).catch(() => {}); } catch (_) {}
@@ -3804,10 +3930,18 @@ async function init() {
   // Fetch today's case (no answers in it: guesses are checked by /api/guess)
   const todayStr = localDayStr();
   try {
-    const res = await fetch(`/api/case?date=${todayStr}`);
+    const res = await fetch(`/api/case?date=${ARCHIVE_DATE || todayStr}`);
     if (!res.ok) throw new Error(`case ${res.status}`);
     dailyCaseData = await res.json();
     ev("load");
+    if (ARCHIVE_DATE) {
+      const tag = `PAST CASE #${dailyCaseData.caseNumber} · ${shortDate(ARCHIVE_DATE).toUpperCase()}`;
+      if ($("caseTag")) $("caseTag").textContent = tag;
+      if ($("cdBadge")) $("cdBadge").textContent = tag;
+      hideDailyOnlyResults();
+      loadRound(0);
+      return registerServiceWorker();
+    }
     joinBoardFromUrl();
     readChallengeParams();
     renderChallengeBanner();
@@ -3825,10 +3959,15 @@ async function init() {
     else startDailyFlow();
   } catch (err) {
     console.error("Failed to load case", err);
+    if (ARCHIVE_DATE) { location.replace("/"); return; }
     showToast("Today's case could not be loaded. Check your connection and refresh.");
   }
 
-  // Register PWA Service Worker (Network-First)
+  registerServiceWorker();
+}
+
+// Register PWA Service Worker (Network-First)
+function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js?v=4.26').then(reg => {
       reg.update();
@@ -4179,6 +4318,7 @@ $("btnNextRound").onclick = () => {
 };
 
 function showFinalResults() {
+  if (ARCHIVE_DATE) return showArchiveResults();
   ev("done");
   playSound("victory");
   const finalSecs = stopSpeedTimer();
@@ -4399,6 +4539,7 @@ function renderResultsExtras(score, time) {
     }
   }
   renderResultsAd();
+  renderPastCases();
 }
 
 let resultsAdRendered = false;
