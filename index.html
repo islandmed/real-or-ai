@@ -2813,7 +2813,7 @@
       </div>
     </div>
 
-    <div class="dist-title" style="margin-top:16px;">Career Forensic Medals</div>
+    <div class="dist-title" style="margin-top:16px;">Career Forensic Medals <span id="dossierMedalCount"></span></div>
     <div class="badges-grid" id="dossierBadgesGrid">
       <!-- Injected dynamically -->
     </div>
@@ -3476,8 +3476,52 @@ const ALL_BADGES = [
   { id: "eagle_eye", icon: "🦅", name: "Eagle Eye", desc: "Flawless unmasking with 100% first-guess accuracy" },
   { id: "streak_master", icon: "🔥", name: "Streak Master", desc: "Maintain a 3-day active daily streak" },
   { id: "top_detective", icon: "🏆", name: "Top Detective", desc: "Score 600+ points in a single daily case" },
-  { id: "case_veteran", icon: "🎖️", name: "Case Veteran", desc: "Solve 7 daily cases" }
+  { id: "case_veteran", icon: "🎖️", name: "Case Veteran", desc: "Solve 7 daily cases" },
+  { id: "week_beat", icon: "🗓️", name: "Week on the Beat", desc: "Reach a 7-day daily streak" },
+  { id: "month_beat", icon: "📅", name: "Month on the Beat", desc: "Reach a 30-day daily streak" },
+  { id: "case_hardened", icon: "📁", name: "Case Hardened", desc: "Solve 30 daily cases" },
+  { id: "century", icon: "💯", name: "Century Detective", desc: "Solve 100 daily cases" },
+  { id: "hat_trick", icon: "🎩", name: "Hat Trick", desc: "Catch all 6 fakes in 3 different daily cases" },
+  { id: "sharpshooter", icon: "🏹", name: "Sharpshooter", desc: "Catch 50 AI fakes in daily cases" },
+  { id: "fake_finder", icon: "🕵️", name: "Fake Finder General", desc: "Catch 250 AI fakes in daily cases" },
+  { id: "comeback", icon: "🔄", name: "Comeback Kid", desc: "Miss round 1, then catch the other 5" },
+  { id: "speed_demon", icon: "⏱️", name: "Speed Demon", desc: "Catch all 6 fakes in under 15s total" },
+  { id: "cold_case", icon: "🧊", name: "Cold Case Squad", desc: "Finish 5 past cases" },
+  { id: "squad_up", icon: "🤝", name: "Squad Up", desc: "Finish a case on a friends board" },
+  { id: "spooky_season", icon: "🎃", name: "Spooky Season", desc: "Finish a daily case in October" },
+  { id: "harvest_hunter", icon: "🦃", name: "Harvest Hunter", desc: "Finish a daily case in November" },
+  { id: "holiday_sleuth", icon: "🎄", name: "Holiday Sleuth", desc: "Finish a daily case in December" }
 ];
+
+// Medals that read the saved history, so a player who already did the thing
+// unlocks them on their next finished case. `run` is the case just finished
+// ({won, total, secs, rounds, archive}).
+function historyMedals(run) {
+  let daily = {};
+  try { daily = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}"); } catch (_) {}
+  const days = Object.entries(daily).filter(([, r]) => r && r.solved);
+  const out = [];
+  const maxStreak = Math.max(playerStats.maxStreak || 0, playerStats.currentStreak || 0);
+  if (maxStreak >= 7) out.push("week_beat");
+  if (maxStreak >= 30) out.push("month_beat");
+  if (playerStats.won >= 30) out.push("case_hardened");
+  if (playerStats.won >= 100) out.push("century");
+  if (days.filter(([, r]) => r.total && r.won === r.total).length >= 3) out.push("hat_trick");
+  if ((playerStats.aces || 0) >= 50) out.push("sharpshooter");
+  if ((playerStats.aces || 0) >= 250) out.push("fake_finder");
+  if (Object.keys(archiveRecords()).length >= 5) out.push("cold_case");
+  const months = new Set(days.map(([d]) => d.slice(5, 7)));
+  if (months.has("10")) out.push("spooky_season");
+  if (months.has("11")) out.push("harvest_hunter");
+  if (months.has("12")) out.push("holiday_sleuth");
+  if (run && !run.archive) {
+    const r = run.rounds || [];
+    if (r.length >= 6 && !r[0].solved && r.slice(1).every(x => x.solved)) out.push("comeback");
+    if (run.total && run.won === run.total && run.secs < 15) out.push("speed_demon");
+    if (boardToday() !== playerId()) out.push("squad_up");
+  }
+  return out;
+}
 
 function getRankForXp(xp) {
   for (let i = CAREER_RANKS.length - 1; i >= 0; i--) {
@@ -3577,6 +3621,7 @@ function renderDossier() {
   $("dossierTotalAces").textContent = playerStats.aces;
 
   const grid = $("dossierBadgesGrid");
+  if ($("dossierMedalCount")) $("dossierMedalCount").textContent = `· ${ALL_BADGES.filter(b => (playerCareer.unlockedBadges || []).includes(b.id)).length}/${ALL_BADGES.length}`;
   if (grid) {
     grid.innerHTML = ALL_BADGES.map(b => {
       const isUnlocked = (playerCareer.unlockedBadges || []).includes(b.id);
@@ -3591,17 +3636,17 @@ function renderDossier() {
   }
 }
 
-function unlockBadge(badgeId) {
-  if (!playerCareer.unlockedBadges) playerCareer.unlockedBadges = [];
-  if (playerCareer.unlockedBadges.includes(badgeId)) return;
 
-  playerCareer.unlockedBadges.push(badgeId);
+// One toast for however many medals a case unlocks at once
+function unlockBadges(ids) {
+  if (!playerCareer.unlockedBadges) playerCareer.unlockedBadges = [];
+  const fresh = [...new Set(ids)].filter(id => !playerCareer.unlockedBadges.includes(id) && ALL_BADGES.some(b => b.id === id));
+  if (!fresh.length) return;
+  playerCareer.unlockedBadges.push(...fresh);
   saveCareer();
-  const badge = ALL_BADGES.find(b => b.id === badgeId);
-  if (badge) {
-    showToast(`🎖️ Forensic Medal Unlocked: ${badge.name}!`);
-    playSound("victory");
-  }
+  const first = ALL_BADGES.find(b => b.id === fresh[0]);
+  showToast(fresh.length === 1 ? `🎖️ Forensic Medal Unlocked: ${first.name}!` : `🎖️ ${fresh.length} Forensic Medals Unlocked! See your dossier.`);
+  playSound("victory");
 }
 
 // --- Deception Index ---
@@ -3846,6 +3891,7 @@ function showArchiveResults() {
       localStorage.setItem(ARCHIVE_KEY, JSON.stringify(recs));
     }
   } catch (_) {}
+  unlockBadges(historyMedals({ archive: true }));
   renderPastCases();
   renderResultsAd();
 }
@@ -4445,14 +4491,14 @@ function showFinalResults() {
   if (firstTryCount === totalRounds) earnedXp += 50;
   awardCareerXp(earnedXp);
 
-  if (firstTryCount === totalRounds) {
-    unlockBadge("flawless_case");
-    unlockBadge("eagle_eye");
-  }
-  if (finalScore >= (totalRounds * 100)) unlockBadge("top_detective");
-  if (playerStats.currentStreak >= 3) unlockBadge("streak_master");
-  if (playerStats.won >= 7) unlockBadge("case_veteran");
-  if (finalSecs < 20.0 && firstTryCount >= (totalRounds - 1)) unlockBadge("lightning_instinct");
+  const medals = [];
+  if (firstTryCount === totalRounds) medals.push("flawless_case", "eagle_eye");
+  if (finalScore >= (totalRounds * 100)) medals.push("top_detective");
+  if (playerStats.currentStreak >= 3) medals.push("streak_master");
+  if (playerStats.won >= 7) medals.push("case_veteran");
+  if (finalSecs < 20.0 && firstTryCount >= (totalRounds - 1)) medals.push("lightning_instinct");
+  medals.push(...historyMedals({ won: totalWon, total: totalRounds, secs: finalSecs, rounds: roundResults }));
+  unlockBadges(medals);
 
   renderResultsExtras(finalScore, finalSecs);
   renderPhotoCredits();
