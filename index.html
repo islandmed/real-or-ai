@@ -4406,15 +4406,12 @@ function finishRoundUI(didWin) {
   // Scoring stays as before: the first REVEAL_MS of a reveal counts, any longer look is free
   revealHoldAt = Date.now() + REVEAL_MS;
 
-  if (didWin) {
-    btnNext.textContent = isLast ? `Case Complete! Opening Scorecard...` : `Spotted it! · Next →`;
-    autoAdvanceTimeout = setTimeout(() => {
-      advanceToNextStage();
-    }, REVEAL_MS);
-  } else {
-    // A miss never whisks the fake away: the player moves on when ready
-    btnNext.textContent = isLast ? `Fooled! · See your scorecard →` : `Fooled! · Study the fake, then Next →`;
-  }
+  // Either way the case keeps moving; studying the fakes is what the results review is for.
+  // A tap on a photo during the reveal still pauses it (inspectRevealed).
+  btnNext.textContent = isLast ? `Case Complete! Opening Scorecard...` : didWin ? `Spotted it! · Next →` : `Fooled! · Next →`;
+  autoAdvanceTimeout = setTimeout(() => {
+    advanceToNextStage();
+  }, REVEAL_MS);
 }
 
 // After a round, a tap on any photo opens it full size (the answers are already shown)
