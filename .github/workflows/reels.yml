@@ -1,0 +1,92 @@
+# Daily Facebook reel, just after midnight Pacific (two crons cover PDT and PST;
+# the script posts once per Pacific date, between 00:00 and 05:59). It pulls the
+# encrypted state, builds the cases, renders a reel from a round everyone has
+# already played and publishes it to the Imposter Page. No LLM involved.
+# Logs are public: nothing here prints which card is AI.
+#
+# Secrets: STATE_KEY, FB_PAGE_TOKEN. Without FB_PAGE_TOKEN it posts nothing.
+
+name: Daily reel
+
+on:
+  schedule:
+    - cron: "3 7 * * *"
+    - cron: "3 8 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Render only, post nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write   # commits social/reels_posted.json
+
+concurrency:
+  group: daily-reel
+  cancel-in-progress: false
+
+jobs:
+  reel:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      STATE_KEY: ${{ secrets.STATE_KEY }}
+      FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      CHROME: google-chrome
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Already posted today?
+        id: due
+        run: |
+          d=$(TZ=America/Los_Angeles date +%F)
+          if grep -q "\"post_date\": \"$d\"" social/reels_posted.json 2>/dev/null; then
+            echo "$d already posted"; echo "go=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.due.outputs.go == 'true'
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        if: steps.due.outputs.go == 'true'
+        with:
+          node-version: "22"
+
+      - name: Install
+        if: steps.due.outputs.go == 'true'
+        run: |
+          pip install --quiet "pillow==11.3.0"
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
+
+      - name: Build cases from the encrypted state
+        if: steps.due.outputs.go == 'true'
+        run: |
+          python3 gen/state_sync.py pull
+          python3 gen/build.py > /dev/null
+
+      - name: Render and post
+        if: steps.due.outputs.go == 'true'
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            python3 gen/reel/post_reel.py --dry-run
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            python3 gen/reel/post_reel.py --force
+          else
+            python3 gen/reel/post_reel.py
+          fi
+
+      - name: Commit the log
+        if: steps.due.outputs.go == 'true'
+        run: |
+          git add social/reels_posted.json 2>/dev/null || exit 0
+          git diff --cached --quiet && exit 0
+          git config user.name "imposter-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "Reel posted $(TZ=America/Los_Angeles date +%F)"
+          git pull --rebase -q && git push -q

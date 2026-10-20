@@ -1,0 +1,90 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@800;900&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #140a1e; }
+  body { font-family: "Noto Sans", sans-serif; color: #fff; position: relative;
+    background: radial-gradient(120% 55% at 50% 0%, #7a3a12 0%, #3a1a1c 45%, #22102e 75%, #1a0c26 100%); }
+  .pill { position: absolute; top: 172px; left: 50%; transform: translateX(-50%); font: 700 34px "JetBrains Mono", monospace;
+    color: #ffb04a; border: 3px solid #ff9a2a; border-radius: 40px; padding: 4px 24px; background: rgb(20 10 10 / .55); letter-spacing: 1px; }
+  h1 { position: absolute; top: 244px; width: 100%; text-align: center; font-weight: 900; font-size: 104px; line-height: 1.18; }
+  h1 span { color: #ff8a1f; }
+  .grid { position: absolute; top: 492px; left: 68px; width: 944px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tile { position: relative; aspect-ratio: 1; border-radius: 22px; overflow: hidden; outline: 6px solid transparent; transition: none; }
+  .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .letter { position: absolute; top: 16px; left: 16px; width: 58px; height: 62px; border-radius: 12px; background: #0b0710;
+    font: 700 42px "JetBrains Mono", monospace; display: grid; place-items: center; }
+  .tag { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%) scale(0); background: #0b0710; border-radius: 14px;
+    font-weight: 900; padding: 2px 26px; white-space: nowrap; }
+  .tag.real { color: #3ee07a; font-size: 50px; }
+  .tag.fake { color: #ff9a2a; font-size: 62px; }
+  .tile.ai { box-shadow: 0 0 0 0 transparent; }
+  .scan { position: absolute; left: 60px; width: 960px; height: 4px; background: linear-gradient(90deg, transparent, #ffb04a 20%, #fff 50%, #ffb04a 80%, transparent);
+    box-shadow: 0 0 18px #ff8a1f; opacity: 0; }
+  .ask { position: absolute; top: 1462px; width: 100%; text-align: center; font-weight: 900; font-size: 66px; }
+  .count { position: absolute; top: 1572px; left: 50%; transform: translateX(-50%); width: 120px; height: 120px; border-radius: 26px;
+    background: #ff8a1f; color: #0b0710; font-weight: 900; font-size: 84px; display: grid; place-items: center; }
+  .credits { position: absolute; top: 1730px; left: 60px; right: 60px; text-align: center; font: 500 22px "JetBrains Mono", monospace; color: #9b8fae; line-height: 1.4; }
+  .end { position: absolute; inset: 0; background: rgb(12 8 18 / .9); opacity: 0; text-align: center; }
+  .end .big { position: absolute; top: 500px; width: 100%; font-weight: 900; font-size: 164px; letter-spacing: 2px; }
+  .end .s1 { position: absolute; top: 730px; width: 100%; font-weight: 900; font-size: 74px; color: #ff8a1f; }
+  .end .s2 { position: absolute; top: 820px; width: 100%; font-weight: 900; font-size: 64px; }
+  .end .btn { position: absolute; top: 950px; left: 50%; transform: translateX(-50%); background: #ff8a1f; color: #0b0710; border-radius: 34px;
+    font: 700 72px "JetBrains Mono", monospace; padding: 26px 40px; white-space: nowrap; }
+  .end .s3 { position: absolute; top: 1170px; width: 100%; font: 500 44px "JetBrains Mono", monospace; color: #e8e0f4; }
+</style></head>
+<body>
+  <div class="pill">PLAY-IMPOSTER.LOL</div>
+  <h1>One of these<br><span>is AI.</span></h1>
+  <div class="grid" id="grid"></div>
+  <div class="scan" id="scan"></div>
+  <div class="ask" id="ask">Can you spot it?</div>
+  <div class="count" id="count">3</div>
+  <div class="credits" id="credits"></div>
+  <div class="end" id="end">
+    <div class="big">IMPOSTER</div>
+    <div class="s1">Spot the AI photo.</div>
+    <div class="s2">A new case every day.</div>
+    <div class="btn">play-imposter.lol</div>
+    <div class="s3">Free. No sign up.</div>
+  </div>
+<script>
+// Timeline (seconds). Puzzle holds, countdown 3-2-1, scan, reveal, end card.
+const T = { countFrom: 0.5, scan0: 2.6, scan1: 3.2, reveal: 3.3, end0: 4.7, end1: 5.2, total: 7.0 };
+const clamp = x => Math.max(0, Math.min(1, x));
+const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+window.setup = cfg => {
+  // cfg: {cards: [{id, src, ai}], credits: "..."}
+  document.getElementById("grid").innerHTML = cfg.cards.map(c => `
+    <div class="tile ${c.ai ? "ai" : ""}"><img src="${c.src}"><div class="letter">${c.id}</div>
+    <div class="tag ${c.ai ? "fake" : "real"}">${c.ai ? "AI FAKE" : "REAL"}</div></div>`).join("");
+  document.getElementById("credits").textContent = cfg.credits;
+  return Promise.all([document.fonts.ready, ...[...document.images].map(i => i.decode())]);
+};
+window.render = t => {
+  const scan = document.getElementById("scan");
+  const sp = (t - T.scan0) / (T.scan1 - T.scan0);
+  scan.style.opacity = sp > 0 && sp < 1 ? 1 : 0;
+  scan.style.top = (492 + 944 * clamp(sp)) + "px";
+  const count = document.getElementById("count");
+  const n = 3 - Math.floor((t - T.countFrom) / ((T.scan0 - T.countFrom) / 3));
+  count.style.opacity = t >= T.countFrom && t < T.reveal ? 1 : 0;
+  count.textContent = Math.max(1, Math.min(3, n));
+  const r = (t - T.reveal) / 0.25;
+  document.querySelectorAll(".tag").forEach((el, i) => {
+    const s = ease(r - (el.classList.contains("fake") ? 0 : 0.6));
+    el.style.transform = `translateX(-50%) scale(${t >= T.reveal ? 0.6 + 0.4 * s : 0})`;
+  });
+  document.querySelectorAll(".tile.ai").forEach(el => {
+    const on = t >= T.reveal;
+    el.style.outline = on ? "6px solid #ff8a1f" : "6px solid transparent";
+    el.style.boxShadow = on ? "0 0 46px 6px rgb(255 138 31 / .75)" : "none";
+  });
+  document.querySelectorAll(".tile:not(.ai) img").forEach(el => el.style.filter = t >= T.reveal ? "brightness(.62)" : "none");
+  document.getElementById("ask").textContent = t >= T.reveal ? "Did you get it?" : "Can you spot it?";
+  document.getElementById("end").style.opacity = ease((t - T.end0) / (T.end1 - T.end0));
+};
+window.TOTAL = T.total;
+</script>
+</body></html>
