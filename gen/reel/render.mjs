@@ -19,10 +19,10 @@ const credits = "Real photos: " + round.cards.filter(c => !c.ai).map(c => `${c.c
 const FPS = 30, PORT = 9300 + Math.floor(Math.random() * 500);
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "reel-"));
 const chrome = spawn(process.env.CHROME || "chromium", ["--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${tmp}/prof`,
-  "--allow-file-access-from-files", "--hide-scrollbars", "about:blank"], { stdio: "ignore" });
+  "--allow-file-access-from-files", "--hide-scrollbars", ...(process.env.CI ? ["--no-sandbox"] : []), "about:blank"], { stdio: "ignore" });
 try {
   let tabs;
-  for (let i = 0; i < 50 && !tabs; i++) { try { tabs = await (await fetch(`http://127.0.0.1:${PORT}/json`)).json(); } catch { await new Promise(r => setTimeout(r, 200)); } }
+  for (let i = 0; i < 150 && !tabs; i++) { try { tabs = await (await fetch(`http://127.0.0.1:${PORT}/json`)).json(); } catch { await new Promise(r => setTimeout(r, 200)); } }
   const ws = new WebSocket(tabs.find(t => t.type === "page").webSocketDebuggerUrl);
   let id = 0; const pend = {};
   ws.onmessage = e => { const m = JSON.parse(e.data); if (pend[m.id]) { pend[m.id](m); delete pend[m.id]; } };
