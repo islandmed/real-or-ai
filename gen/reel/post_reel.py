@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Daily Facebook reel: one "One of these is AI" reel from a past round.
 
-Run by .github/workflows/reels.yml just after midnight Pacific. Picks a round
+Run by .github/workflows/reels.yml twice a day: just after 00:00 and 12:00 Pacific. Picks a round
 from a case everyone has already played (two or more days old), renders it
 with gen/reel/render.mjs, and publishes it as a Reel on the Imposter Page.
 social/reels_posted.json records what went out, so a day never posts twice and
@@ -9,7 +9,8 @@ a theme is not repeated until the others have had a turn.
 
   python3 gen/reel/post_reel.py --dry-run          # pick + render, post nothing
   python3 gen/reel/post_reel.py --dry-run --date 2026-11-05
-  python3 gen/reel/post_reel.py                    # post if due (00:00-05:59 Pacific)
+  python3 gen/reel/post_reel.py                    # post if due (am slot 00:00-05:59, pm slot 12:00-17:59 Pacific)
+  python3 gen/reel/post_reel.py --check            # check FB_PAGE_TOKEN, post nothing
   python3 gen/reel/post_reel.py --force            # post now, ignore the clock
 
 Needs functions/_data/cases.json (gen/build.py writes it from the state).
@@ -25,7 +26,7 @@ SEASONS = ROOT / "gen/seasons.json"
 LOG = ROOT / "social/reels_posted.json"
 PLAN = ROOT / "social/reels_plan.json"   # optional {post_date: [case_date, round]}
 PAGE_ID = os.environ.get("FB_PAGE_ID", "61595152297634")
-GRAPH = "https://graph.facebook.com/v24.0"
+GRAPH = "https://graph.facebook.com/v26.0"
 PACIFIC = ZoneInfo("America/Los_Angeles")
 EMOJI = {"mansions": "🏚️", "jackolanterns": "🎃", "blackcats": "🐈‍⬛", "cemeteries": "🪦", "costumes": "🎭",
          "foggyforest": "🌫️", "candles": "🕯️", "skulls": "💀", "witches": "🧙", "bats": "🦇", "cornmazes": "🌽",
@@ -60,11 +61,11 @@ def season_for(date, seasons):
     return next((s for s in seasons if s["start"] <= md <= s["end"]), None)
 
 
-def pick(post_date, cases, seasons, log):
-    plan = load(PLAN, {}).get(post_date.isoformat())
+def pick(post_date, cases, seasons, log, slot="am"):
+    plan = load(PLAN, {}).get(post_date.isoformat()) if slot == "am" else None
     if plan:
-        return plan[0], int(plan[1])
-    done = {(e["case"], e["round"]) for e in log}
+        return tuple(plan[:1]) + (int(plan[1]),)
+    done = {(e["case"], e["round"]) for e in log} | {(c, int(r)) for c, r in load(PLAN, {}).values()}
     last_used = {}
     for i, e in enumerate(log):
         last_used[e["theme"]] = i
@@ -124,11 +125,33 @@ def publish(video, text, token):
     start = graph("POST", f"{PAGE_ID}/video_reels", {"upload_phase": "start", "access_token": tok})
     vid = start["video_id"]
     body = Path(video).read_bytes()
-    graph("POST", "", data=body, url=start.get("upload_url") or f"https://rupload.facebook.com/video-upload/v24.0/{vid}",
+    graph("POST", "", data=body, url=start.get("upload_url") or f"https://rupload.facebook.com/video-upload/v26.0/{vid}",
           headers={"Authorization": f"OAuth {tok}", "offset": "0", "file_size": str(len(body))})
     graph("POST", f"{PAGE_ID}/video_reels", {"upload_phase": "finish", "video_id": vid, "video_state": "PUBLISHED",
                                              "description": text, "access_token": tok})
     return vid
+
+
+def check(token):
+    """Says what FB_PAGE_TOKEN is without printing it."""
+    if not token:
+        sys.exit("FB_PAGE_TOKEN is empty")
+    tok = page_token(token)
+    d = graph("GET", "debug_token", {"input_token": tok, "access_token": tok}).get("data", {})
+    page = graph("GET", PAGE_ID, {"fields": "name", "access_token": tok})
+    exp = d.get("expires_at")
+    print(f"token length {len(token)}; posting as page: {page.get('name')}")
+    print(f"type {d.get('type')}, valid {d.get('is_valid')}, expires {'never' if not exp else dt.datetime.fromtimestamp(exp, dt.timezone.utc)}")
+    print(f"scopes: {', '.join(d.get('scopes', []))}")
+
+
+def slot_of(hour):
+    return "am" if hour < 6 else "pm" if 12 <= hour < 18 else None
+
+
+def write_log(log):
+    # One entry per line so the workflow can grep a date and slot together
+    LOG.write_text("[\n" + ",\n".join(json.dumps(e) for e in log) + "\n]\n")
 
 
 def main():
@@ -137,22 +160,27 @@ def main():
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--date", help="Pacific date to post for (default: today in Pacific time)")
     ap.add_argument("--out", help="keep the rendered reel here")
+    ap.add_argument("--slot", choices=["am", "pm"])
+    ap.add_argument("--check", action="store_true")
     a = ap.parse_args()
+    token = os.environ.get("FB_PAGE_TOKEN", "").strip()
+    if a.check:
+        return check(token)
     now = dt.datetime.now(PACIFIC)
     post_date = dt.date.fromisoformat(a.date) if a.date else now.date()
+    slot = a.slot or slot_of(now.hour) or ("am" if now.hour < 12 else "pm")
     log = load(LOG, [])
-    if any(e["post_date"] == post_date.isoformat() for e in log):
-        print(f"{post_date}: already posted")
+    if any(e["post_date"] == post_date.isoformat() and e.get("slot", "am") == slot for e in log):
+        print(f"{post_date} {slot}: already posted")
         return
-    if not (a.dry_run or a.force or a.date) and now.hour >= 6:
-        print(f"{post_date}: not due (Pacific {now:%H:%M}); posts between 00:00 and 05:59")
+    if not (a.dry_run or a.force or a.date) and not slot_of(now.hour):
+        print(f"{post_date}: not due (Pacific {now:%H:%M}); posts 00:00-05:59 and 12:00-17:59")
         return
-    token = os.environ.get("FB_PAGE_TOKEN", "").strip()
     if not a.dry_run and not token:
         print("::notice::FB_PAGE_TOKEN is not set; nothing posted")
         return
     cases, seasons = load(CASES, {}), load(SEASONS, {})["seasons"]
-    choice = pick(post_date, cases, seasons, log)
+    choice = pick(post_date, cases, seasons, log, slot)
     if not choice:
         sys.exit(f"{post_date}: no eligible round")
     case_date, r = choice
@@ -163,14 +191,14 @@ def main():
         out = a.out or f"{td}/reel.mp4"
         subprocess.run(["node", str(ROOT / "gen/reel/render.mjs"), case_date, str(r), out], check=True, stdout=subprocess.DEVNULL)
         # The log is public: it names the round, never the AI card.
-        print(f"{post_date}: {name} from case {case_date} round {r + 1}")
+        print(f"{post_date} {slot}: {name} from case {case_date} round {r + 1}")
         if a.dry_run:
             print(text)
             return
         vid = publish(out, text, token)
-    log.append({"post_date": post_date.isoformat(), "case": case_date, "round": r, "theme": key, "video_id": vid})
-    LOG.write_text(json.dumps(log, indent=1) + "\n")
-    print(f"{post_date}: posted reel {vid}")
+    log.append({"post_date": post_date.isoformat(), "slot": slot, "case": case_date, "round": r, "theme": key, "video_id": vid})
+    write_log(log)
+    print(f"{post_date} {slot}: posted reel {vid}")
 
 
 if __name__ == "__main__":

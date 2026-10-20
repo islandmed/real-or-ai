@@ -1,5 +1,5 @@
-# Daily Facebook reel, just after midnight Pacific (two crons cover PDT and PST;
-# the script posts once per Pacific date, between 00:00 and 05:59). It pulls the
+# Facebook reels twice a day, just after 00:00 and 12:00 Pacific (two crons per
+# slot cover PDT and PST; the script posts once per slot per Pacific date). It pulls the
 # encrypted state, builds the cases, renders a reel from a round everyone has
 # already played and publishes it to the Imposter Page. No LLM involved.
 # Logs are public: nothing here prints which card is AI.
@@ -12,12 +12,15 @@ on:
   schedule:
     - cron: "3 7 * * *"
     - cron: "3 8 * * *"
+    - cron: "3 19 * * *"
+    - cron: "3 20 * * *"
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: "Render only, post nothing"
-        type: boolean
-        default: true
+      mode:
+        description: "check = test the token; dry_run = render only; post = post now"
+        type: choice
+        options: [check, dry_run, post]
+        default: check
 
 permissions:
   contents: write   # commits social/reels_posted.json
@@ -38,12 +41,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Already posted today?
+      - name: Due?
         id: due
         run: |
-          d=$(TZ=America/Los_Angeles date +%F)
-          if grep -q "\"post_date\": \"$d\"" social/reels_posted.json 2>/dev/null; then
-            echo "$d already posted"; echo "go=false" >> "$GITHUB_OUTPUT"
+          d=$(TZ=America/Los_Angeles date +%F); h=$(TZ=America/Los_Angeles date +%-H)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ "$h" -lt 6 ]; then slot=am; elif [ "$h" -ge 12 ] && [ "$h" -lt 18 ]; then slot=pm; else
+            echo "not a posting hour ($h:00 Pacific)"; echo "go=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if grep "\"post_date\": \"$d\"" social/reels_posted.json 2>/dev/null | grep -q "\"slot\": \"$slot\""; then
+            echo "$d $slot already posted"; echo "go=false" >> "$GITHUB_OUTPUT"
           else
             echo "go=true" >> "$GITHUB_OUTPUT"
           fi
@@ -73,9 +79,11 @@ jobs:
       - name: Render and post
         if: steps.due.outputs.go == 'true'
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+          if [ "${{ inputs.mode }}" = "check" ]; then
+            python3 gen/reel/post_reel.py --check
+          elif [ "${{ inputs.mode }}" = "dry_run" ]; then
             python3 gen/reel/post_reel.py --dry-run
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          elif [ "${{ inputs.mode }}" = "post" ]; then
             python3 gen/reel/post_reel.py --force
           else
             python3 gen/reel/post_reel.py
