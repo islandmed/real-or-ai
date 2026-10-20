@@ -111,23 +111,31 @@ def graph(method, path, params=None, data=None, headers=None, url=None):
         sys.exit(f"Graph {method} {path or 'upload'} failed: {e.code} {e.read().decode()[:500]}")
 
 
-def page_token(token):
-    """A Page token from a system user token; a Page token passes through."""
+def pages(token):
+    """Pages this token can manage: [{id, name, access_token}]. Empty for a Page token."""
     try:
-        r = graph("GET", PAGE_ID, {"fields": "access_token", "access_token": token})
-        return r.get("access_token") or token
+        return graph("GET", "me/accounts", {"fields": "id,name,access_token", "access_token": token}).get("data", [])
     except SystemExit:
-        return token
+        return []
+
+
+def page_token(token):
+    """(page id, Page token). A user/system user token is swapped for the Imposter Page's
+    token, matched by FB_PAGE_ID or by name; a Page token passes through."""
+    for p in pages(token):
+        if p["id"] == PAGE_ID or "imposter" in p["name"].lower():
+            return p["id"], p["access_token"]
+    return PAGE_ID, token
 
 
 def publish(video, text, token):
-    tok = page_token(token)
-    start = graph("POST", f"{PAGE_ID}/video_reels", {"upload_phase": "start", "access_token": tok})
+    page_id, tok = page_token(token)
+    start = graph("POST", f"{page_id}/video_reels", {"upload_phase": "start", "access_token": tok})
     vid = start["video_id"]
     body = Path(video).read_bytes()
     graph("POST", "", data=body, url=start.get("upload_url") or f"https://rupload.facebook.com/video-upload/v26.0/{vid}",
           headers={"Authorization": f"OAuth {tok}", "offset": "0", "file_size": str(len(body))})
-    graph("POST", f"{PAGE_ID}/video_reels", {"upload_phase": "finish", "video_id": vid, "video_state": "PUBLISHED",
+    graph("POST", f"{page_id}/video_reels", {"upload_phase": "finish", "video_id": vid, "video_state": "PUBLISHED",
                                              "description": text, "access_token": tok})
     return vid
 
@@ -136,11 +144,13 @@ def check(token):
     """Says what FB_PAGE_TOKEN is without printing it."""
     if not token:
         sys.exit("FB_PAGE_TOKEN is empty")
-    tok = page_token(token)
+    listed = pages(token)
+    print(f"token length {len(token)}; pages it manages: {', '.join(f'{p['name']} ({p['id']})' for p in listed) or 'none listed'}")
+    page_id, tok = page_token(token)
     d = graph("GET", "debug_token", {"input_token": tok, "access_token": tok}).get("data", {})
-    page = graph("GET", PAGE_ID, {"fields": "name", "access_token": tok})
+    page = graph("GET", page_id, {"fields": "name", "access_token": tok})
     exp = d.get("expires_at")
-    print(f"token length {len(token)}; posting as page: {page.get('name')}")
+    print(f"posting as page: {page.get('name')} ({page_id})")
     print(f"type {d.get('type')}, valid {d.get('is_valid')}, expires {'never' if not exp else dt.datetime.fromtimestamp(exp, dt.timezone.utc)}")
     print(f"scopes: {', '.join(d.get('scopes', []))}")
 
