@@ -378,30 +378,36 @@
   }
 
   /* Status Overlays on flip */
+  /* Reveal: a compact strip along the bottom, so the photo itself stays visible */
   .card-status-badge {
     position: absolute;
-    inset: 0;
-    background: hsl(var(--h) calc(var(--sk) * 29%) 5.5% / 0.95);
-    border: 2px solid var(--border);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: hsl(var(--h) calc(var(--sk) * 29%) 5.5% / 0.86);
+    border-top: 2px solid var(--border);
     display: none;
-    flex-direction: column;
+    grid-template-columns: auto 1fr;
+    column-gap: 6px;
     align-items: center;
-    justify-content: center;
-    padding: 10px;
-    text-align: center;
+    padding: 5px 7px;
+    text-align: left;
     z-index: 3;
     animation: fadeIn 0.1s;
   }
   .imposter-card.eliminated .card-status-badge,
   .imposter-card.caught .card-status-badge {
-    display: flex;
+    display: grid;
   }
-  .badge-icon { font-size: 22px; margin-bottom: 4px; }
+  .imposter-card.eliminated .card-status-badge { border-top-color: var(--neon-green); }
+  .imposter-card.caught .card-status-badge { border-top-color: var(--neon-pink); }
+  .imposter-card.round-over { cursor: zoom-in; }
+  .badge-icon { font-size: 16px; grid-row: span 2; line-height: 1; }
   .badge-title {
     font-family: var(--retro-font);
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 0.05em;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
   }
   .imposter-card.eliminated .badge-title { color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
   .imposter-card.caught .badge-title { color: var(--neon-pink); text-shadow: 0 0 5px var(--neon-pink); }
@@ -409,9 +415,7 @@
     font-size: 9px;
     font-family: var(--mono-font);
     color: var(--fg);
-    line-height: 1.35;
-    max-height: 70px;
-    overflow-y: auto;
+    line-height: 1.3;
   }
 
   .imposter-card.checking { opacity: 0.75; }
@@ -680,6 +684,13 @@
     border-radius: 6px;
     font-size: 12px;
   }
+  .rb-row.has-pics { flex-direction: column; align-items: stretch; gap: 8px; }
+  .rb-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .rb-pics { display: flex; gap: 8px; }
+  .rb-pic { flex: 0 1 calc(50% - 4px); min-width: 0; padding: 0; margin: 0; background: none; border: 0; cursor: zoom-in; text-align: left; font: inherit; color: inherit; }
+  .rb-pic img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 6px; border: 2px solid var(--neon-pink); background: hsl(calc(var(--h) + 2) calc(var(--sk) * 37%) 12.4%); }
+  .rb-pic.real img { border-color: var(--neon-green); }
+  .rb-pic span { display: block; margin-top: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--fg); }
   .rb-name { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; }
   .rb-res { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 11px; letter-spacing: 0.02em; }
   .rb-res.pass-flawless { color: #39ff14; text-shadow: 0 0 6px rgba(57, 255, 20, 0.4); }
@@ -2000,6 +2011,7 @@
     background: rgba(255, 222, 89, 0.12);
     border-color: rgba(255, 222, 89, 0.35);
   }
+  .card-status-badge .badge-deception { background: none; border: 0; padding: 0; margin-top: 0; border-radius: 0; font-size: 9px; }
 
   .modal-close-x {
     position: absolute;
@@ -2987,6 +2999,7 @@ function showCountdownReadyState() {
   }
   caseStartTime = null;
   elapsedSeconds = 0;
+  revealHoldAt = null;
   isCountingDown = false;
 
   const overlay = $("countdownOverlay");
@@ -3124,7 +3137,7 @@ function startSpeedTimer() {
   updateLiveTimerUI(0);
   timerInterval = setInterval(() => {
     if (!caseStartTime) return;
-    const now = Date.now();
+    const now = revealHoldAt ? Math.min(Date.now(), revealHoldAt) : Date.now();
     elapsedSeconds = (now - caseStartTime) / 1000;
     updateLiveTimerUI(elapsedSeconds);
   }, 100);
@@ -3721,13 +3734,38 @@ function renderRoundBreakdown() {
     if (r.solved && r.attempts === 1) tag = `<span class="rb-res pass-flawless">🎯 Aced (1st Guess)</span>`;
     else if (r.solved && r.attempts === 2) tag = `<span class="rb-res pass-great">⚡ Caught (2nd Guess)</span>`;
     else if (r.solved) tag = `<span class="rb-res pass-close">🔍 Caught (3rd Guess)</span>`;
+    const pics = reviewPics(r);
     return `
-      <div class="rb-row">
-        <span class="rb-name">R${r.roundIndex} · ${r.theme}</span>
-        ${tag}
+      <div class="rb-row${pics ? " has-pics" : ""}">
+        <div class="rb-head">
+          <span class="rb-name">R${r.roundIndex} · ${escapeHtml(r.theme)}</span>
+          ${tag}
+        </div>
+        ${pics}
       </div>
     `;
   }).join("");
+}
+
+// The fake (and, on a miss, the real photo picked) for a finished round; empty when unknown
+function reviewCard(roundIndex, cardId) {
+  const round = dailyCaseData?.rounds?.[roundIndex - 1];
+  const card = round && cardId ? (round.cards || []).find(c => c.id === cardId) : null;
+  return card && card.image ? card : null;
+}
+function reviewPics(r) {
+  const ai = reviewCard(r.roundIndex, r.aiId);
+  const picked = !r.solved ? reviewCard(r.roundIndex, r.pickedId) : null;
+  if (!ai && !picked) return "";
+  const pic = (card, real, label) => `<button type="button" class="rb-pic${real ? " real" : ""}" onclick="openReviewPhoto(${r.roundIndex}, '${card.id}')"><img src="${escapeHtml(card.image)}" alt="${escapeHtml(label)}" loading="lazy"><span>${label}</span></button>`;
+  return `<div class="rb-pics">${ai ? pic(ai, false, `🤖 AI fake (${ai.id})`) : ""}${picked ? pic(picked, true, `🏛️ Your pick (${picked.id}, real)`) : ""}</div>`;
+}
+function openReviewPhoto(roundIndex, cardId) {
+  const r = roundResults.find(x => x.roundIndex === roundIndex);
+  const card = reviewCard(roundIndex, cardId);
+  if (!r || !card) return;
+  const what = cardId === r.aiId ? "AI fake" : "Real photo (your pick)";
+  showLightboxImage(card.image, `R${roundIndex} · ${cardId} · ${what} (tap to zoom)`);
 }
 
 function showAlreadyCompletedToday(record) {
@@ -4281,12 +4319,13 @@ function markImposter(cardId, caughtByPlayer, picks) {
   el.classList.add("caught");
   $(`badgeIcon_${cardId}`).textContent = "🤖";
   $(`badgeTitle_${cardId}`).textContent = caughtByPlayer ? "AI IMPOSTER CAUGHT" : "AI IMPOSTER";
-  $(`badgeDesc_${cardId}`).innerHTML = `<div class="badge-deception">👥 ${deceptionRate(cardId, true, picks)}% of detectives caught this AI fake</div><div style="margin-top:4px;">Generated by AI (FLUX.1 schnell).</div>`;
+  $(`badgeDesc_${cardId}`).innerHTML = `<div class="badge-deception">👥 ${deceptionRate(cardId, true, picks)}% caught it · 🔍 tap to zoom</div>`;
 }
 
 async function selectCard(id) {
   if (warmup) return warmupGuess(id);
-  if (isCurrentRoundOver || prerollShowing || guessInFlight) return;
+  if (isCurrentRoundOver) return inspectRevealed(id);
+  if (prerollShowing || guessInFlight) return;
   if (prerollNeeded() && !caseStartTime) { dismissCountdown(); return; }
 
   // If user clicks a card while countdown is running, dismiss countdown instantly and start timer!
@@ -4331,7 +4370,7 @@ async function selectCard(id) {
       solvedPip.textContent = "🎯";
     }
 
-    roundResults.push({ roundIndex: roundIdx + 1, theme, solved: true, attempts: attemptsUsedThisRound });
+    roundResults.push({ roundIndex: roundIdx + 1, theme, solved: true, attempts: attemptsUsedThisRound, aiId: id, pickedId: id });
     finishRoundUI(true);
   } else {
     // Wrong guess: one guess per round, so the round is lost and the fake revealed
@@ -4342,33 +4381,65 @@ async function selectCard(id) {
     if (result.credit) roundCredits[id] = result.credit;
     $(`badgeIcon_${id}`).textContent = "🏛️";
     $(`badgeTitle_${id}`).textContent = "100% REAL";
-    $(`badgeDesc_${id}`).innerHTML = `<div class="badge-deception">👥 ${deceptionRate(id, false, result.picks)}% of detectives were tricked by this photo</div><div style="margin-top:4px;">A real photograph.</div>`;
+    $(`badgeDesc_${id}`).innerHTML = `<div class="badge-deception">👥 ${deceptionRate(id, false, result.picks)}% fell for this real one</div>`;
     const lostPip = $("dot1");
     if (lostPip) { lostPip.className = "heart-pip lost"; lostPip.textContent = "💔"; }
     if (result.ai) markImposter(result.ai, false, result.picks);
     renderRoundCredits();
-    roundResults.push({ roundIndex: roundIdx + 1, theme, solved: false, attempts: 1 });
+    roundResults.push({ roundIndex: roundIdx + 1, theme, solved: false, attempts: 1, aiId: result.ai || null, pickedId: id });
     finishRoundUI(false);
   }
 }
 
+const REVEAL_MS = 2600;
+let revealHoldAt = null; // the clock stops here while the player studies a reveal past REVEAL_MS
+
 function finishRoundUI(didWin) {
   const btnNext = $("btnNextRound");
   btnNext.classList.add("show");
+  document.querySelectorAll("#gridWrap .imposter-card").forEach(c => c.classList.add("round-over"));
 
-  const totalRounds = dailyCaseData.rounds.length;
-  if (currentRoundIndex < totalRounds - 1) {
-    btnNext.textContent = didWin ? `Spotted it! · Next (or tap) →` : `Fooled! · Next (or tap) →`;
-  } else {
-    btnNext.textContent = `Case Complete! Opening Scorecard...`;
-  }
-
-  // Smooth auto-advance with comfortable observation time
+  const isLast = currentRoundIndex >= dailyCaseData.rounds.length - 1;
   if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
+  autoAdvanceTimeout = null;
   dayCredits.push({ round: currentRoundIndex + 1, credits: { ...roundCredits } });
-  autoAdvanceTimeout = setTimeout(() => {
-    advanceToNextStage();
-  }, 2600);
+  // Scoring stays as before: the first REVEAL_MS of a reveal counts, any longer look is free
+  revealHoldAt = Date.now() + REVEAL_MS;
+
+  if (didWin) {
+    btnNext.textContent = isLast ? `Case Complete! Opening Scorecard...` : `Spotted it! · Next →`;
+    autoAdvanceTimeout = setTimeout(() => {
+      advanceToNextStage();
+    }, REVEAL_MS);
+  } else {
+    // A miss never whisks the fake away: the player moves on when ready
+    btnNext.textContent = isLast ? `Fooled! · See your scorecard →` : `Fooled! · Study the fake, then Next →`;
+  }
+}
+
+// After a round, a tap on any photo opens it full size (the answers are already shown)
+function inspectRevealed(cardId) {
+  if (warmup) return;
+  const r = roundResults[roundResults.length - 1];
+  const round = dailyCaseData.rounds[currentRoundIndex];
+  const card = round && round.cards.find(c => c.id === cardId);
+  if (!card || !r || r.roundIndex !== currentRoundIndex + 1) return;
+  if (autoAdvanceTimeout) {
+    clearTimeout(autoAdvanceTimeout);
+    autoAdvanceTimeout = null;
+    const btn = $("btnNextRound");
+    btn.textContent = currentRoundIndex >= dailyCaseData.rounds.length - 1 ? "See your scorecard →" : "Next Round →";
+  }
+  const what = cardId === r.aiId ? "AI fake" : "Real photo";
+  showLightboxImage(card.image, `Card ${cardId} · ${what} (tap to zoom)`);
+}
+
+function releaseRevealHold() {
+  if (revealHoldAt && caseStartTime) {
+    const extra = Date.now() - revealHoldAt;
+    if (extra > 0) caseStartTime += extra;
+  }
+  revealHoldAt = null;
 }
 
 function advanceToNextStage() {
@@ -4377,6 +4448,9 @@ function advanceToNextStage() {
     clearTimeout(autoAdvanceTimeout);
     autoAdvanceTimeout = null;
   }
+  if (!isCurrentRoundOver) return;
+  $("lightboxModal").classList.remove("open");
+  releaseRevealHold();
   const totalRounds = dailyCaseData.rounds.length;
   if (currentRoundIndex < totalRounds - 1) {
     loadRound(currentRoundIndex + 1);
@@ -4473,7 +4547,7 @@ function showFinalResults() {
     const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
     const prior = records[todayStr];
     // First result stands: a finished day is never overwritten
-    if (!(prior && prior.solved && prior.caseNumber === dailyCaseData.caseNumber)) records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, speedBonus, stars, title, rounds: roundResults.map(r => ({ roundIndex: r.roundIndex, theme: r.theme, solved: r.solved, attempts: r.attempts })), date: new Date().toISOString() };
+    if (!(prior && prior.solved && prior.caseNumber === dailyCaseData.caseNumber)) records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, speedBonus, stars, title, rounds: roundResults.map(r => ({ roundIndex: r.roundIndex, theme: r.theme, solved: r.solved, attempts: r.attempts, aiId: r.aiId, pickedId: r.pickedId })), date: new Date().toISOString() };
     localStorage.setItem("imposter_daily_records", JSON.stringify(records));
     checkDailyStatus();
   } catch (_) {}
@@ -4508,11 +4582,14 @@ function showFinalResults() {
 // Lightbox full inspection
 function openLightbox(e, cardId) {
   e.stopPropagation();
-  playSound("tap");
   const round = dailyCaseData.rounds[currentRoundIndex];
   const card = round.cards.find(c => c.id === cardId);
-  $("lightboxLabel").textContent = `Card ${cardId} (Tap to Zoom)`;
-  $("lightboxImg").src = card.image;
+  showLightboxImage(card.image, `Card ${cardId} (Tap to Zoom)`);
+}
+function showLightboxImage(src, label) {
+  playSound("tap");
+  $("lightboxLabel").textContent = label;
+  $("lightboxImg").src = src;
   $("lightboxStage").classList.remove("zoomed");
   $("lightboxModal").classList.add("open");
 }
