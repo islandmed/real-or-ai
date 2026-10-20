@@ -52,6 +52,9 @@ try {
   // Never print the AI card: Action logs are public.
   console.log(`${out}: ${round.shortName}`);
 } finally {
+  // Let Chrome exit before removing its profile; cleanup never fails the render
+  const exited = new Promise(r => chrome.once("exit", r));
   chrome.kill();
-  fs.rmSync(tmp, { recursive: true, force: true });
+  await Promise.race([exited, new Promise(r => setTimeout(r, 5000))]);
+  try { fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch {}
 }
