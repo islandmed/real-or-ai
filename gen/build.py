@@ -38,17 +38,24 @@ PUBLIC = ["index.html", "sw.js", "manifest.json", "favicon.svg", "og-image.png",
           "assets/promo/cats/a.webp", "assets/promo/cats/b.webp", "assets/promo/cats/c.webp", "assets/promo/cats/d.webp"]
 
 
-def shrink_card(src, dst):
+def shrink_round(pairs):
     """Cards show at ~170px on a phone, so 960px at q80 is mostly wasted bytes on
     the first screen. Re-encode at 720px, q70 (about a third of the size); every
-    card gets the same treatment, real or AI."""
-    if dst.exists() and dst.stat().st_mtime >= src.stat().st_mtime:
-        return
+    card gets the same treatment, real or AI, and the round's four files are
+    padded to one byte size so the download size never hints at the AI one."""
+    import io
     from PIL import Image
-    im = Image.open(src)
-    if im.width > 720:
-        im = im.resize((720, round(im.height * 720 / im.width)), Image.LANCZOS)
-    im.save(dst, "WEBP", quality=70, method=6)
+    out = []
+    for src, dst in pairs:
+        im = Image.open(src)
+        if im.width > 720:
+            im = im.resize((720, round(im.height * 720 / im.width)), Image.LANCZOS)
+        buf = io.BytesIO()
+        im.save(buf, "WEBP", quality=70, method=6)
+        out.append((dst, buf.getvalue(), im.size))
+    target = g.padded_size([len(d) for _, d, _ in out])
+    for dst, data, (w, h) in out:
+        dst.write_bytes(g.pad_webp(data, target, w, h))
 
 
 def main():
@@ -86,8 +93,8 @@ def main():
         for i, rnd in enumerate(day["rounds"]):
             t = tk[rnd["theme"]]
             cards = []
+            shrink_round([(g.IMG / c["file"], DIST / "img" / c["file"]) for c in rnd["cards"]])
             for c in rnd["cards"]:
-                shrink_card(g.IMG / c["file"], DIST / "img" / c["file"])
                 n_img += 1
                 card = {"id": c["id"], "image": f"img/{c['file']}", "ai": c["ai"]}
                 if not c["ai"]:

@@ -450,14 +450,14 @@ def match_one(im, others):
     return fit_detail(im, lo + secrets.SystemRandom().random() * (hi - lo))
 
 
-def pad_webp(data, target):
+def pad_webp(data, target, w=W, h=H):
     """Rewrap as extended WebP (VP8X) and append an ignorable chunk so every
     card in a round has the exact same byte size. Byte size would otherwise
     hint which image is the smoother AI one."""
     assert data[:4] == b"RIFF" and data[8:12] == b"WEBP"
     chunks = data[12:]
     if chunks[:4] != b"VP8X":
-        vp8x = b"VP8X" + struct.pack("<I", 10) + bytes(4) + (W - 1).to_bytes(3, "little") + (H - 1).to_bytes(3, "little")
+        vp8x = b"VP8X" + struct.pack("<I", 10) + bytes(4) + (w - 1).to_bytes(3, "little") + (h - 1).to_bytes(3, "little")
         chunks = vp8x + chunks
     body = b"WEBP" + chunks
     need = target - 8 - len(body)
