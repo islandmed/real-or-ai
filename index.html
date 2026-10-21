@@ -476,7 +476,7 @@
     inset: 0;
     background: hsl(calc(var(--h) + 15) calc(var(--sk) * 18%) 6.7% / 0.96);
     backdrop-filter: blur(10px);
-    z-index: 999;
+    z-index: 10010; /* above the rounds review and dossier overlays */
     display: none;
     flex-direction: column;
     padding: 12px;
@@ -726,6 +726,12 @@
     text-decoration: none; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 13px; color: #fff;
     background: hsl(calc(var(--h) + 2) calc(var(--sk) * 33%) 16.5%); border: 2px solid var(--accent2); }
   .btn-past:active { transform: scale(0.98); }
+  .btn-see-rounds { display: block; width: 100%; margin: 10px 0 4px; padding: 11px 10px; border-radius: 8px; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 13px; color: #fff;
+    background: hsl(calc(var(--h) + 2) calc(var(--sk) * 33%) 16.5%); border: 2px solid var(--accent2); }
+  .btn-see-rounds:active { transform: scale(0.98); }
+  .rounds-card { padding: 20px 16px; }
+  .rounds-card-title { margin: 0 0 12px; font-family: 'JetBrains Mono', monospace; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; }
   .past-list { list-style: none; margin: 10px 0 0; padding: 0; }
   .past-list a { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; padding: 8px;
     border-radius: 6px; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #fff; }
@@ -2463,6 +2469,7 @@
       <span class="summary-score-badge" id="summaryScoreBadge">6 / 6 CLEARED</span>
       <div class="challenge-result" id="challengeResult" hidden></div>
       <div class="result-grid" id="resultGrid"></div>
+      <button class="btn-see-rounds" id="btnSeeRounds" type="button" onclick="openRoundsModal()">🔍 See rounds · review the AI fakes</button>
       <div class="career-stats">
         <div><b id="cPlayed">0</b><span>Played</span></div>
         <div><b id="cWinPct">0</b><span>Win %</span></div>
@@ -2498,14 +2505,6 @@
           <ol class="past-list" id="pastList"></ol>
         </details>
       </div>
-      <details class="rounds-fold">
-        <summary>See rounds</summary>
-        <div class="round-breakdown" id="roundBreakdown"></div>
-        <details class="photo-credits" id="photoCredits" hidden>
-          <summary>Photo credits</summary>
-          <div id="photoCreditsList"></div>
-        </details>
-      </details>
     </div>
     <div class="results-links">
       Follow: <a href="https://www.facebook.com/profile.php?id=61595152297634" target="_blank" rel="noopener">Facebook</a> · <a href="https://x.com/PlayImposterAI" target="_blank" rel="noopener">X</a><button class="link-btn" id="installBtn" type="button" onclick="installApp()" hidden>Install app</button>
@@ -2786,6 +2785,19 @@
 </div>
 
 <!-- Detective Career Dossier Modal -->
+<!-- Round review: opened from "See rounds" under the result grid -->
+<div class="dossier-modal" id="roundsModal" onclick="if (event.target === this) closeRoundsModal()">
+  <div class="dossier-card rounds-card">
+    <div class="modal-close-x" onclick="closeRoundsModal()">✕</div>
+    <h3 class="rounds-card-title">Your rounds</h3>
+    <div class="round-breakdown" id="roundBreakdown"></div>
+    <details class="photo-credits" id="photoCredits" hidden>
+      <summary>Photo credits</summary>
+      <div id="photoCreditsList"></div>
+    </details>
+  </div>
+</div>
+
 <div class="dossier-modal" id="dossierModal">
   <div class="dossier-card">
     <div class="modal-close-x" onclick="closeDossierModal()">✕</div>
@@ -3609,6 +3621,14 @@ function openDossierModal() {
 
 function closeDossierModal() {
   $("dossierModal").classList.remove("open");
+}
+
+function openRoundsModal() {
+  playSound("tap");
+  $("roundsModal").classList.add("open");
+}
+function closeRoundsModal() {
+  $("roundsModal").classList.remove("open");
 }
 
 function renderDossier() {
