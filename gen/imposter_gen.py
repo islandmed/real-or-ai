@@ -34,6 +34,7 @@ import hashlib
 import html
 import io
 import json
+import math
 import os
 import random
 import re
@@ -46,7 +47,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-from PIL import Image, ImageCms, ImageDraw, ImageOps, ImageStat
+from PIL import Image, ImageChops, ImageCms, ImageDraw, ImageFilter, ImageOps, ImageStat
 
 ROOT = Path(__file__).resolve().parent.parent
 PRIV = ROOT / "private"
@@ -325,15 +326,128 @@ def crop_43(im):
     return im.resize((W, H), Image.LANCZOS)
 
 
-def encode_card(im):
-    """One pipeline for every card: crop 4:3, 1024x768, fresh pixels (no
+def encode_card(im, cropped=False):
+    """One pipeline for every card: crop 4:3, 960x720, fresh pixels (no
     EXIF/ICC/XMP), one WebP quality."""
-    im = crop_43(im)
+    if not cropped:
+        im = crop_43(im)
     fresh = Image.new("RGB", (W, H))
     fresh.paste(im)
     buf = io.BytesIO()
     fresh.save(buf, "WEBP", quality=QUALITY, method=6)
     return buf.getvalue()
+
+
+# ---------------------------------------------------------------- detail matching
+# Real photos come from 1600 px Commons thumbnails (crisp after the downscale,
+# with sensor grain); FLUX gives a smooth, grain-free 1024 px image. Left alone
+# the AI card was the softest of the four in ~61% of rounds (gen/sharpness_audit.py).
+# So every card of a round, real or AI, goes through the same steps:
+#   1. the same light luminance grain (GRAIN_SIGMA);
+#   2. a detail gain s on the band above a Gaussian of DETAIL_RADIUS:
+#      s < 0 blends toward the blur (softer), s > 0 is an unsharp mask. A gain
+#      scales fine and pixel-level detail together, so a softened photo keeps
+#      the same fine/coarse balance a plain Gaussian blur would wreck;
+#   3. s is searched so the card's detail, measured on the copy players get
+#      (build.shrink_card: WebP, 720 px, WebP), lands on its slot in a narrow
+#      band. The AI card's slot (softest .. sharpest) comes from a shuffled
+#      bag of 0-3 drawn with the system RNG, the real photos keep their natural
+#      order in the other slots. Sharpness then says nothing about which card
+#      is the imposter. Nothing here depends on the date or the code alone.
+GRAIN_SIGMA = 5.0       # effect_noise sigma, same for all four cards
+DETAIL_RADIUS = 2.0     # px at 960 wide
+DETAIL_BAND = 0.12      # log spacing between neighbouring slots (~13%)
+DETAIL_PULL = 0.1       # band centre: from the AI's detail this far toward the reals' median
+DETAIL_SOFT_MAX = 0.85  # most a card is blended toward its blur
+DETAIL_SHARP_MAX = 0.8  # strongest unsharp mask (80%)
+_SLOT_BAG = []
+
+
+def add_grain(im, sigma=GRAIN_SIGMA):
+    if sigma <= 0:
+        return im
+    n = Image.effect_noise(im.size, sigma)
+    return ImageChops.add(im, Image.merge("RGB", (n, n, n)), 1.0, -128)
+
+
+def detail_gain(im, s):
+    if s < 0:
+        return Image.blend(im, im.filter(ImageFilter.GaussianBlur(DETAIL_RADIUS)), min(-s, 1.0))
+    if s > 0:
+        return im.filter(ImageFilter.UnsharpMask(radius=DETAIL_RADIUS, percent=round(s * 100), threshold=0))
+    return im
+
+
+_LAP = ImageFilter.Kernel((3, 3), [0, 1, 0, 1, -4, 1, 0, 1, 0], scale=1, offset=128)
+
+
+def served_detail(im):
+    """log detail of the copy players get: geometric mean of the FIND_EDGES
+    and Laplacian variances after WebP -> 720 px -> WebP."""
+    buf = io.BytesIO()
+    im.save(buf, "WEBP", quality=QUALITY, method=4)
+    x = Image.open(io.BytesIO(buf.getvalue())).resize((720, 540), Image.LANCZOS)
+    buf = io.BytesIO()
+    x.save(buf, "WEBP", quality=70, method=4)
+    g = Image.open(io.BytesIO(buf.getvalue())).convert("L")
+    e = ImageStat.Stat(g.filter(ImageFilter.FIND_EDGES)).var[0]
+    lap = ImageStat.Stat(g.filter(_LAP)).var[0]
+    return 0.5 * (math.log(max(e, 1e-3)) + math.log(max(lap, 1e-3)))
+
+
+def fit_detail(im, target, have=None):
+    """The card with its detail gain searched (bisection) to hit target."""
+    have = served_detail(im) if have is None else have
+    if abs(have - target) < 0.02:
+        return im
+    sign, hi = (-1, DETAIL_SOFT_MAX) if target < have else (1, DETAIL_SHARP_MAX)
+    lo, out = 0.0, im
+    for _ in range(9):
+        mid = (lo + hi) / 2
+        out = detail_gain(im, sign * mid)
+        if (served_detail(out) > target) == (sign > 0):
+            hi = mid
+        else:
+            lo = mid
+    return out
+
+
+def next_slot():
+    if not _SLOT_BAG:
+        _SLOT_BAG.extend(range(4))
+        secrets.SystemRandom().shuffle(_SLOT_BAG)
+    return _SLOT_BAG.pop()
+
+
+def match_detail(ims, ai_idx, slot=None):
+    """ims: the round's 4 cards, already crop_43'd, in card order. Returns
+    them grained and detail matched (see above). slot (0-3, the AI's place
+    from softest) defaults to the next one from the bag."""
+    ims = [add_grain(im) for im in ims]
+    have = [served_detail(im) for im in ims]
+    reals = sorted(have[i] for i in range(4) if i != ai_idx)
+    c = have[ai_idx] + DETAIL_PULL * (reals[1] - have[ai_idx])
+    # Keep the band where every card can reach every slot.
+    lows = [served_detail(detail_gain(im, -DETAIL_SOFT_MAX)) for im in ims]
+    highs = [served_detail(detail_gain(im, DETAIL_SHARP_MAX * 0.75)) for im in ims]
+    cmin, cmax = max(lows) + 1.5 * DETAIL_BAND, min(highs) - 1.5 * DETAIL_BAND
+    c = max(cmin, min(cmax, c)) if cmin <= cmax else (cmin + cmax) / 2
+    slots = [c + DETAIL_BAND * x for x in (-1.5, -0.5, 0.5, 1.5)]
+    ai_slot = slots.pop(next_slot() if slot is None else slot)
+    target = {ai_idx: ai_slot}
+    for i, t in zip(sorted((i for i in range(4) if i != ai_idx), key=lambda i: have[i]), slots):
+        target[i] = t
+    return [fit_detail(im, target[i], have[i]) for i, im in enumerate(ims)]
+
+
+def match_one(im, others):
+    """One new card (crop_43'd) for a round whose other cards are already
+    matched (encoded images): grain, then a detail at a random point of the
+    span the others cover, widened by one slot each side."""
+    im = add_grain(im)
+    vals = [served_detail(o) for o in others]
+    lo, hi = min(vals) - DETAIL_BAND, max(vals) + DETAIL_BAND
+    return fit_detail(im, lo + secrets.SystemRandom().random() * (hi - lo))
 
 
 def pad_webp(data, target):
@@ -697,7 +811,8 @@ def build_round(date, slot, theme, state, secret, rng, keep_reals=None, keep_ai=
             return None
     srcs = [{"real": c, "im": im} for c, im in reals] + [{"ai": True, "im": open_image(ai_path.read_bytes())}]
     rng.shuffle(srcs)
-    encoded = [encode_card(s["im"]) for s in srcs]
+    matched = match_detail([crop_43(s["im"]) for s in srcs], next(i for i, s in enumerate(srcs) if s.get("ai")))
+    encoded = [encode_card(m, cropped=True) for m in matched]
     target = padded_size([len(e) for e in encoded])
     cards = []
     IMG.mkdir(parents=True, exist_ok=True)
@@ -930,7 +1045,8 @@ def decide(state, pool_key, bad):
 
 def place_card(rnd, card, im, meta):
     target = (IMG / card["file"]).stat().st_size
-    data = pad_webp(encode_card(im), target)
+    others = [Image.open(IMG / c["file"]).convert("RGB") for c in rnd["cards"] if c is not card]
+    data = pad_webp(encode_card(match_one(crop_43(im), others), cropped=True), target)
     if len(data) != target:
         return False
     name = secrets.token_hex(10) + ".webp"
