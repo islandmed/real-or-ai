@@ -1,5 +1,7 @@
-// Renders a 9:16 "One of these is AI" reel for one past round.
+// Renders a 9:16 "One of these is AI" reel for one past round, or with a .png
+// out a 4:5 still of the puzzle (no reveal) for a photo post.
 //   node gen/reel/render.mjs 2026-10-12 0 out.mp4
+//   node gen/reel/render.mjs 2026-10-12 0 out.png
 // Needs chromium and ffmpeg. Reads the answers from functions/_data/cases.json
 // (gitignored), so outputs belong in private/, never in the repo.
 import fs from "fs";
@@ -13,6 +15,7 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../.
 const day = JSON.parse(fs.readFileSync(path.join(ROOT, "functions/_data/cases.json"), "utf8"))[date];
 const round = day?.rounds[+roundArg];
 if (!round) { console.error("no such round"); process.exit(1); }
+const still = out.endsWith(".png");
 const cards = round.cards.map(c => ({ id: c.id, ai: !!c.ai, src: "file://" + path.join(ROOT, "dist", c.image) }));
 const credits = "Real photos: " + round.cards.filter(c => !c.ai).map(c => `${c.credit.artist} (${c.credit.license})`).join(", ");
 
@@ -30,27 +33,34 @@ try {
   const send = (method, params = {}) => new Promise(r => { const i = ++id; pend[i] = r; ws.send(JSON.stringify({ id: i, method, params })); });
   const ev = async expr => { const m = await send("Runtime.evaluate", { expression: expr, awaitPromise: true, returnByValue: true });
     if (m.result.exceptionDetails) throw new Error(JSON.stringify(m.result.exceptionDetails)); return m.result.result.value; };
-  await send("Emulation.setDeviceMetricsOverride", { width: 1080, height: 1920, deviceScaleFactor: 1, mobile: false });
+  await send("Emulation.setDeviceMetricsOverride", { width: 1080, height: still ? 1350 : 1920, deviceScaleFactor: 1, mobile: false });
   await send("Page.navigate", { url: "file://" + path.join(ROOT, "gen/reel/reel.html") });
   await new Promise(r => setTimeout(r, 2500));
-  await ev(`setup(${JSON.stringify({ cards, credits })}).then(() => 1)`);
-  const total = await ev("TOTAL");
-  const n = Math.round(total * FPS);
-  for (let f = 0; f < n; f++) {
-    await ev(`render(${f / FPS})`);
-    const shot = await send("Page.captureScreenshot", { format: "jpeg", quality: 92 });
-    fs.writeFileSync(`${tmp}/f${String(f).padStart(4, "0")}.jpg`, Buffer.from(shot.result.data, "base64"));
+  await ev(`setup(${JSON.stringify({ cards, credits, still })}).then(() => 1)`);
+  if (still) {
+    const shot = await send("Page.captureScreenshot", { format: "png" });
+    fs.writeFileSync(out, Buffer.from(shot.result.data, "base64"));
+    ws.close();
+    console.log(`${out}: ${round.shortName}`);
+  } else {
+    const total = await ev("TOTAL");
+    const n = Math.round(total * FPS);
+    for (let f = 0; f < n; f++) {
+      await ev(`render(${f / FPS})`);
+      const shot = await send("Page.captureScreenshot", { format: "jpeg", quality: 92 });
+      fs.writeFileSync(`${tmp}/f${String(f).padStart(4, "0")}.jpg`, Buffer.from(shot.result.data, "base64"));
+    }
+    ws.close();
+    // Audio: the ad's music bed under the puzzle, the jingle on the end card.
+    const assets = path.join(ROOT, "gen/reel/assets");
+    execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-framerate", String(FPS), "-i", `${tmp}/f%04d.jpg`,
+      "-i", `${assets}/bed.m4a`, "-i", `${assets}/jingle.mp3`,
+      "-filter_complex", `[1:a]atrim=0:4.7,afade=t=out:st=4.0:d=0.7,aresample=44100[a1];[2:a]adelay=4700|4700,aresample=44100[a2];[a1][a2]amix=inputs=2:normalize=0,apad,atrim=0:${total}[a]`,
+      "-map", "0:v", "-map", "[a]", "-c:v", "libx264", "-profile:v", "main", "-level", "4.0", "-pix_fmt", "yuv420p", "-crf", "19",
+      "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", "-t", String(total), out]);
+    // Never print the AI card: Action logs are public.
+    console.log(`${out}: ${round.shortName}`);
   }
-  ws.close();
-  // Audio: the ad's music bed under the puzzle, the jingle on the end card.
-  const assets = path.join(ROOT, "gen/reel/assets");
-  execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-framerate", String(FPS), "-i", `${tmp}/f%04d.jpg`,
-    "-i", `${assets}/bed.m4a`, "-i", `${assets}/jingle.mp3`,
-    "-filter_complex", `[1:a]atrim=0:4.7,afade=t=out:st=4.0:d=0.7,aresample=44100[a1];[2:a]adelay=4700|4700,aresample=44100[a2];[a1][a2]amix=inputs=2:normalize=0,apad,atrim=0:${total}[a]`,
-    "-map", "0:v", "-map", "[a]", "-c:v", "libx264", "-profile:v", "main", "-level", "4.0", "-pix_fmt", "yuv420p", "-crf", "19",
-    "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", "-t", String(total), out]);
-  // Never print the AI card: Action logs are public.
-  console.log(`${out}: ${round.shortName}`);
 } finally {
   // Let Chrome exit before removing its profile; cleanup never fails the render
   const exited = new Promise(r => chrome.once("exit", r));

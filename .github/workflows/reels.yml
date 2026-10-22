@@ -1,7 +1,8 @@
-# Facebook reels twice a day, just after 00:00 and 12:00 Pacific (two crons per
+# Facebook posts twice a day, just after 00:00 and 12:00 Pacific (two crons per
 # slot cover PDT and PST; the script posts once per slot per Pacific date). It pulls the
-# encrypted state, builds the cases, renders a reel from a round everyone has
-# already played and publishes it to the Imposter Page. No LLM involved.
+# encrypted state, builds the cases, renders a round everyone has already played
+# and posts it to the Imposter Page, alternating a Reel and a photo of the puzzle;
+# the run after a photo comments its answer. No LLM involved.
 # Logs are public: nothing here prints which card is AI.
 #
 # Secrets: STATE_KEY, FB_PAGE_TOKEN. Without FB_PAGE_TOKEN it posts nothing.
@@ -96,5 +97,5 @@ jobs:
           git diff --cached --quiet && exit 0
           git config user.name "imposter-bot"
           git config user.email "actions@users.noreply.github.com"
-          git commit -m "Reel posted $(TZ=America/Los_Angeles date +%F)"
+          git commit -m "Facebook post $(TZ=America/Los_Angeles date +%F)"
           git pull --rebase -q && git push -q

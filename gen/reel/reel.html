@@ -33,6 +33,14 @@
   .end .btn { position: absolute; top: 950px; left: 50%; transform: translateX(-50%); background: #ff8a1f; color: #0b0710; border-radius: 34px;
     font: 700 72px "JetBrains Mono", monospace; padding: 26px 40px; white-space: nowrap; }
   .end .s3 { position: absolute; top: 1170px; width: 100%; font: 500 44px "JetBrains Mono", monospace; color: #e8e0f4; }
+  /* Still: a 4:5 feed photo of the puzzle, no countdown and no reveal */
+  body.still, html:has(body.still) { height: 1350px; }
+  .still .pill { top: 34px; }
+  .still h1 { top: 96px; font-size: 88px; }
+  .still .grid { top: 322px; left: 120px; width: 840px; }
+  .still .ask { top: 1180px; font-size: 60px; }
+  .still .credits { top: 1272px; font-size: 20px; }
+  .still .count, .still .scan, .still .end, .still .tag { display: none; }
 </style></head>
 <body>
   <div class="pill">PLAY-IMPOSTER.LOL</div>
@@ -55,7 +63,8 @@ const T = { countFrom: 0.5, scan0: 2.6, scan1: 3.2, reveal: 3.3, end0: 4.7, end1
 const clamp = x => Math.max(0, Math.min(1, x));
 const ease = x => 1 - Math.pow(1 - clamp(x), 3);
 window.setup = cfg => {
-  // cfg: {cards: [{id, src, ai}], credits: "..."}
+  // cfg: {cards: [{id, src, ai}], credits: "...", still: bool}
+  document.body.classList.toggle("still", !!cfg.still);
   document.getElementById("grid").innerHTML = cfg.cards.map(c => `
     <div class="tile ${c.ai ? "ai" : ""}"><img src="${c.src}"><div class="letter">${c.id}</div>
     <div class="tag ${c.ai ? "fake" : "real"}">${c.ai ? "AI FAKE" : "REAL"}</div></div>`).join("");
