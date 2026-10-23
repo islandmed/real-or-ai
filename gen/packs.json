@@ -599,7 +599,7 @@
       "thai green curry",
       "indian curry"
      ],
-     "match": "curry|curries|korma|masala|vindaloo|rogan josh|massaman|panang|kare\\b|dal\\b|dhal",
+     "match": "(?<!north )(?<!stephen )(?<!seth )(?<!dell )curry(?! rivel| mallet| moor| hill)|curries|korma|masala|vindaloo|rogan josh|massaman|panang|kare\\b|dal\\b|dhal",
      "prompts": [
       "a bowl of chicken curry with rice",
       "Thai green curry in a ceramic bowl",
@@ -674,9 +674,19 @@
       "street food",
       "food stall",
       "food market",
-      "street vendor food"
+      "street vendor food",
+      "takoyaki",
+      "churros",
+      "falafel",
+      "shawarma",
+      "banh mi",
+      "pani puri",
+      "jianbing",
+      "elote",
+      "corn dog",
+      "tanghulu"
      ],
-     "match": "street food|street vendor|food stall|hawker|food market|night market|food cart|streetfood|garküche",
+     "match": "street food|street vendor|food stall|hawker|food market|night market|food cart|streetfood|garküche|takoyaki|churro|falafel|shawarma|b[áa]nh m[ìi]|pani ?puri|golgappa|jianbing|elote|corn ?dog|tanghulu",
      "prompts": [
       "skewers grilling on a street food stall",
       "a night market stall with steaming woks",
@@ -684,6 +694,11 @@
       "noodles cooking at a hawker stall"
      ],
      "cats": [
+      "Takoyaki",
+      "Churros",
+      "Falafel",
+      "Shawarma",
+      "Bánh mì",
       "Street food",
       "Food stalls",
       "Night markets"
