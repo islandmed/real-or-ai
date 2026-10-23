@@ -25,3 +25,6 @@ functions/_data/
 # Push worker secrets (never commit)
 push-worker/.vapid.local.json
 push-worker/.dev.vars
+
+# local Pages Functions secrets (Stripe test key etc.), never commit
+.dev.vars
