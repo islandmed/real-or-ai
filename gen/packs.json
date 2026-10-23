@@ -834,8 +834,8 @@
    "id": "funny",
    "name": "Funny Animals",
    "emoji": "🦥",
-   "tagline": "30 cases of animals being ridiculous. One clown in every lineup never existed.",
-   "cases": 30,
+   "tagline": "20 cases of animals being ridiculous. One clown in every lineup never existed.",
+   "cases": 20,
    "free": 3,
    "themes": [
     {
@@ -852,10 +852,10 @@
      ],
      "match": "yawn|gähn|gaehn|bâill|baill|bostez|sbadigl|geeuw|ziew",
      "prompts": [
-      "a tabby cat mid-yawn on a sofa, mouth wide open, eyes squeezed shut",
-      "a lioness yawning hugely in golden savanna grass",
-      "a dog yawning while lying on a worn rug",
-      "a baboon yawning on a rock, showing its long teeth"
+      "a tabby cat yawning on a sofa, seen from the side",
+      "a lioness yawning while lying in savanna grass, seen from a safari vehicle",
+      "a hippo yawning in a river, seen from a distance",
+      "a baboon yawning on a rock, seen from the side"
      ],
      "cats": [
       "Yawning animals",
@@ -880,10 +880,10 @@
      ],
      "match": "(?s)^(?!.*(?:blue[- ]?tongue|tiliqua|soup|salad|taco|kalbs|kalvetunge|rinder|beef|ox tongue|lingua de|dil çorbası|kue lidah|wellcome|buckle|belt\\b|overdoor|newel|figure|foo lion|matchsafe|mount \\(|thongue|la tongue|montblanc|lipoma|immunostain|tumou?r|tongue mass|geographic tongue|terracotta|einstein|zungenzeig|girl|woman|\\bboy\\b|\\bman\\b|child|kid\\b|baby|doctor|smile noah|redaktionstreffen|alona beach|snake eating|cooking|restaurant|kalbskopf|steinbockbraten|cactus|prickly|templom|gnm\\b|mattes|usmc)).*?(?:tongue|zunge|langue|lengua|lingua|j[eę]zyk|menjulurkan lidah|\\bblep)",
      "prompts": [
-      "a small mixed-breed dog panting with its tongue out after a walk in a park",
-      "a giraffe reaching out its long dark tongue toward the camera",
-      "a cat lying on a blanket with a tiny bit of tongue poking out",
-      "a calf licking its own nose with a long tongue in a barn"
+      "a small mixed-breed dog panting with its tongue out on a park path, seen from the side",
+      "a giraffe at a zoo feeding station wrapping its long dark tongue around leaves",
+      "a cat on a blanket licking its paw, tongue showing",
+      "a cow in a field licking its nose, photographed over a fence"
      ],
      "cats": [
       "Animal tongues",
@@ -905,10 +905,10 @@
      ],
      "match": "\\bcats?\\b|kitten|kitty|felis catus|katze|\\bchats?\\b|\\bgat[oa]s?\\b|\\bgatt[oi]\\b|\\bkat\\b|\\bkot\\b",
      "prompts": [
-      "a ginger cat squeezed into a cardboard box far too small for it",
-      "a grey cat curled up inside a bathroom sink",
-      "a black and white cat peeking out of a paper shopping bag",
-      "a fluffy cat sitting in an open kitchen drawer"
+      "a ginger cat squeezed into a cardboard box far too small for it, on a living room floor",
+      "a tabby cat lying in an open cardboard delivery box on a kitchen floor",
+      "a black and white cat curled up in a shoebox",
+      "two cats sharing one cardboard box on a carpet"
      ],
      "cats": [
       "Cats in boxes",
@@ -934,10 +934,10 @@
      ],
      "match": "(?s)^(?!.*(?:petroglyph|rock art|carving|statue|sculpture|brunnen|fountain|braten|skull|\\bmort\\b|dead|trussed|museum|coat of arms|drawing|painting|willow|christmas tree|goat fire|moth\\b|catkin|geograph|betlém|ndebele|leiden|airbus|plowing|\\bbus\\b|nagoya|\\btoy|tibetaanse|castle|market|woman|shepherd|hiker|visitors|goat island|goat hill|grotte|nilgiri tahr|bharal)).*?(?:goats?\\b|capra|ibex|oreamnos|ziegen?\\b|steinb[oö]ck|chèvres?|chevres?|bouquetin|cabras?\\b|stambecc)",
      "prompts": [
-      "several domestic goats standing in the branches of an argan tree in Morocco, seen from the road",
-      "a white mountain goat balanced on a narrow cliff ledge",
-      "a domestic farm goat standing on the roof of a wooden shed",
-      "a domestic goat standing on top of a large boulder in a field"
+      "several goats standing in the branches of an argan tree in Morocco, seen from the road",
+      "a white mountain goat balanced on a narrow cliff ledge, seen from far below",
+      "a white mountain goat with a kid on a steep rocky slope",
+      "a goat standing on top of a large boulder in a field, seen from a distance"
      ],
      "cats": [
       "Goats in trees",
@@ -983,9 +983,9 @@
      "match": "(?s)^(?!.*(?:sloth bear|melursus|lippenbär|lippenbaer|ours lippu|oso bezudo|skeleton|skull|fossil|megatherium|ground sloth)).*?(?:sloths?\\b|bradypus|choloepus|faultier|paresseux|perezoso|bradipo|preguiça|preguica)",
      "prompts": [
       "a three-toed sloth hanging from a branch high in a tree, seen from below",
-      "a two-toed sloth hanging upside down in the rainforest",
-      "a sloth clinging to a tree trunk and looking over its shoulder",
-      "a baby sloth holding on to its mother's fur"
+      "a brown-throated sloth climbing a thin tree trunk in Costa Rica, seen from a path",
+      "a two-toed sloth hanging from a rope in a zoo enclosure",
+      "a sloth curled up asleep in the fork of a tree, seen from far below"
      ],
      "cats": [
       "Bradypus variegatus",
@@ -1130,10 +1130,10 @@
      ],
      "match": "(?s)^(?!.*(?:statue|sculpture|homeless|person|people|\\bman\\b|woman|child|baby|castle|stone)).*?(?:(?:\\bcats?\\b|kitten|kitty|felis catus|katze|\\bdogs?\\b|pupp|\\bhunde?\\b|chien|perro|\\bgat[oa]s?\\b).*?(?:sleep|asleep|napping|\\bnaps?\\b|schlaf|\\bdort\\b|dormi|durmi|slaap)|(?:sleep|asleep|napping|\\bnaps?\\b|schlaf|\\bdort\\b|dormi|durmi|slaap).*?(?:\\bcats?\\b|kitten|kitty|felis catus|katze|\\bdogs?\\b|pupp|\\bhunde?\\b|chien|perro|\\bgat[oa]s?\\b))",
      "prompts": [
-      "a cat asleep on its back with all four paws in the air",
-      "a dog asleep upside down on a sofa with its legs sticking up",
-      "a cat sleeping with its face pressed flat against a windowsill",
-      "a puppy fallen asleep sitting up, head drooping"
+      "a cat asleep on its back with its paws in the air on a bed",
+      "a cat asleep stretched out on a stone wall in the sun",
+      "a cat sleeping curled up on a cushion with its face hidden",
+      "a cat asleep on a windowsill with one leg hanging down"
      ],
      "cats": [
       "Sleeping cats",
@@ -1155,10 +1155,10 @@
      ],
      "match": "(?s)^(?!.*(?:rubber|toy|plastic|statue|sculpture|drawing|painting|roast|food)).*?(?:ducklings?|ducks? family|family of ducks|ducks in a row|küken|entenküken|caneton|patitos?|anatroccol|eendjes|kaczęt)",
      "prompts": [
-      "a mallard duck leading a line of ducklings across a grassy park path",
-      "a row of fluffy ducklings swimming behind their mother on a pond",
-      "a cluster of ducklings tumbling over each other at the edge of a lake",
-      "a duck family waddling through a puddle on a farm track"
+      "a brown female mallard duck with three ducklings walking across a grassy park path, seen from a distance",
+      "a brown female mallard swimming on a pond followed by a few ducklings, seen from the bank",
+      "two mallard ducklings resting on a rock at the edge of a lake",
+      "a brown female mallard and her ducklings among reeds at a pond edge"
      ],
      "cats": [
       "Ducklings",
@@ -1181,10 +1181,10 @@
      ],
      "match": "(?s)^(?!.*(?:statue|sculpture|drawing|painting|toy|plush|dead|roadkill|monkey|flying squirrel)).*?(?:squirrels?|sciurus|tamias|chipmunks?|eichhörnchen|eichhoernchen|écureuil|ecureuil|ardilla|scoiattol|eekhoorn|wiewiórk)",
      "prompts": [
-      "a grey squirrel sitting upright on a park lawn nibbling a nut held in its paws",
-      "a red squirrel on a tree branch gnawing a pine cone",
-      "a chipmunk on a rock with its cheek pouches stuffed full",
-      "a squirrel hanging upside down from a garden bird feeder, eating seeds"
+      "a grey squirrel sitting on a park lawn eating a nut, seen from a few metres away",
+      "a red squirrel on a mossy tree stump eating a hazelnut, Scotland",
+      "a grey squirrel climbing down a tree trunk head first",
+      "a grey squirrel stealing seeds from a garden bird feeder"
      ],
      "cats": [
       "Sciurus carolinensis eating",
@@ -1207,10 +1207,10 @@
      ],
      "match": "(?s)^(?!.*(?:statue|sculpture|drawing|painting|toy|hot dog|sea dog|dogfish|prairie dog|raccoon dog|people|\\bman\\b|woman|child|boy\\b|girl)).*?(?:\\bdogs?\\b|pupp|\\bhunde?\\b|\\bchiens?\\b|\\bperros?\\b|\\bcane\\b|\\bhond\\b|retriever|labrador|spaniel|terrier|collie|poodle|setter)",
      "prompts": [
-      "a soaking wet dog shaking water off its fur in a spray of droplets on a beach",
-      "a labrador swimming across a lake with a stick in its mouth",
-      "a muddy wet spaniel bounding out of a river onto the bank",
-      "a scruffy dog dripping wet standing in shallow sea water"
+      "a wet labrador shaking water off its fur on a beach, seen from the side",
+      "a labrador swimming across a lake with a stick in its mouth, seen from the shore",
+      "a muddy wet spaniel running out of a river onto the bank",
+      "a scruffy dog standing in shallow sea water, dripping wet, seen from behind and to the side"
      ],
      "cats": [
       "Dogs shaking",
@@ -1236,9 +1236,9 @@
      "match": "(?s)^(?!.*(?:pork|meat|roast|\\bham\\b|sausage|bacon|lechon|spanferkel|butcher|slaughter|carcass|statue|sculpture|drawing|painting|toy|piggy bank|guinea pig|pig iron|pig latin|peccar|warthog|babirusa|people|\\bman\\b|woman|child|race\\b|racing)).*?(?:\\bpigs?\\b|piglets?|\\bhogs?\\b|\\bsows?\\b|swine|sus scrofa|wild boars?|schwein|ferkel|\\bcochons?\\b|porcelets?|sanglier|\\bcerdos?\\b|lechones|\\bmaial[ei]|\\bvarkens?|biggetje|\\bświni|prosiak|prasiąt)",
      "prompts": [
       "a pink farm pig lying on its side in a brown mud wallow, caked in mud",
-      "a pile of piglets asleep on top of each other in straw",
+      "a sow lying in straw with piglets feeding, seen over a pen wall",
       "a muddy pig rooting with its snout in a wet farmyard pen",
-      "a spotted pig trotting across a muddy field toward a feeding trough"
+      "a Gloucestershire Old Spot pig walking across a muddy field"
      ],
      "cats": [
       "Pigs in mud",
