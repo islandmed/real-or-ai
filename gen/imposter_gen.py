@@ -998,7 +998,9 @@ def review_sheets(state, seasons, keys, n):
     done = set(state["approved"])
     seen = set(state["blacklist"]) | set(state["used"])
     out = []
-    for s in seasons:
+    # Case Pack themes are reviewed the same way (their pools are "pack-<id>-<key>")
+    groups = list(seasons) + [{"themes": p["themes"]} for p in load_packs()]
+    for s in groups:
         for t in s["themes"]:
             if keys != ["all"] and t["pool"] not in keys and t["key"] not in keys:
                 continue

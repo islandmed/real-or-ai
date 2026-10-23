@@ -110,7 +110,9 @@ jobs:
         # Bounded so the state push below always runs inside the job's 150 minutes;
         # the generator is resumable, so a cut-off run loses at most one round.
         timeout-minutes: 60
-        run: python3 gen/imposter_gen.py --packs
+        # --no-vision: pack photos are hand-approved (--review/--decide), so the
+        # whole leftover budget goes to AI images instead of vision calls.
+        run: python3 gen/imposter_gen.py --packs --no-vision
 
       - name: Push encrypted state
         if: always() && steps.pull.outcome == 'success'
