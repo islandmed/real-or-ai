@@ -107,6 +107,9 @@ jobs:
       - name: Generate Case Packs (leftover budget)
         if: steps.pull.outcome == 'success' && (github.event_name == 'schedule' || inputs.generate)
         continue-on-error: true
+        # Bounded so the state push below always runs inside the job's 150 minutes;
+        # the generator is resumable, so a cut-off run loses at most one round.
+        timeout-minutes: 60
         run: python3 gen/imposter_gen.py --packs
 
       - name: Push encrypted state
