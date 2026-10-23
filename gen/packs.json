@@ -808,6 +808,407 @@
      "vision": "bread (loaves, baguettes, rolls or similar), large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
     }
    ]
+  },
+  {
+   "id": "funny",
+   "name": "Funny Animals",
+   "emoji": "🦥",
+   "tagline": "30 cases of animals being ridiculous. One clown in every lineup never existed.",
+   "cases": 30,
+   "free": 3,
+   "themes": [
+    {
+     "key": "yawning",
+     "name": "Yawning",
+     "short": "YAWNS",
+     "queries": [
+      "yawning cat",
+      "yawning dog",
+      "yawning lion",
+      "yawning monkey",
+      "hippo yawning",
+      "animal yawning"
+     ],
+     "match": "yawn|gähn|gaehn|bâill|baill|bostez|sbadigl|geeuw|ziew",
+     "prompts": [
+      "a tabby cat mid-yawn on a sofa, mouth wide open, eyes squeezed shut",
+      "a lioness yawning hugely in golden savanna grass",
+      "a puppy yawning on a wooden floor, tongue curled",
+      "a baboon yawning on a rock, showing its long teeth"
+     ],
+     "cats": [
+      "Yawning animals",
+      "Yawning cats",
+      "Yawning dogs",
+      "Yawning lions",
+      "Yawning primates"
+     ],
+     "vision": "a real animal caught mid-yawn, mouth wide open, large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "tongues",
+     "name": "Tongues Out",
+     "short": "TONGUES",
+     "queries": [
+      "dog tongue out",
+      "cat tongue out",
+      "giraffe tongue",
+      "animal sticking out tongue",
+      "lizard tongue",
+      "cow tongue nose"
+     ],
+     "match": "(?s)^(?!.*(?:blue[- ]?tongue|tiliqua|soup|salad|taco|kalbs|kalvetunge|rinder|beef|ox tongue|lingua de|dil çorbası|kue lidah|wellcome|buckle|belt\\b|overdoor|newel|figure|foo lion|matchsafe|mount \\(|thongue|la tongue|montblanc|lipoma|immunostain|tumou?r|tongue mass|geographic tongue|terracotta|einstein|zungenzeig|girl|woman|\\bboy\\b|\\bman\\b|child|kid\\b|baby|doctor|smile noah|redaktionstreffen|alona beach|snake eating|cooking|restaurant|kalbskopf|steinbockbraten|cactus|prickly|templom|gnm\\b|mattes|usmc)).*?(?:tongue|zunge|langue|lengua|lingua|j[eę]zyk|menjulurkan lidah|\\bblep)",
+     "prompts": [
+      "a small dog sitting on grass with the tip of its pink tongue sticking out",
+      "a giraffe reaching out its long dark tongue toward the camera",
+      "a cat lying on a blanket with a tiny bit of tongue poking out",
+      "a calf licking its own nose with a long tongue in a barn"
+     ],
+     "cats": [
+      "Animal tongues",
+      "Tongues"
+     ],
+     "vision": "a real animal with its tongue visibly sticking out, the animal large and clear as the main subject. Not a human. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "catboxes",
+     "name": "Cats in Odd Places",
+     "short": "CAT SPOTS",
+     "queries": [
+      "cat in box",
+      "cat in sink",
+      "cat in cardboard box",
+      "cat in bag",
+      "cat in drawer",
+      "cat in basket"
+     ],
+     "match": "\\bcats?\\b|kitten|kitty|felis catus|katze|\\bchats?\\b|\\bgat[oa]s?\\b|\\bgatt[oi]\\b|\\bkat\\b|\\bkot\\b",
+     "prompts": [
+      "a ginger cat squeezed into a cardboard box far too small for it",
+      "a grey cat curled up inside a bathroom sink",
+      "a black and white cat peeking out of a paper shopping bag",
+      "a fluffy cat sitting in an open kitchen drawer"
+     ],
+     "cats": [
+      "Cats in boxes",
+      "Cats in sinks",
+      "Cats in containers",
+      "Cats in bags",
+      "Cats in drawers",
+      "Cats in baskets"
+     ],
+     "vision": "a real domestic cat sitting or lying inside a box, sink, bag, drawer, basket or other container, the cat large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "goats",
+     "name": "Climbing Goats",
+     "short": "GOATS",
+     "queries": [
+      "goats in argan tree",
+      "goat in tree",
+      "goat climbing",
+      "goat on roof",
+      "mountain goat cliff",
+      "ibex dam wall"
+     ],
+     "match": "(?s)^(?!.*(?:petroglyph|rock art|carving|statue|sculpture|brunnen|fountain|braten|skull|\\bmort\\b|dead|trussed|museum|coat of arms|drawing|painting|willow|christmas tree|goat fire|moth\\b|catkin|geograph|betlém|ndebele|leiden|airbus|plowing|\\bbus\\b|nagoya|\\btoy|tibetaanse|castle|market|woman|shepherd|hiker|visitors|goat island|goat hill|grotte|nilgiri tahr|bharal)).*?(?:goats?\\b|capra|ibex|oreamnos|ziegen?\\b|steinb[oö]ck|chèvres?|chevres?|bouquetin|cabras?\\b|stambecc)",
+     "prompts": [
+      "several goats standing in the branches of an argan tree",
+      "a white mountain goat balanced on a narrow cliff ledge",
+      "a goat standing on the roof of a wooden farm shed",
+      "an alpine ibex standing on a near-vertical rocky slope"
+     ],
+     "cats": [
+      "Goats in trees",
+      "Oreamnos americanus"
+     ],
+     "vision": "a real goat or ibex climbing or perched somewhere high or unlikely (a tree, a roof, a cliff, a steep rock), the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "pugs",
+     "name": "Pugs & Bulldogs",
+     "short": "PUGS",
+     "queries": [
+      "pug",
+      "pug dog",
+      "french bulldog",
+      "english bulldog",
+      "bulldog puppy"
+     ],
+     "match": "(?s)^(?!.*(?:lanz|tractor|traktor|revolver|pistol|plaque|statue|sculpture|drawing|engraving)).*?(?:\\bpugs?\\b|\\bmops\\b|carlin|bulldog|bouledogue)",
+     "prompts": [
+      "a pug with a wrinkled face tilting its head on a sofa",
+      "a French bulldog with big bat ears sitting on a lawn",
+      "an English bulldog lying flat on a cool kitchen floor",
+      "a pug puppy sleeping on its back in a dog bed"
+     ],
+     "cats": [
+      "Pug",
+      "Bulldog",
+      "French Bulldog"
+     ],
+     "vision": "a real pug or bulldog (English or French), the dog large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "sloths",
+     "name": "Sloths",
+     "short": "SLOTHS",
+     "queries": [
+      "sloth",
+      "three-toed sloth",
+      "two-toed sloth",
+      "sloth hanging"
+     ],
+     "match": "(?s)^(?!.*(?:sloth bear|melursus|lippenbär|lippenbaer|ours lippu|oso bezudo|skeleton|skull|fossil|megatherium|ground sloth)).*?(?:sloths?\\b|bradypus|choloepus|faultier|paresseux|perezoso|bradipo|preguiça|preguica)",
+     "prompts": [
+      "a three-toed sloth hanging from a branch, smiling sleepily",
+      "a two-toed sloth hanging upside down in the rainforest",
+      "a sloth clinging to a tree trunk and looking over its shoulder",
+      "a baby sloth holding on to its mother's fur"
+     ],
+     "cats": [
+      "Bradypus variegatus",
+      "Bradypus tridactylus",
+      "Choloepus hoffmanni",
+      "Choloepus didactylus"
+     ],
+     "vision": "a real sloth, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "alpacas",
+     "name": "Alpacas & Llamas",
+     "short": "ALPACAS",
+     "queries": [
+      "alpaca",
+      "llama",
+      "alpaca face",
+      "llama portrait",
+      "fluffy alpaca"
+     ],
+     "match": "(?s)^(?!.*(?:teddy|steiff|plush|yarn|wool\\b|garn|knit|stofftier|sweater|textile|poncho|blanket)).*?(?:alpacas?|alpakas?|\\bllamas?\\b|lama glama|vicugna pacos)",
+     "prompts": [
+      "a fluffy white alpaca staring straight at the camera with a big tuft of hair",
+      "a llama chewing with its lower teeth showing in a field",
+      "a brown alpaca with a freshly shorn body and a fluffy head",
+      "two alpacas standing cheek to cheek by a farm fence"
+     ],
+     "cats": [
+      "Vicugna pacos",
+      "Lama glama"
+     ],
+     "vision": "a real alpaca or llama, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "puffins",
+     "name": "Puffins",
+     "short": "PUFFINS",
+     "queries": [
+      "puffin",
+      "atlantic puffin",
+      "puffin with fish",
+      "tufted puffin",
+      "horned puffin"
+     ],
+     "match": "puffins?|fratercula|papageitaucher|macareux|frailecillo|pulcinella di mare|lundi",
+     "prompts": [
+      "an Atlantic puffin standing on a cliff top with a beak full of small fish",
+      "a puffin landing on grass with its orange feet out",
+      "two puffins standing side by side on a rock by the sea",
+      "a tufted puffin with blond head plumes on a rocky ledge"
+     ],
+     "cats": [
+      "Fratercula arctica",
+      "Fratercula corniculata",
+      "Fratercula cirrhata"
+     ],
+     "vision": "a real puffin, the bird large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "proboscis",
+     "name": "Proboscis Monkeys",
+     "short": "NOSES",
+     "queries": [
+      "proboscis monkey",
+      "nasalis larvatus",
+      "proboscis monkey borneo"
+     ],
+     "match": "proboscis|nasalis|nasenaffe|nasique|mono narigudo|bekantan",
+     "prompts": [
+      "a male proboscis monkey with a huge drooping nose sitting in a tree",
+      "a proboscis monkey eating leaves in a mangrove forest",
+      "a proboscis monkey sitting on a branch with its belly out",
+      "a proboscis monkey looking down from the canopy by a river"
+     ],
+     "cats": [
+      "Nasalis larvatus"
+     ],
+     "vision": "a real proboscis monkey, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "pelicans",
+     "name": "Pelicans",
+     "short": "PELICANS",
+     "queries": [
+      "pelican",
+      "brown pelican",
+      "pelican pouch",
+      "pelican flying",
+      "australian pelican"
+     ],
+     "match": "pelicans?|pelecanus|pelikan|pélican|pelícano|pellicano",
+     "prompts": [
+      "a brown pelican on a wooden pier post with its pouch bulging",
+      "an Australian pelican swimming and looking sideways at the camera",
+      "a white pelican stretching its huge beak wide open",
+      "a pelican scratching its head with its foot on a dock"
+     ],
+     "cats": [
+      "Pelecanus occidentalis",
+      "Pelecanus onocrotalus",
+      "Pelecanus conspicillatus",
+      "Pelecanus erythrorhynchos"
+     ],
+     "vision": "a real pelican, the bird large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "sealions",
+     "name": "Lounging Seals",
+     "short": "SEALS",
+     "queries": [
+      "sea lions pier 39",
+      "sea lion sleeping",
+      "elephant seal beach",
+      "seal lying on beach",
+      "harbor seal resting"
+     ],
+     "match": "sea ?lions?|\\bseals?\\b|zalophus|mirounga|otaria|phoca|halichoerus|seelöwe|robbe|phoque|otarie|lobo marino|foca\\b|leone marino",
+     "prompts": [
+      "a pile of sea lions sprawled across a wooden dock",
+      "an elephant seal lying on a beach flicking sand onto its back",
+      "a harbor seal lying on a rock in a banana shape, head and tail raised",
+      "a sea lion asleep on its back on the sand with its flippers in the air"
+     ],
+     "cats": [
+      "Zalophus californianus at Pier 39",
+      "Zalophus californianus",
+      "Mirounga angustirostris",
+      "Phoca vitulina"
+     ],
+     "vision": "a real seal, sea lion or elephant seal, lying, lounging or sleeping, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "capybaras",
+     "name": "Capybaras",
+     "short": "CAPYBARAS",
+     "queries": [
+      "capybara",
+      "capybara bathing",
+      "capybara group",
+      "capybara in water"
+     ],
+     "match": "capybaras?|hydrochoerus|carpincho|capivara|wasserschwein|capibara|chigüiro",
+     "prompts": [
+      "a capybara sitting calmly in a warm pond up to its chin",
+      "a capybara lying on grass with a small bird standing on its back",
+      "a family of capybaras resting together by a riverbank",
+      "a capybara chewing grass with a completely relaxed face"
+     ],
+     "cats": [
+      "Hydrochoerus hydrochaeris"
+     ],
+     "vision": "a real capybara, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "meerkats",
+     "name": "Meerkats",
+     "short": "MEERKATS",
+     "queries": [
+      "meerkat",
+      "meerkat standing",
+      "meerkats sentinel",
+      "meerkat family"
+     ],
+     "match": "meerkats?|suricat|erdmännchen|erdmaennchen",
+     "prompts": [
+      "a meerkat standing bolt upright on its hind legs, keeping watch",
+      "three meerkats standing in a row on a sandy mound",
+      "a meerkat sunbathing with its belly out on warm sand",
+      "a young meerkat peeking out of its burrow"
+     ],
+     "cats": [
+      "Suricata suricatta"
+     ],
+     "vision": "a real meerkat, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "sleepers",
+     "name": "Sleeping Pets",
+     "short": "NAPS",
+     "queries": [
+      "sleeping cat",
+      "sleeping dog",
+      "cat sleeping on back",
+      "dog sleeping funny position",
+      "cat asleep",
+      "puppy asleep"
+     ],
+     "match": "(?s)^(?!.*(?:statue|sculpture|homeless|person|people|\\bman\\b|woman|child|baby|castle|stone)).*?(?:(?:\\bcats?\\b|kitten|kitty|felis catus|katze|\\bdogs?\\b|pupp|\\bhunde?\\b|chien|perro|\\bgat[oa]s?\\b).*?(?:sleep|asleep|napping|\\bnaps?\\b|schlaf|\\bdort\\b|dormi|durmi|slaap)|(?:sleep|asleep|napping|\\bnaps?\\b|schlaf|\\bdort\\b|dormi|durmi|slaap).*?(?:\\bcats?\\b|kitten|kitty|felis catus|katze|\\bdogs?\\b|pupp|\\bhunde?\\b|chien|perro|\\bgat[oa]s?\\b))",
+     "prompts": [
+      "a cat asleep on its back with all four paws in the air",
+      "a dog asleep upside down on a sofa with its legs sticking up",
+      "a cat sleeping with its face pressed flat against a windowsill",
+      "a puppy fallen asleep sitting up, head drooping"
+     ],
+     "cats": [
+      "Sleeping cats",
+      "Sleeping dogs"
+     ],
+     "vision": "a real cat or dog clearly asleep, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "quokkas",
+     "name": "Quokkas",
+     "short": "QUOKKAS",
+     "queries": [
+      "quokka",
+      "quokka rottnest island",
+      "setonix brachyurus"
+     ],
+     "match": "(?s)^(?!.*(?:plush|mascot|stuffed|soft toy|wikimania|eseap|conference|meetup|user group|state of the map|puppet|kuscheltier|bus\\b|coach|skull|placard|tobu|interior|side car|gate on)).*?(?:quokkas?|setonix)",
+     "prompts": [
+      "a quokka looking up at the camera with its smiling face",
+      "a quokka sitting on its hind legs nibbling a leaf",
+      "a quokka resting in the shade of a bush on sandy ground",
+      "a mother quokka with a joey peeking out of her pouch"
+     ],
+     "cats": [
+      "Setonix brachyurus"
+     ],
+     "vision": "a real quokka, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "lemurs",
+     "name": "Lemurs",
+     "short": "LEMURS",
+     "queries": [
+      "ring-tailed lemur",
+      "lemur sunbathing",
+      "lemur catta",
+      "lemurs huddle"
+     ],
+     "match": "lemurs?\\b|lemur catta|katta\\b|maki\\b",
+     "prompts": [
+      "a ring-tailed lemur sitting upright sunbathing with its arms spread wide",
+      "a ring-tailed lemur hugging its striped tail",
+      "several ring-tailed lemurs huddled in a ball on a branch",
+      "a ring-tailed lemur staring with wide orange eyes from a rock"
+     ],
+     "cats": [
+      "Lemur catta"
+     ],
+     "vision": "a real lemur, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    }
+   ]
   }
  ]
 }
