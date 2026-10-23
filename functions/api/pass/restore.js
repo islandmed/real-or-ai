@@ -3,7 +3,10 @@ import { passConfigured, signPass, sha256Hex } from "../../../lib/pass.js";
 
 // POST {email} -> {token} when a pass was bought with that email, else 404.
 // Knowing a buyer's email is enough to restore their pass: a deliberate tradeoff
-// for a $5 unlock with no accounts (see README, Detective Pass).
+// for a $5 unlock with no accounts (see README, Detective Pass). Each pass can be
+// restored MAX_RESTORES times, so sharing the email does not unlock it everywhere.
+const MAX_RESTORES = 3;
+
 export async function onRequestPost({ request, env }) {
   if (!passConfigured(env)) return json({ error: "not available" }, 404);
   let body;
@@ -13,6 +16,10 @@ export async function onRequestPost({ request, env }) {
   const row = await env.DB.prepare("SELECT session_id, created FROM passes WHERE email_hash = ? ORDER BY created LIMIT 1")
     .bind(await sha256Hex(email)).first();
   if (!row) return json({ error: "no pass for that email" }, 404);
+  // Atomic: two racing restores cannot both take the last slot
+  const r = await env.DB.prepare("UPDATE passes SET restores = restores + 1 WHERE session_id = ? AND restores < ?")
+    .bind(row.session_id, MAX_RESTORES).run();
+  if (!r.meta || !r.meta.changes) return json({ error: "restore limit reached" }, 429);
   return json({ token: await signPass(env, row.session_id, row.created) });
 }
 

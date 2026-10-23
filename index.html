@@ -4154,7 +4154,9 @@ async function restorePass(e) {
     $("passMsg").textContent = "Pass restored. Welcome back, detective.";
     setTimeout(() => location.reload(), 900);
   } catch (err) {
-    $("passMsg").textContent = /no pass/.test(err.message) ? "No pass on file for that email." : "Could not reach the office. Try again.";
+    $("passMsg").textContent = /no pass/.test(err.message) ? "No pass on file for that email."
+      : /limit/.test(err.message) ? "This pass has been restored on 3 devices already. Email hello@play-imposter.lol for help."
+      : "Could not reach the office. Try again.";
   }
 }
 
