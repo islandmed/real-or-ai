@@ -744,6 +744,15 @@
   .results-links a, .results-links .link-btn { color: #fff; }
   .link-btn { all: unset; cursor: pointer; }
   .results-links .link-btn:not([hidden])::before { content: "·"; margin: 0 6px; color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
+  /* Today's score spread (renderSpread) */
+  .spread { margin: 14px 0 4px; text-align: center; }
+  .spread-line { font-size: 14px; font-weight: 800; color: var(--fg); }
+  .spread-line b { color: var(--accent); }
+  .spread svg { display: block; width: 100%; max-width: 280px; height: auto; margin: 6px auto 2px; overflow: visible; }
+  .spread .sp-area { fill: rgb(var(--accent-rgb) / 0.18); stroke: var(--accent); stroke-width: 1.5; stroke-linejoin: round; }
+  .spread .sp-you { stroke: var(--fg); stroke-width: 1.5; stroke-dasharray: 3 2; }
+  .spread .sp-dot { fill: var(--accent); stroke: var(--fg); stroke-width: 1.5; }
+  .spread-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--fg-muted); }
   .board { margin: 14px 0 4px; text-align: left; }
   .board-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--accent); margin-bottom: 6px; text-align: center; }
@@ -2476,6 +2485,11 @@
         <div><b id="cStreak">0</b><span>Streak</span></div>
         <div><b id="cMaxStreak">0</b><span>Max streak</span></div>
       </div>
+      <div class="spread" id="scoreSpread" hidden>
+        <div class="spread-line" id="spreadLine"></div>
+        <svg id="spreadCurve" viewBox="0 0 200 44" role="img" aria-label="Today's score spread"></svg>
+        <div class="spread-sub" id="spreadSub"></div>
+      </div>
       <div class="board" id="friendsBoard" hidden>
         <div class="board-title">Today's board</div>
         <ol class="board-rows" id="boardRows"></ol>
@@ -4035,6 +4049,57 @@ async function saveBoardName(e, inputId) {
   if (await postBoard()) renderBoard();
   if (inputId === "boardNameInput") showToast("Saved. Your friends will see it.");
 }
+// ===== Today's score spread =====
+// One POST (first daily result, remembered per day) and one GET per finished
+// game, never for past cases. Shown only once 30 detectives have filed today.
+const SPREAD_MIN = 30, SPREAD_W = 40;
+let spreadShown = false;
+async function renderSpread() {
+  const res = getTodayResult(), d = boardDay();
+  if (ARCHIVE_DATE || spreadShown || !res) return;
+  spreadShown = true;
+  let sent = null;
+  try { sent = localStorage.getItem("imposter_score_sent"); } catch (_) {}
+  if (sent !== d) {
+    try {
+      const r = await fetch("/api/score", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ date: d, pid: playerId(), score: res.score, time: res.time, won: res.won }) });
+      if (r.status < 500) localStorage.setItem("imposter_score_sent", d);
+    } catch (_) {}
+  }
+  let data;
+  try { data = await (await fetch(`/api/score?date=${d}`)).json(); } catch (_) { return; }
+  const b = Array.isArray(data?.buckets) ? data.buckets.map(x => Math.max(0, x | 0)) : [];
+  const n = b.reduce((a, x) => a + x, 0);
+  if (n < SPREAD_MIN || !b.length) return;
+  // Share below your score, spreading your own bucket evenly across its width
+  const i = Math.min(b.length - 1, Math.floor(res.score / SPREAD_W));
+  const frac = Math.min(1, (res.score - i * SPREAD_W) / SPREAD_W);
+  const below = b.slice(0, i).reduce((a, x) => a + x, 0) + b[i] * frac;
+  const pct = Math.max(0, Math.min(99, Math.round(100 * below / n)));
+  $("spreadLine").innerHTML = pct >= 99 ? "Top of the precinct: you beat <b>99%</b> of today's detectives"
+    : `You beat <b>${pct}%</b> of today's detectives`;
+  $("spreadSub").textContent = `${n.toLocaleString()} cases filed today · your score ${res.score}`;
+  // Smooth curve over the buckets anyone (or you) reached
+  let last = i;
+  b.forEach((x, k) => { if (x) last = Math.max(last, k); });
+  const span = (last + 1) * SPREAD_W, max = Math.max(...b.slice(0, last + 1)), W = 200, H = 44;
+  const pts = b.slice(0, last + 1).map((x, k) => [((k + 0.5) * SPREAD_W / span) * W, H - 2 - (x / max) * (H - 6)]);
+  pts.unshift([0, H - 2]); pts.push([W, H - 2]);
+  let path = `M0 ${H}L${pts[0][0]} ${pts[0][1]}`;
+  for (let k = 1; k < pts.length; k++) {
+    const [x0, y0] = pts[k - 1], [x1, y1] = pts[k], mx = (x0 + x1) / 2;
+    path += `C${mx.toFixed(1)} ${y0.toFixed(1)} ${mx.toFixed(1)} ${y1.toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+  }
+  path += `L${W} ${H}Z`;
+  const yx = Math.min(W, (res.score / span) * W);
+  let yy = H - 2;
+  for (let k = 1; k < pts.length; k++) if (pts[k][0] >= yx) { const [x0, y0] = pts[k - 1], [x1, y1] = pts[k]; yy = y0 + (y1 - y0) * ((yx - x0) / ((x1 - x0) || 1)); break; }
+  $("spreadCurve").innerHTML = `<path class="sp-area" d="${path}"/><line class="sp-you" x1="${yx.toFixed(1)}" y1="0" x2="${yx.toFixed(1)}" y2="${H}"/>` +
+    `<circle class="sp-dot" cx="${yx.toFixed(1)}" cy="${yy.toFixed(1)}" r="3"/>`;
+  $("scoreSpread").hidden = false;
+  ev("s-shown");
+}
 // +25 XP for the first share or challenge each day
 function shareXpOnce() {
   try {
@@ -4680,6 +4745,7 @@ function getDailyShareText() {
 // Results-screen extras: streak, friend comparison, ad slot
 function renderResultsExtras(score, time) {
   postBoard().then(renderBoard);
+  renderSpread();
   const res = getTodayResult();
   if ($("resultGrid")) $("resultGrid").textContent = res ? (res.grid || "").replace(/🟦/g, "🟧").replace(/🟥/g, "🤖") : "";
   const played = playerStats.played || 0;
