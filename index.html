@@ -2671,7 +2671,7 @@
       <span class="invite-icon">🗄️</span>
       <h3 class="invite-title" id="passTitle">Detective Pass</h3>
     </div>
-    <p class="invite-desc" id="passLead">This file is sealed. Today's case and the last two are always open; older ones are kept in the evidence room, for pass holders only.</p>
+    <p class="invite-desc" id="passLead">This file is sealed. Today's case and yesterday's are always open; older ones are kept in the evidence room, for pass holders only.</p>
     <p class="pass-price">$5<small>one-time · no subscription</small></p>
     <ul class="pass-perks">
       <li>Every past case, back to case #1, open for good</li>
@@ -4084,7 +4084,7 @@ function shortDate(iso) {
 // its presence matters, so ads are skipped before they can flash (see the <head> loader).
 const PASS_URL = "https://buy.stripe.com/8x25kFfGd9e95eEc6weQM00";
 const PASS_KEY = "imposter_pass";
-const PASS_FREE_DAYS = 2; // matches FREE_DAYS in lib/pass.js
+const PASS_FREE_DAYS = 1; // matches FREE_DAYS in lib/pass.js
 function passToken() { try { return localStorage.getItem(PASS_KEY) || ""; } catch (_) { return ""; } }
 function hasPass() { return !!passToken(); }
 function passHeaders(h = {}) { const t = passToken(); return t ? { ...h, "X-Pass": t } : h; }

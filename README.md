@@ -150,7 +150,7 @@ Keys and limits: the VAPID private key exists only as the Worker secret `VAPID_P
 
 ## 🗄️ Detective Pass ($5 one-time: every past case, no ads)
 
-Today's case is always free, and so are the 2 most recent past days (yesterday and the day before). Older past
+Today's case is always free, and so is yesterday's case. Older past
 cases need a Detective Pass, a one-time $5 Stripe Payment Link purchase that
 also turns ads off on every page.
 
