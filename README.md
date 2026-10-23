@@ -147,3 +147,80 @@ How push works:
 4. `sw.js` handles `push` by showing the fixed "New case is live" notification (tag `daily-case`); clicking focuses or opens the site.
 
 Keys and limits: the VAPID private key exists only as the Worker secret `VAPID_PRIVATE_JWK` and in the gitignored `push-worker/.vapid.local.json`. Free tier: 24 KV list ops a day; a free Worker invocation allows 50 outbound requests, so one cron run can reach about 50 subscribers in a given hour before needing a paid plan or a fan-out. `/test-send` is inert unless a `TEST_SECRET` secret is set (it is not). Deploy with `cd push-worker && npx wrangler deploy`.
+
+## 🗄️ Detective Pass ($5 one-time: every past case, no ads)
+
+Today's case is always free, and so are the 7 most recent past days. Older past
+cases need a Detective Pass, a one-time $5 Stripe Payment Link purchase that
+also turns ads off on every page.
+
+**Dormant until configured.** Nothing is locked and nothing about the pass shows
+unless `PASS_URL` in `index.html` is set **and** the server has all three
+secrets plus the `DB` binding (`GET /api/pass/status` -> `{configured}`). As
+shipped, `PASS_URL` is empty and the site behaves exactly as before.
+
+How it works:
+
+- **Gate (server).** `lib/pass.js`. `/api/case` and `/api/guess` answer `402`
+  for a date older than UTC today - 8 days (one spare day so no time zone loses
+  its 7th day) unless the request carries a valid `X-Pass` token. Today and
+  tomorrow (the nightly smoke test) are never locked. The reel and photo scripts
+  read `functions/_data/cases.json` directly and never hit the API.
+- **List (client).** In the past-cases list, days older than the player's local
+  today - 7 show a 🔒 and open the pass sheet; so does a locked `?d=` link.
+- **Purchase.** The Payment Link redirects to `/?pass={CHECKOUT_SESSION_ID}`.
+  The page strips `?pass=` and POSTs the id to `/api/pass/claim`, which asks
+  Stripe for that Checkout Session, requires `payment_status == "paid"` and
+  `payment_link == PASS_PAYMENT_LINK_ID`, stores `(session_id, sha256(lowercased
+  email), created)` in the D1 table `passes` (`gen/sql/passes.sql`) and returns a
+  token. Claiming the same session again returns the same token.
+- **Token.** `base64url(payload).base64url(HMAC-SHA256(payload, PASS_SIGNING_KEY))`;
+  the payload holds a hash of the session id, never the email. Kept in
+  `localStorage` (`imposter_pass`). It is checked without a D1 read, so a
+  refunded pass keeps working; rotating `PASS_SIGNING_KEY` voids every token
+  (buyers then use Restore).
+- **Restore.** "Restore purchase" takes the email paid with; `/api/pass/restore`
+  looks up its hash and returns a token. Anyone who knows a buyer's email can
+  restore that pass: an accepted tradeoff for a $5 unlock with no accounts.
+- **Ads off.** A small loader in `<head>` (index, about, contact, how-to-spot)
+  injects the AdSense script only when no token is in `localStorage`, and a
+  `has-pass` class hides every ad slot, so pass holders never see an ad flash.
+  The results banner and pre-roll also skip themselves.
+- **Funnel.** `p-view` (sheet shown), `p-click` (Get the Pass), `p-claim`
+  (claimed ok), `p-restore` (restored ok), in `gen/funnel.py`.
+
+Server env (Pages secrets): `STRIPE_SECRET_KEY` (restricted key, read-only
+Checkout Sessions), `PASS_PAYMENT_LINK_ID` (`plink_...`), `PASS_SIGNING_KEY`
+(random string, 32+ bytes).
+
+Setup (Tony, in this order, so the site is never half-on):
+
+1. Stripe, Product catalog: create a product **Imposter Detective Pass**, one-time
+   price **$5.00 USD**.
+2. Stripe, Payment Links: create a link for it. After payment: *Don't show
+   confirmation page*, redirect to
+   `https://play-imposter.lol/?pass={CHECKOUT_SESSION_ID}` (type it exactly,
+   braces included). Note the link URL (`https://buy.stripe.com/...`) and its id
+   (`plink_...`, in the link's page URL or API view).
+3. Stripe, Developers, API keys: *Create restricted key*, all permissions None
+   except **Checkout Sessions: Read**. Copy the `rk_live_...` key.
+4. Create the table: `npx wrangler d1 execute imposter-boards --remote --file gen/sql/passes.sql`
+5. Paste the link URL into `const PASS_URL = "..."` in `index.html`, commit and
+   push to main. (Still dormant: the server has no secrets yet.)
+6. Set the secrets on both Pages projects (each command prompts for the value):
+   ```bash
+   for p in playimposter imposter-game; do
+     npx wrangler pages secret put STRIPE_SECRET_KEY --project-name=$p
+     npx wrangler pages secret put PASS_PAYMENT_LINK_ID --project-name=$p
+     npx wrangler pages secret put PASS_SIGNING_KEY --project-name=$p
+   done
+   ```
+   Use the same `PASS_SIGNING_KEY` on both (`openssl rand -base64 32`), or a
+   token from one domain fails on the other.
+7. Deploy: `gh workflow run nightly.yml` (secrets apply from the next deploy).
+8. Check: `curl https://play-imposter.lol/api/pass/status` says `{"configured":true}`;
+   a case older than a week shows 🔒; buy once with a real card and refund it in
+   Stripe to test the whole path.
+
+Turn it off again: delete the three secrets and redeploy (emptying only `PASS_URL`
+hides the sheet but the server would still lock old cases).

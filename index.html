@@ -27,7 +27,8 @@
 <meta name="twitter:image:alt" content="Imposter: four photos. Three are real, one is AI. Can you spot the fake?">
 <meta name="theme-color" content="#0d0f18">
 <meta name="google-adsense-account" content="ca-pub-2828356328766240">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2828356328766240" crossorigin="anonymous"></script>
+<!-- Ads load from here, unless this browser holds a Detective Pass (or is claiming one): then never -->
+<script>(function(){var p;try{p=localStorage.getItem("imposter_pass")||/[?&]pass=cs_/.test(location.search)}catch(_){}if(p){document.documentElement.classList.add("has-pass");return}var s=document.createElement("script");s.async=true;s.crossOrigin="anonymous";s.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2828356328766240";document.head.appendChild(s)})();</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -722,6 +723,20 @@
   .warmup-prompt p { margin: 4px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 13px;
     color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
   .past-cases { margin-top: 16px; }
+  /* Detective Pass */
+  #passModal { z-index: 100000; } /* above the start overlay: a locked ?d= link opens on it */
+  .has-pass .ad-slot, .has-pass ins.adsbygoogle { display: none !important; }
+  .past-list a.locked { opacity: 0.6; }
+  .past-list .pr.lock { color: var(--accent2); }
+  .pass-note { all: unset; cursor: pointer; display: block; margin-top: 8px; text-align: center; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--accent2); text-decoration: underline; width: 100%; }
+  .pass-price { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; color: #fff; margin: 0; }
+  .pass-price small { font-size: 12px; font-weight: 700; color: var(--accent); margin-left: 6px; }
+  .pass-perks { margin: 0; padding-left: 18px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.6; color: #fff; }
+  .pass-buy { text-decoration: none; justify-content: center; }
+  .pass-restore { display: flex; gap: 8px; }
+  .pass-restore input { flex: 1; min-width: 0; }
+  .pass-msg { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); min-height: 1em; }
   .btn-past { display: block; box-sizing: border-box; width: 100%; padding: 14px 10px; border-radius: 8px; text-align: center;
     text-decoration: none; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 13px; color: #fff;
     background: hsl(calc(var(--h) + 2) calc(var(--sk) * 33%) 16.5%); border: 2px solid var(--accent2); }
@@ -2536,6 +2551,7 @@
           <summary>More past cases</summary>
           <ol class="past-list" id="pastList"></ol>
         </details>
+        <button class="pass-note" id="passNote" type="button" onclick="openPassSheet()" hidden>🔒 Older cases need a Detective Pass</button>
       </div>
     </div>
     <div class="results-links">
@@ -2644,6 +2660,31 @@
         <span>✉️ Email</span>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- Detective Pass sheet (see "Detective Pass" in the script; dormant until PASS_URL is set) -->
+<div class="invite-modal" id="passModal" role="dialog" aria-labelledby="passTitle">
+  <div class="invite-card">
+    <div class="modal-close-x" onclick="closePassSheet()">✕</div>
+    <div class="invite-header">
+      <span class="invite-icon">🗄️</span>
+      <h3 class="invite-title" id="passTitle">Detective Pass</h3>
+    </div>
+    <p class="invite-desc" id="passLead">This file is sealed. The last week of cases is always open; older ones are kept in the evidence room, for pass holders only.</p>
+    <p class="pass-price">$5<small>one-time · no subscription</small></p>
+    <ul class="pass-perks">
+      <li>Every past case, back to case #1, open for good</li>
+      <li>No ads anywhere on the site</li>
+      <li>Keeps the lights on in the detective office</li>
+    </ul>
+    <a class="invite-btn-copy-link pass-buy" id="passBuy" href="#" rel="noopener" onclick="ev('p-click')"><span>🔓 Get the Pass</span></a>
+    <button class="pass-note" type="button" onclick="$('passRestore').hidden = false; $('passEmail').focus()">Restore purchase</button>
+    <form class="board-name pass-restore" id="passRestore" hidden onsubmit="restorePass(event)">
+      <input id="passEmail" type="email" placeholder="Email you paid with" autocomplete="email" required>
+      <button class="invite-btn-copy-link" type="submit"><span>Restore</span></button>
+    </form>
+    <p class="pass-msg" id="passMsg" aria-live="polite"></p>
   </div>
 </div>
 
@@ -4036,6 +4077,80 @@ function shortDate(iso) {
   return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
 }
 
+// ===== Detective Pass =====
+// $5 once (Stripe Payment Link) unlocks cases older than PASS_FREE_DAYS and turns ads off.
+// Dormant, exactly as before, until PASS_URL is set here AND /api/pass/status says the
+// server has its secrets. The token is checked by the server (X-Pass header); here only
+// its presence matters, so ads are skipped before they can flash (see the <head> loader).
+const PASS_URL = "";
+const PASS_KEY = "imposter_pass";
+const PASS_FREE_DAYS = 7; // matches FREE_DAYS in lib/pass.js
+function passToken() { try { return localStorage.getItem(PASS_KEY) || ""; } catch (_) { return ""; } }
+function hasPass() { return !!passToken(); }
+function passHeaders(h = {}) { const t = passToken(); return t ? { ...h, "X-Pass": t } : h; }
+const passOn = !PASS_URL ? Promise.resolve(false)
+  : fetch("/api/pass/status").then(r => r.ok ? r.json() : {}).then(j => j.configured === true).catch(() => false);
+function passLocked(date, on) { return on && !hasPass() && date < localDayStr(-PASS_FREE_DAYS); }
+function savePass(token) {
+  try { localStorage.setItem(PASS_KEY, token); } catch (_) {}
+  document.documentElement.classList.add("has-pass");
+  if ($("resultsAdSlot")) $("resultsAdSlot").hidden = true;
+}
+
+let passBackOnClose = false;
+function openPassSheet(opts = {}) {
+  if (!PASS_URL) return;
+  passBackOnClose = !!opts.back;
+  $("passBuy").href = PASS_URL;
+  $("passMsg").textContent = "";
+  $("passModal").classList.add("open");
+  ev("p-view");
+}
+function closePassSheet() {
+  $("passModal").classList.remove("open");
+  if (passBackOnClose) location.replace("/");
+}
+
+async function passPost(path, body) {
+  const res = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok || !j.token) throw new Error(j.error || `pass ${res.status}`);
+  return j.token;
+}
+
+async function restorePass(e) {
+  e.preventDefault();
+  $("passMsg").textContent = "Checking the files…";
+  try {
+    savePass(await passPost("/api/pass/restore", { email: $("passEmail").value }));
+    ev("p-restore");
+    $("passMsg").textContent = "Pass restored. Welcome back, detective.";
+    setTimeout(() => location.reload(), 900);
+  } catch (err) {
+    $("passMsg").textContent = /no pass/.test(err.message) ? "No pass on file for that email." : "Could not reach the office. Try again.";
+  }
+}
+
+// After paying, Stripe sends the player to /?pass=<checkout session id>
+(function claimPassFromUrl() {
+  const params = new URLSearchParams(location.search);
+  const id = params.get("pass");
+  if (!id) return;
+  params.delete("pass");
+  const q = params.toString();
+  history.replaceState(null, "", location.pathname + (q ? "?" + q : "") + location.hash);
+  if (!PASS_URL || !/^cs_/.test(id)) return;
+  passPost("/api/pass/claim", { session: id }).then(token => {
+    savePass(token);
+    ev("p-claim");
+    showToast("🗄️ Detective Pass active: every case file is open, ads are off.");
+    renderPastCases();
+  }).catch(() => {
+    if (!hasPass()) document.documentElement.classList.remove("has-pass");
+    showToast("We could not confirm the payment yet. Use Restore purchase with your email.");
+  });
+})();
+
 // "Play yesterday's case" plus a list of the rest, newest first. Your result shows
 // next to each: the day's own record if you played it live, else a replay record.
 async function renderPastCases() {
@@ -4052,22 +4167,26 @@ async function renderPastCases() {
   let daily = {};
   try { daily = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}"); } catch (_) {}
   const replays = archiveRecords();
+  const on = await passOn;
+  const locked = c => passLocked(c.date, on);
   const resultFor = c => {
     const r = daily[c.date];
     if (r && r.solved && (!r.caseNumber || r.caseNumber === c.caseNumber)) return r;
     return replays[c.date] || null;
   };
   // The button goes to the newest past case you have not played
-  const next = cases.find(c => !resultFor(c)) || cases[0];
+  const next = cases.find(c => !resultFor(c) && !locked(c)) || cases[0];
   const btn = $("btnPastNext");
   btn.href = `/?d=${next.date}`;
   btn.textContent = next.date === localDayStr(-1) ? "▶ Play yesterday's case" : `▶ Play case #${next.caseNumber} (${shortDate(next.date)})`;
   const rest = cases.filter(c => c !== next);
   $("pastList").innerHTML = rest.map(c => {
     const r = resultFor(c);
+    if (locked(c)) return `<li><a class="locked" href="/?d=${c.date}" onclick="event.preventDefault(); openPassSheet()"><span>#${c.caseNumber}</span><span class="pd">${shortDate(c.date)}</span><span class="pr lock">🔒</span></a></li>`;
     const tag = r ? `<span class="pr">${r.won}/${r.total || 6}</span>` : `<span class="pr todo">Play</span>`;
     return `<li><a href="/?d=${c.date}"><span>#${c.caseNumber}</span><span class="pd">${shortDate(c.date)}</span>${tag}</a></li>`;
   }).join("");
+  $("passNote").hidden = !rest.some(locked);
   $("pastFold").hidden = !rest.length;
   box.hidden = false;
 }
@@ -4120,7 +4239,7 @@ function hideDailyOnlyResults() {
 }
 function ev(step) {
   // A past case is counted on its own: a-load, a-r1, a-done, nothing else
-  if (ARCHIVE_DATE) { step = "a-" + step; if (!["a-load", "a-r1", "a-done"].includes(step)) return; }
+  if (ARCHIVE_DATE && !step.startsWith("p-")) { step = "a-" + step; if (!["a-load", "a-r1", "a-done"].includes(step)) return; }
   if (evSent.has(step)) return;
   evSent.add(step);
   try { fetch(`/api/ev/${EV_SRC}/${step}`, { keepalive: true }).catch(() => {}); } catch (_) {}
@@ -4258,7 +4377,8 @@ async function init() {
   // Fetch today's case (no answers in it: guesses are checked by /api/guess)
   const todayStr = localDayStr();
   try {
-    const res = await fetch(`/api/case?date=${ARCHIVE_DATE || todayStr}`);
+    const res = await fetch(`/api/case?date=${ARCHIVE_DATE || todayStr}`, { headers: passHeaders() });
+    if (res.status === 402 && ARCHIVE_DATE && PASS_URL) return openPassSheet({ back: true });
     if (!res.ok) throw new Error(`case ${res.status}`);
     dailyCaseData = await res.json();
     ev("load");
@@ -4530,7 +4650,7 @@ function renderRoundCredits() {
 async function postGuess(round, card) {
   const res = await fetch("/api/guess", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: passHeaders({ "content-type": "application/json" }),
     body: JSON.stringify({ date: dailyCaseData.date, round, card, reveal: true })
   });
   if (!res.ok) throw new Error(`guess ${res.status}`);
@@ -4919,6 +5039,7 @@ let resultsAdRendered = false;
 function renderResultsAd() {
   const slot = $("resultsAdSlot");
   if (!slot || resultsAdRendered) return;
+  if (hasPass()) { slot.hidden = true; return; }
   if (!(ADS.enabled && ADS.adsenseClient && ADS.resultsSlot)) { slot.hidden = true; return; }
   resultsAdRendered = true;
   slot.hidden = false;
@@ -4943,7 +5064,7 @@ function renderResultsAd() {
 let prerollDone = false;
 let prerollShowing = false;
 function prerollNeeded() {
-  return !prerollDone && !!(ADS.video && ADS.video.enabled && ADS.video.src);
+  return !prerollDone && !hasPass() && !!(ADS.video && ADS.video.enabled && ADS.video.src);
 }
 function runPreroll(next) {
   if (prerollShowing) return;
