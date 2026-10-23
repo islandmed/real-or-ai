@@ -2159,6 +2159,23 @@
     line-height: 1.25;
   }
 
+  /* Detective partners (dossier picker + results chip) */
+  .results-level { position: relative; padding-left: 50px; min-height: 40px; }
+  .partner-chip { position: absolute; left: 0; top: 50%; width: 40px; height: 40px; margin-top: -20px; }
+  .partner-chip svg, .partner-av svg { display: block; width: 100%; height: 100%; }
+  .partner-list { display: grid; gap: 6px; margin-top: 10px; }
+  .partner-row { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 10px; width: 100%; padding: 6px 10px 6px 6px; cursor: pointer;
+    background: hsl(calc(var(--h) + 1) calc(var(--sk) * 39%) 12.9%); border: 1px solid hsl(calc(var(--h) + -2) calc(var(--sk) * 38%) 23.9%); border-radius: 8px; text-align: left; }
+  .partner-row.on { border-color: #ffde59; background: rgba(255, 222, 89, 0.08); box-shadow: 0 0 10px rgba(255, 222, 89, 0.15); }
+  .partner-row.locked { cursor: default; opacity: 0.45; }
+  .partner-row.locked .partner-av { filter: grayscale(1) brightness(0.7); }
+  .partner-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .partner-av { flex: 0 0 40px; width: 40px; height: 40px; }
+  .partner-txt { flex: 1; min-width: 0; }
+  .partner-txt b { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 800; color: #fff; }
+  .partner-txt small { display: block; margin-top: 2px; font-size: 10px; line-height: 1.3; color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
+  .partner-tick { flex: 0 0 14px; color: #ffde59; font-weight: 800; }
+
   /* Endless Game Over View */
   .endless-over-card {
     background: hsl(calc(var(--h) + 2) calc(var(--sk) * 43%) 10.4%);
@@ -2485,6 +2502,7 @@
         </form>
       </div>
       <button class="results-level" id="resultsLevel" type="button" onclick="openDossierModal()">
+        <span class="partner-chip" id="resultsPartner"></span>
         <div class="xp-label-row"><span id="resultsLevelTitle">🎖️ CADET · LEVEL 1</span><span id="resultsXpGain"></span></div>
         <div class="xp-bar-bg"><div class="xp-bar-fill" id="resultsXpFill" style="width: 0%;"></div></div>
         <div class="results-level-next" id="resultsLevelNext"></div>
@@ -2836,6 +2854,9 @@
         <div class="stat-label">1st-Try Aces</div>
       </div>
     </div>
+
+    <div class="dist-title" style="margin-top:16px;">Detective Partner</div>
+    <div class="partner-list" id="partnerList"></div>
 
     <div class="dist-title" style="margin-top:16px;">Career Forensic Medals <span id="dossierMedalCount"></span></div>
     <div class="badges-grid" id="dossierBadgesGrid">
@@ -3682,6 +3703,123 @@ function unlockBadges(ids) {
   playSound("victory");
 }
 
+// --- Detective partners: avatars unlocked by the best daily streak ---
+// Each is drawn from path data, so the same shapes render as inline SVG in the
+// page and through Path2D on the story card. Archive replays never touch
+// maxStreak, so they never unlock a partner.
+const pE = (cx, cy, rx, ry = rx) => `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0z`;
+const INK = "#16161c";
+const PARTNERS = [
+  { id: "rookie", name: "Pip", role: "The Rookie", streak: 0, ring: "#9fe8ff", flavour: "Fresh badge, sharp pencil, notes on everything.", art: [
+    ["M10 64Q12 47 32 47Q52 47 54 64Z", "#c49a5a"], ["M28 47L32 56L36 47Z", "#f3ead8"],
+    [pE(32, 35, 12), "#f2c79b"], [pE(25, 39, 2, 1.3), "#f29b8b"], [pE(39, 39, 2, 1.3), "#f29b8b"],
+    [pE(27.5, 34, 1.6), INK], [pE(36.5, 34, 1.6), INK], ["M28 40Q32 43 36 40", "none", INK, 1.6],
+    ["M21 26Q22 13 32 13Q42 13 43 26Z", "#3b4a6b"], ["M21.5 22.5h21v3h-21z", INK], [pE(32, 26, 17, 3.5), "#2c3852"]] },
+  { id: "hound", name: "Biscuit", role: "The Bloodhound", streak: 5, ring: "#ffde59", flavour: "Sniffs out a fake from three rounds away.", art: [
+    ["M18 49Q32 57 46 49L47 64H17Z", "#c0392b"], [pE(32, 55, 2.6), "#ffde59"],
+    ["M17 24Q9 40 15 51Q22 49 23 33Z", "#7a4a22"], ["M47 24Q55 40 49 51Q42 49 41 33Z", "#7a4a22"],
+    ["M21 22Q32 11 43 22L44 40Q32 51 20 40Z", "#b0743f"], [pE(32, 41, 8, 6), "#d9a066"],
+    [pE(32, 37, 3.4, 2.4), INK], [pE(27, 29, 1.8), INK], [pE(37, 29, 1.8), INK],
+    ["M24.5 27Q27 25.5 29.5 27M34.5 27Q37 25.5 39.5 27", "none", "#5a3418", 1.6], ["M32 39.5v3M29 44Q32 46 35 44", "none", "#5a3418", 1.4]] },
+  { id: "owl", name: "Nyx", role: "The Night Owl", streak: 14, ring: "#b48cff", flavour: "Reads every pixel, even long after midnight.", art: [
+    ["M16 23L19 11L26 20Z", "#5e4633"], ["M48 23L45 11L38 20Z", "#5e4633"],
+    [pE(32, 40, 17, 20), "#7b5e45"], [pE(32, 49, 10, 10), "#c9a77c"],
+    [pE(25, 30, 7), "#f3ead8"], [pE(39, 30, 7), "#f3ead8"], [pE(25, 30, 4.2), "#ffb547"], [pE(39, 30, 4.2), "#ffb547"],
+    [pE(25, 30, 2.2), INK], [pE(39, 30, 2.2), INK], ["M29.5 36H34.5L32 41Z", "#ff9f1c"],
+    [pE(39, 30, 8.2), "none", "#f5c451", 1.6], ["M46.5 33.5Q51 42 45 49", "none", "#f5c451", 1]] },
+  { id: "fox", name: "Vesper", role: "The Fox", streak: 30, ring: "#ff7a1a", flavour: "Too sly to fall for anybody else's trick.", art: [
+    ["M17 52Q32 60 47 52L49 64H15Z", "#2f6fdb"],
+    ["M13 10L27 21L18 30Z", "#e8641c"], ["M51 10L37 21L46 30Z", "#e8641c"], ["M16 15L23 21L19 25Z", "#3a1f14"], ["M48 15L41 21L45 25Z", "#3a1f14"],
+    ["M13 24Q32 13 51 24Q49 41 32 51Q15 41 13 24Z", "#ff7a1a"],
+    ["M17 32Q26 36 32 51Q21 45 17 32Z", "#fff2e6"], ["M47 32Q38 36 32 51Q43 45 47 32Z", "#fff2e6"],
+    [pE(32, 47, 2.6, 2), INK], ["M22 29Q25.5 26.5 29 29Q25.5 30.5 22 29Z", INK], ["M42 29Q38.5 26.5 35 29Q38.5 30.5 42 29Z", INK]] },
+  { id: "chameleon", name: "Mirage", role: "The Chameleon", streak: 45, ring: "#39ff14", flavour: "A master of disguise, so no disguise fools it.", art: [
+    ["M44 50Q56 50 56 40Q56 32 48 33Q42 34 44 40Q46 44 50 41", "none", "#2ea35a", 4],
+    ["M9 40Q11 24 30 22Q46 22 46 36Q46 50 28 50Q13 50 9 40Z", "#3fbf6f"],
+    ["M17 29Q28 25 40 27", "none", "#2ea35a", 2], [pE(22, 43, 1.8), "#7be495"], [pE(38, 44, 1.6), "#7be495"],
+    [pE(32, 33, 7), "#2ea35a"], [pE(33, 33, 4.2), "#f3ead8"], [pE(34.5, 33, 2), INK], ["M10 41Q20 44 28 42", "none", "#1f6b3b", 1.5],
+    [pE(14, 18, 5), "rgba(159,232,255,0.18)", "#9fe8ff", 2], ["M10.5 21.5L5 27", "none", "#9fe8ff", 2.6]] }
+];
+
+function partnerBestStreak() {
+  return Math.max(playerStats.maxStreak || 0, playerStats.currentStreak || 0);
+}
+function partnerUnlocked(p) { return partnerBestStreak() >= p.streak; }
+function chosenPartner() {
+  let id = null;
+  try { id = localStorage.getItem("imposter_partner"); } catch (_) {}
+  const p = PARTNERS.find(x => x.id === id);
+  return p && partnerUnlocked(p) ? p : PARTNERS[0];
+}
+
+function partnerSvg(p) {
+  const cid = `pc_${p.id}`;
+  const shapes = p.art.map(([d, fill, stroke, sw]) => `<path d="${d}" fill="${fill}"${stroke ? ` stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"` : ""}/>`).join("");
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><defs><clipPath id="${cid}"><path d="${pE(32, 32, 30)}"/></clipPath></defs><path d="${pE(32, 32, 30)}" fill="#141a2b"/><g clip-path="url(#${cid})">${shapes}</g><path d="${pE(32, 32, 30.5)}" fill="none" stroke="${p.ring}" stroke-width="2.5"/></svg>`;
+}
+
+// Draws the partner as a `size` px disc centred on (cx, cy)
+function drawPartner(ctx, p, cx, cy, size) {
+  ctx.save();
+  ctx.translate(cx - size / 2, cy - size / 2);
+  ctx.scale(size / 64, size / 64);
+  ctx.fillStyle = "#141a2b";
+  ctx.fill(new Path2D(pE(32, 32, 30)));
+  ctx.save();
+  ctx.clip(new Path2D(pE(32, 32, 30)));
+  ctx.lineCap = ctx.lineJoin = "round";
+  p.art.forEach(([d, fill, stroke, sw]) => {
+    const path = new Path2D(d);
+    if (fill !== "none") { ctx.fillStyle = fill; ctx.fill(path); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = sw; ctx.stroke(path); }
+  });
+  ctx.restore();
+  ctx.strokeStyle = p.ring;
+  ctx.lineWidth = 2.5;
+  ctx.stroke(new Path2D(pE(32, 32, 30.5)));
+  ctx.restore();
+}
+
+function renderPartners() {
+  const p = chosenPartner();
+  const chip = $("resultsPartner");
+  if (chip) { chip.innerHTML = partnerSvg(p); chip.title = `${p.name}, ${p.role}`; }
+  const list = $("partnerList");
+  if (!list) return;
+  list.innerHTML = PARTNERS.map(x => {
+    const open = partnerUnlocked(x), on = open && x.id === p.id;
+    return `<button type="button" class="partner-row${open ? "" : " locked"}${on ? " on" : ""}" ${open ? `onclick="pickPartner('${x.id}')"` : "disabled"} aria-pressed="${on}">
+      <span class="partner-av">${partnerSvg(x)}</span>
+      <span class="partner-txt"><b>${x.name} · ${x.role}</b><small>${open ? x.flavour : `🔒 Unlocks at a ${x.streak}-day streak`}</small></span>
+      <span class="partner-tick">${on ? "✓" : ""}</span></button>`;
+  }).join("");
+}
+
+function pickPartner(id) {
+  playSound("tap");
+  try { localStorage.setItem("imposter_partner", id); } catch (_) {}
+  renderPartners();
+}
+
+// After a daily case: one toast per newly reached partner. Already-unlocked
+// partners are recorded silently on first run, so a returning player is not
+// greeted with a stack of old unlocks.
+function checkPartnerUnlocks(announce) {
+  let seen = null;
+  try { seen = JSON.parse(localStorage.getItem("imposter_partners_seen") || "null"); } catch (_) {}
+  const open = PARTNERS.filter(partnerUnlocked).map(p => p.id);
+  const fresh = seen ? open.filter(id => !seen.includes(id)) : [];
+  try { localStorage.setItem("imposter_partners_seen", JSON.stringify(open)); } catch (_) {}
+  renderPartners();
+  if (!announce || !fresh.length) return;
+  const p = PARTNERS.find(x => x.id === fresh[fresh.length - 1]);
+  // After the XP and medal toasts have had their turn
+  setTimeout(() => {
+    showToast(`🐾 New partner unlocked: ${p.name}, ${p.role}! Pick them in your dossier.`);
+    playSound("victory");
+  }, 3000);
+}
+
 // --- Deception Index ---
 // Real share of players who tapped this card, from the pick tally /api/guess
 // returns, once the round has REAL_PICKS_MIN plays; until then the simulated
@@ -4048,6 +4186,7 @@ async function init() {
   clearStaleLeaderboardKeys();
   loadStats();
   loadCareer();
+  checkPartnerUnlocks(false);
   updateSoundButton();
   $("btnSound").onclick = toggleSound;
 
@@ -4590,6 +4729,7 @@ function showFinalResults() {
   if (finalSecs < 20.0 && firstTryCount >= (totalRounds - 1)) medals.push("lightning_instinct");
   medals.push(...historyMedals({ won: totalWon, total: totalRounds, secs: finalSecs, rounds: roundResults }));
   unlockBadges(medals);
+  checkPartnerUnlocks(true);
 
   renderResultsExtras(finalScore, finalSecs);
   renderPhotoCredits();
@@ -4909,6 +5049,12 @@ function renderStoryCard() {
   ctx.font = "800 38px 'JetBrains Mono', monospace";
   ctx.fillStyle = P.accent;
   ctx.fillText(window.location.host || "impostergame.com", 540, 1650);
+
+  const partner = chosenPartner();
+  drawPartner(ctx, partner, 540, 1745, 120);
+  ctx.font = "700 24px 'JetBrains Mono', monospace";
+  ctx.fillStyle = P.muted;
+  ctx.fillText(`ON THE CASE WITH ${partner.name.toUpperCase()}`, 540, 1845);
 
   if (SEASON.id === "christmas") {
     ctx.fillStyle = "#ffffff";
