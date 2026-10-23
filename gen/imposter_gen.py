@@ -1385,6 +1385,9 @@ def pack_sheet_path(pid, n):
     return PACK_SHEETS / pid / f"{case_id(n)}.jpg"
 
 
+PACK_WAIT_DAYS = 7
+
+
 def daily_pending(state, seasons, days=44):
     """Dates of the daily lookahead (the default generator window) that have a
     season and are not finished. Packs wait while there are any."""
@@ -1400,9 +1403,11 @@ def daily_pending(state, seasons, days=44):
 def run_packs(state, seasons, packs, secret):
     """Fill the packs in gen/packs.json order, case by case, with what is left
     of today's budget. Daily cases always come first."""
-    pending = daily_pending(state, seasons)
+    # Only the coming week blocks packs: days further out can sit unfinished for
+    # weeks while their pools wait for a human review, and must not starve packs.
+    pending = daily_pending(state, seasons, days=PACK_WAIT_DAYS)
     if pending:
-        log(f"packs: waiting, {len(pending)} daily case(s) in the lookahead are not finished yet")
+        log(f"packs: waiting, {len(pending)} daily case(s) in the next {PACK_WAIT_DAYS} days are not finished yet")
         return
     for pack in packs:
         for n in range(1, pack["cases"] + 1):
