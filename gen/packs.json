@@ -996,30 +996,6 @@
      "vision": "a real sloth, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
     },
     {
-     "key": "alpacas",
-     "name": "Alpacas & Llamas",
-     "short": "ALPACAS",
-     "queries": [
-      "alpaca",
-      "llama",
-      "alpaca face",
-      "llama portrait",
-      "fluffy alpaca"
-     ],
-     "match": "(?s)^(?!.*(?:teddy|steiff|plush|yarn|wool\\b|garn|knit|stofftier|sweater|textile|poncho|blanket)).*?(?:alpacas?|alpakas?|\\bllamas?\\b|lama glama|vicugna pacos)",
-     "prompts": [
-      "a fluffy white alpaca with a big tuft of hair grazing in a muddy paddock",
-      "a llama chewing hay at a farm fence",
-      "a brown alpaca with a freshly shorn body and a fluffy head standing in a farm field",
-      "two alpacas standing cheek to cheek by a farm fence"
-     ],
-     "cats": [
-      "Vicugna pacos",
-      "Lama glama"
-     ],
-     "vision": "a real alpaca or llama, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
-    },
-    {
      "key": "puffins",
      "name": "Puffins",
      "short": "PUFFINS",
@@ -1043,27 +1019,6 @@
       "Fratercula cirrhata"
      ],
      "vision": "a real puffin, the bird large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
-    },
-    {
-     "key": "proboscis",
-     "name": "Proboscis Monkeys",
-     "short": "NOSES",
-     "queries": [
-      "proboscis monkey",
-      "nasalis larvatus",
-      "proboscis monkey borneo"
-     ],
-     "match": "proboscis|nasalis|nasenaffe|nasique|mono narigudo|bekantan",
-     "prompts": [
-      "a male proboscis monkey, orange-brown fur, grey legs and a long fleshy nose hanging over its mouth, sitting in a mangrove tree, photographed from a riverboat",
-      "a group of proboscis monkeys with long drooping noses feeding in mangrove trees in Borneo, seen from a distance",
-      "a proboscis monkey with a big pot belly and a long pendulous nose resting on a branch at a zoo",
-      "a proboscis monkey leaping between trees over a muddy river in Borneo"
-     ],
-     "cats": [
-      "Nasalis larvatus"
-     ],
-     "vision": "a real proboscis monkey, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
     },
     {
      "key": "pelicans",
@@ -1187,47 +1142,110 @@
      "vision": "a real cat or dog clearly asleep, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
     },
     {
-     "key": "quokkas",
-     "name": "Quokkas",
-     "short": "QUOKKAS",
+     "key": "ducklings",
+     "name": "Ducklings",
+     "short": "DUCKLINGS",
      "queries": [
-      "quokka",
-      "quokka rottnest island",
-      "setonix brachyurus"
+      "ducklings",
+      "mallard with ducklings",
+      "ducklings following mother",
+      "duck family walking",
+      "ducklings swimming",
+      "ducks in a row"
      ],
-     "match": "(?s)^(?!.*(?:plush|mascot|stuffed|soft toy|wikimania|eseap|conference|meetup|user group|state of the map|puppet|kuscheltier|bus\\b|coach|skull|placard|tobu|interior|side car|gate on)).*?(?:quokkas?|setonix)",
+     "match": "(?s)^(?!.*(?:rubber|toy|plastic|statue|sculpture|drawing|painting|roast|food)).*?(?:ducklings?|ducks? family|family of ducks|ducks in a row|küken|entenküken|caneton|patitos?|anatroccol|eendjes|kaczęt)",
      "prompts": [
-      "a quokka, a small cat-sized brown marsupial with short round ears, hopping across a sandy path on Rottnest Island, photographed from standing height",
-      "a quokka sitting on its hind legs nibbling a leaf in dry scrub",
-      "a quokka resting in the shade of a bush on sandy ground",
-      "two quokkas foraging under low bushes on Rottnest Island"
+      "a mallard duck leading a line of ducklings across a grassy park path",
+      "a row of fluffy ducklings swimming behind their mother on a pond",
+      "a cluster of ducklings tumbling over each other at the edge of a lake",
+      "a duck family waddling through a puddle on a farm track"
      ],
      "cats": [
-      "Setonix brachyurus"
+      "Ducklings",
+      "Anas platyrhynchos (ducklings)",
+      "Ducks in a row"
      ],
-     "vision": "a real quokka, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+     "vision": "real ducklings, alone or with a parent duck, large and clear as the main subject. Alive and in natural surroundings, a home, a farm or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
     },
     {
-     "key": "lemurs",
-     "name": "Lemurs",
-     "short": "LEMURS",
+     "key": "squirrels",
+     "name": "Squirrels Snacking",
+     "short": "SQUIRRELS",
      "queries": [
-      "ring-tailed lemur",
-      "lemur sunbathing",
-      "lemur catta",
-      "lemurs huddle"
+      "squirrel eating",
+      "squirrel eating nut",
+      "squirrel with nut in mouth",
+      "chipmunk cheeks",
+      "squirrel eating acorn",
+      "squirrel bird feeder"
      ],
-     "match": "lemurs?\\b|lemur catta|katta\\b|maki\\b",
+     "match": "(?s)^(?!.*(?:statue|sculpture|drawing|painting|toy|plush|dead|roadkill|monkey|flying squirrel)).*?(?:squirrels?|sciurus|tamias|chipmunks?|eichhörnchen|eichhoernchen|écureuil|ecureuil|ardilla|scoiattol|eekhoorn|wiewiórk)",
      "prompts": [
-      "a ring-tailed lemur sitting upright sunbathing with its arms spread wide at a zoo",
-      "a ring-tailed lemur hugging its striped tail on a branch",
-      "two ring-tailed lemurs sitting on a wooden platform at a zoo",
-      "a ring-tailed lemur walking on all fours with its striped tail raised, at a zoo"
+      "a grey squirrel sitting upright on a park lawn nibbling a nut held in its paws",
+      "a red squirrel on a tree branch gnawing a pine cone",
+      "a chipmunk on a rock with its cheek pouches stuffed full",
+      "a squirrel hanging upside down from a garden bird feeder, eating seeds"
      ],
      "cats": [
-      "Lemur catta"
+      "Sciurus carolinensis eating",
+      "Sciurus vulgaris eating",
+      "Tamias striatus"
      ],
-     "vision": "a real lemur, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+     "vision": "a real squirrel or chipmunk, ideally eating or holding food, the animal large and clear as the main subject. Alive and in natural surroundings, a home, a farm or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "wetdogs",
+     "name": "Wet Dogs",
+     "short": "WET DOGS",
+     "queries": [
+      "dog shaking water",
+      "wet dog",
+      "dog swimming",
+      "dog splashing in water",
+      "dog jumping into lake",
+      "dog running in sea"
+     ],
+     "match": "(?s)^(?!.*(?:statue|sculpture|drawing|painting|toy|hot dog|sea dog|dogfish|prairie dog|raccoon dog|people|\\bman\\b|woman|child|boy\\b|girl)).*?(?:\\bdogs?\\b|pupp|\\bhunde?\\b|\\bchiens?\\b|\\bperros?\\b|\\bcane\\b|\\bhond\\b|retriever|labrador|spaniel|terrier|collie|poodle|setter)",
+     "prompts": [
+      "a soaking wet dog shaking water off its fur in a spray of droplets on a beach",
+      "a labrador swimming across a lake with a stick in its mouth",
+      "a muddy wet spaniel bounding out of a river onto the bank",
+      "a scruffy dog dripping wet standing in shallow sea water"
+     ],
+     "cats": [
+      "Dogs shaking",
+      "Wet dogs",
+      "Swimming dogs",
+      "Dogs playing in water",
+      "Dogs in water"
+     ],
+     "vision": "a real dog that is wet, swimming, splashing or shaking off water, the animal large and clear as the main subject. Alive and in natural surroundings, a home, a farm or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
+    },
+    {
+     "key": "pigs",
+     "name": "Pigs & Piglets",
+     "short": "PIGS",
+     "queries": [
+      "pig in mud",
+      "muddy pig",
+      "piglets",
+      "piglets sleeping",
+      "pig rooting",
+      "pigs on farm"
+     ],
+     "match": "(?s)^(?!.*(?:pork|meat|roast|\\bham\\b|sausage|bacon|lechon|spanferkel|butcher|slaughter|carcass|statue|sculpture|drawing|painting|toy|piggy bank|guinea pig|pig iron|pig latin|peccar|warthog|babirusa|people|\\bman\\b|woman|child|race\\b|racing)).*?(?:\\bpigs?\\b|piglets?|\\bhogs?\\b|\\bsows?\\b|swine|sus scrofa|wild boars?|schwein|ferkel|\\bcochons?\\b|porcelets?|sanglier|\\bcerdos?\\b|lechones|\\bmaial[ei]|\\bvarkens?|biggetje|\\bświni|prosiak|prasiąt)",
+     "prompts": [
+      "a pink farm pig lying on its side in a brown mud wallow, caked in mud",
+      "a pile of piglets asleep on top of each other in straw",
+      "a muddy pig rooting with its snout in a wet farmyard pen",
+      "a spotted pig trotting across a muddy field toward a feeding trough"
+     ],
+     "cats": [
+      "Pigs in mud",
+      "Wallows",
+      "Sus scrofa domesticus"
+     ],
+     "vision": "a real domestic pig, piglet or wild boar, ideally muddy, rooting, napping or in a heap of piglets, the animal large and clear as the main subject. Alive and in natural surroundings, a home, a farm or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
     }
    ],
    "style": "Candid snapshot taken from a few metres away at a zoo, farm, beach or home, the whole animal in frame, anatomically accurate for its species, not looking into the lens, not cute, not a portrait, not symmetrical, muted natural colours, cluttered ordinary background, not cartoon, not 3D render, not illustration."
