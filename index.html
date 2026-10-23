@@ -754,6 +754,23 @@
   .past-list .pd { color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
   .past-list .pr { font-weight: 800; }
   .past-list .pr.todo { color: var(--accent); font-weight: 700; }
+  /* Case Packs */
+  .case-packs { margin-top: 12px; }
+  .pack-card { --pk: var(--accent2); margin-top: 10px; padding: 12px; border-radius: 10px; border: 2px solid var(--pk);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--pk) 22%, transparent), hsl(calc(var(--h) + 2) calc(var(--sk) * 33%) 12%) 70%); }
+  .pack-card.wildlife { --pk: #4cc38a; }
+  .pack-card.food { --pk: #ff9f43; }
+  .pack-head { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; }
+  .pack-head svg { width: 64px; height: 64px; display: block; }
+  .pack-name { margin: 0; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+  .pack-tag { margin: 2px 0 0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; line-height: 1.4; color: hsl(var(--h) calc(var(--sk) * 27%) 74%); }
+  .pack-prog { margin: 6px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--pk); }
+  .pack-grid { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+  .pack-grid a { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; border-radius: 6px; text-decoration: none;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; color: #fff; border: 1px solid color-mix(in srgb, var(--pk) 55%, transparent); }
+  .pack-grid a.solved { background: color-mix(in srgb, var(--pk) 35%, transparent); }
+  .pack-grid a.here { outline: 2px solid #fff; }
+  .pack-grid a.locked { opacity: 0.55; font-size: 11px; }
   .results-links { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; margin: 4px 0 16px;
     color: hsl(var(--h) calc(var(--sk) * 27%) 64.1%); }
   .results-links a, .results-links .link-btn { color: #fff; }
@@ -2553,6 +2570,14 @@
         </details>
         <button class="pass-note" id="passNote" type="button" onclick="openPassSheet()" hidden>🔒 Older cases need a Detective Pass</button>
       </div>
+      <!-- Case Packs: filled from /api/packs (only finished, approved packs exist there), never counted in stats -->
+      <div class="case-packs" id="casePacks" hidden>
+        <a class="btn-past" id="btnPackNext" href="/" hidden></a>
+        <details class="rounds-fold" id="packsFold" ontoggle="if (this.open) ev('k-view')">
+          <summary>🗂️ Case Packs</summary>
+          <div id="packList"></div>
+        </details>
+      </div>
     </div>
     <div class="results-links">
       Follow: <a href="https://www.facebook.com/profile.php?id=61595152297634" target="_blank" rel="noopener">Facebook</a> · <a href="https://x.com/PlayImposterAI" target="_blank" rel="noopener">X</a><button class="link-btn" id="installBtn" type="button" onclick="installApp()" hidden>Install app</button>
@@ -2675,6 +2700,7 @@
     <p class="pass-price">$5<small>one-time · no subscription</small></p>
     <ul class="pass-perks">
       <li>Every past case in the evidence room, open for good</li>
+      <li id="passPackPerk" hidden>All 30 cases in every Case Pack</li>
       <li>No ads anywhere on the site</li>
       <li>Keeps the lights on in the detective office</li>
     </ul>
@@ -4101,6 +4127,7 @@ let passBackOnClose = false;
 function openPassSheet(opts = {}) {
   if (!PASS_URL) return;
   passBackOnClose = !!opts.back;
+  const lead = $("passLead"); lead.dataset.def ??= lead.textContent; lead.textContent = opts.lead || lead.dataset.def;
   $("passBuy").href = PASS_URL;
   $("passMsg").textContent = "";
   $("passModal").classList.add("open");
@@ -4154,6 +4181,7 @@ async function restorePass(e) {
 // "Play yesterday's case" plus a list of the rest, newest first. Your result shows
 // next to each: the day's own record if you played it live, else a replay record.
 async function renderPastCases() {
+  renderCasePacks();
   const box = $("pastCases");
   if (!box) return;
   let cases = [];
@@ -4237,9 +4265,128 @@ function hideDailyOnlyResults() {
   back.style.marginTop = "10px";
   $("pastCases").after(back);
 }
+// ===== Case Packs =====
+// ?k=<pack>-<n> plays case n of a themed pack (lib/packs.js). Like a past case it
+// never touches the daily record, streak, stats, XP, badges or the friends board;
+// results go to imposter_pack_records. /api/packs lists only packs whose 30 cases
+// are all generated and approved, so until then none of this shows.
+const PACK_CASE = (() => {
+  if (ARCHIVE_DATE) return null;
+  try {
+    const m = (new URLSearchParams(location.search).get("k") || "").match(/^([a-z]{2,20})-(\d{1,2})$/);
+    return m && Number(m[2]) >= 1 ? { id: m[1], n: Number(m[2]), key: `pack:${m[1]}:${m[2].padStart(2, "0")}` } : null;
+  } catch (_) { return null; }
+})();
+const PACK_REC_KEY = "imposter_pack_records";
+const PACK_LEAD = "This case file is sealed. The first cases of every pack are open; the rest are for pass holders.";
+function packRecords() {
+  try { return JSON.parse(localStorage.getItem(PACK_REC_KEY) || "{}"); } catch (_) { return {}; }
+}
+let packsReq = null;
+function fetchPacks() {
+  packsReq = packsReq || fetch("/api/packs").then(r => r.ok ? r.json() : {}).then(j => j.packs || []).catch(() => []);
+  return packsReq;
+}
+const PACK_ART = {
+  wildlife: `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="44" cy="16" r="10" fill="#f5f0d0" opacity=".85"/><path d="M4 58c10-14 20-20 30-20s20 6 26 20z" fill="#1f4d36"/><path d="M22 44c0-9 5-16 10-16s10 7 10 16c0 6-4 10-10 10s-10-4-10-10z" fill="#4cc38a"/><path d="M23 30l3 6M41 30l-3 6" stroke="#4cc38a" stroke-width="3" stroke-linecap="round"/><circle cx="28" cy="40" r="4" fill="#fff"/><circle cx="36" cy="40" r="4" fill="#fff"/><circle cx="28" cy="40" r="1.8" fill="#111"/><circle cx="36" cy="40" r="1.8" fill="#111"/><path d="M31 44l1 2 1-2z" fill="#ffb347"/><circle cx="50" cy="48" r="7" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M55 53l5 5" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`,
+  food: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 10c-3 4 3 6 0 10M30 8c-3 4 3 6 0 10M40 10c-3 4 3 6 0 10" stroke="#ffd9a8" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M8 30h48c0 13-11 22-24 22S8 43 8 30z" fill="#ff9f43"/><path d="M8 30h48" stroke="#ffd9a8" stroke-width="3" stroke-linecap="round"/><path d="M18 30c2-4 6-4 8 0M30 30c2-5 7-5 9 0" stroke="#fff3e0" stroke-width="2.5" fill="none"/><path d="M38 24l18-14" stroke="#c2410c" stroke-width="2.5" stroke-linecap="round"/><path d="M42 26l18-12" stroke="#c2410c" stroke-width="2.5" stroke-linecap="round"/><circle cx="47" cy="47" r="8" fill="rgba(0,0,0,.25)" stroke="#fff" stroke-width="2.5"/><path d="M53 53l6 6" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`,
+};
+const PACK_ART_DEFAULT = `<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="14" width="44" height="36" rx="4" fill="none" stroke="#fff" stroke-width="3"/><circle cx="40" cy="38" r="9" fill="none" stroke="#fff" stroke-width="3"/><path d="M47 45l8 8" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`;
+function openPackPass(back) { openPassSheet({ lead: PACK_LEAD, back }); }
+
+async function renderCasePacks() {
+  const box = $("casePacks");
+  if (!box) return;
+  const packs = await fetchPacks();
+  if (!packs.length) { box.hidden = true; return; }
+  if ($("passPackPerk")) $("passPackPerk").hidden = false;
+  const on = await passOn;
+  const locked = (p, n) => on && !hasPass() && n > p.free;
+  const recs = packRecords();
+  $("packList").innerHTML = packs.map(p => {
+    const id = String(p.id).replace(/[^a-z]/g, "");
+    const done = Array.from({ length: p.total }, (_, i) => recs[`${id}:${i + 1}`]).filter(Boolean).length;
+    const cells = Array.from({ length: p.total }, (_, i) => {
+      const n = i + 1, r = recs[`${id}:${n}`];
+      const here = PACK_CASE && PACK_CASE.id === id && PACK_CASE.n === n ? " here" : "";
+      if (locked(p, n)) return `<li><a class="locked${here}" href="/?k=${id}-${n}" onclick="event.preventDefault(); openPackPass()" aria-label="Case ${n}, locked">🔒</a></li>`;
+      return `<li><a class="${r ? "solved" : ""}${here}" href="/?k=${id}-${n}" aria-label="Case ${n}${r ? `, ${r.won} of ${r.total}` : ""}">${r ? "✓" : n}</a></li>`;
+    }).join("");
+    return `<div class="pack-card ${id}"><div class="pack-head">${PACK_ART[id] || PACK_ART_DEFAULT}<div>
+      <p class="pack-name">${escapeText(p.emoji || "")} ${escapeText(p.name)}</p><p class="pack-tag">${escapeText(p.tagline || "")}</p>
+      <p class="pack-prog">${done}/${p.total} cases closed${on && !hasPass() ? ` · first ${p.free} free` : ""}</p></div></div>
+      <ol class="pack-grid">${cells}</ol></div>`;
+  }).join("");
+  // In a pack case: the next case of the same pack, or the pass sheet when it is locked
+  const btn = $("btnPackNext"), cur = PACK_CASE && packs.find(p => p.id === PACK_CASE.id);
+  if (cur && PACK_CASE.n < cur.total && dailyCaseData && packRecords()[`${cur.id}:${PACK_CASE.n}`]) {
+    const n = PACK_CASE.n + 1;
+    btn.href = `/?k=${cur.id}-${n}`;
+    btn.textContent = `${locked(cur, n) ? "🔒" : "▶"} Next: ${cur.name} case ${n}`;
+    btn.onclick = locked(cur, n) ? e => { e.preventDefault(); openPackPass(); } : null;
+    btn.hidden = false;
+    $("packsFold").open = true;
+  }
+  box.hidden = false;
+}
+function escapeText(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+async function initPackCase() {
+  try {
+    const res = await fetch(`/api/case?date=${encodeURIComponent(PACK_CASE.key)}`, { headers: passHeaders() });
+    if (res.status === 402 && PASS_URL) return openPackPass(true);
+    if (!res.ok) throw new Error(`pack case ${res.status}`);
+    dailyCaseData = await res.json();
+    ev("load");
+    const tag = `${dailyCaseData.eventBadge} · CASE ${PACK_CASE.n}`;
+    if ($("caseTag")) $("caseTag").textContent = tag;
+    if ($("cdBadge")) $("cdBadge").textContent = tag;
+    hideDailyOnlyResults();
+    loadRound(0);
+  } catch (err) {
+    console.error("Failed to load pack case", err);
+    location.replace("/");
+    return;
+  }
+  registerServiceWorker();
+}
+
+function showPackResults() {
+  ev("done");
+  playSound("victory");
+  const finalSecs = stopSpeedTimer();
+  $("viewPlaying").style.display = "none";
+  $("viewResults").style.display = "flex";
+  if ($("gameStatusBar")) $("gameStatusBar").style.display = "none";
+  const total = dailyCaseData.rounds.length;
+  const won = roundResults.filter(r => r.solved).length;
+  const firstTry = roundResults.filter(r => r.solved && r.attempts === 1).length;
+  const score = firstTry * 100 + roundResults.filter(r => r.solved && r.attempts === 2).length * 45
+    + roundResults.filter(r => r.solved && r.attempts === 3).length * 15 + calculateSpeedBonus(finalSecs, roundResults);
+  $("resultTitle").textContent = dailyCaseData.title;
+  $("summaryScoreBadge").textContent = `${won}/${total} CAUGHT · ${score} PTS · ${finalSecs.toFixed(1)}s`;
+  $("summaryScoreBadge").className = "summary-score-badge" + (firstTry === total ? " flawless" : "");
+  $("resultGrid").textContent = buildEmojiGrid(roundResults);
+  renderRoundBreakdown();
+  renderPhotoCredits();
+  // First result for a pack case stands, like the daily one
+  try {
+    const recs = packRecords(), k = `${PACK_CASE.id}:${PACK_CASE.n}`;
+    if (!recs[k]) {
+      recs[k] = { won, total, score, time: finalSecs };
+      localStorage.setItem(PACK_REC_KEY, JSON.stringify(recs));
+    }
+  } catch (_) {}
+  renderPastCases();
+  renderResultsAd();
+}
+
 function ev(step) {
-  // A past case is counted on its own: a-load, a-r1, a-done, nothing else
-  if (ARCHIVE_DATE && !step.startsWith("p-")) { step = "a-" + step; if (!["a-load", "a-r1", "a-done"].includes(step)) return; }
+  // A past case is counted on its own: a-load, a-r1, a-done, nothing else; a pack case as k-start, k-done
+  if (PACK_CASE && !/^[pk]-/.test(step)) { step = { load: "k-start", done: "k-done" }[step]; if (!step) return; }
+  if (ARCHIVE_DATE && !/^[pk]-/.test(step)) { step = "a-" + step; if (!["a-load", "a-r1", "a-done"].includes(step)) return; }
   if (evSent.has(step)) return;
   evSent.add(step);
   try { fetch(`/api/ev/${EV_SRC}/${step}`, { keepalive: true }).catch(() => {}); } catch (_) {}
@@ -4374,6 +4521,7 @@ async function init() {
   updateSoundButton();
   $("btnSound").onclick = toggleSound;
 
+  if (PACK_CASE) return initPackCase();
   // Fetch today's case (no answers in it: guesses are checked by /api/guess)
   const todayStr = localDayStr();
   try {
@@ -4806,6 +4954,7 @@ $("btnNextRound").onclick = () => {
 };
 
 function showFinalResults() {
+  if (PACK_CASE) return showPackResults();
   if (ARCHIVE_DATE) return showArchiveResults();
   ev("done");
   playSound("victory");

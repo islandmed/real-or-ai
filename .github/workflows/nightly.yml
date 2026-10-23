@@ -3,7 +3,7 @@
 # Just after 00:00 UTC (when the Workers AI free quota resets) it pulls the
 # encrypted generator state, swaps any photos Tony marked bad on the review
 # page, generates missing days up to ~45 days ahead within the free neuron
-# budget, pushes the state back (encrypted), builds and deploys dist/ to both
+# budget, then Case Pack cases with whatever budget is left, pushes the state back (encrypted), builds and deploys dist/ to both
 # Pages projects, checks the live API carries no answers, and refreshes the
 # review page. Logs are public: nothing here prints which card is AI.
 #
@@ -100,6 +100,14 @@ jobs:
       - name: Generate missing days
         if: steps.pull.outcome == 'success' && (github.event_name == 'schedule' || inputs.generate)
         run: python3 gen/imposter_gen.py
+
+      # Case Packs only get what the daily lookahead left of the budget (the
+      # generator waits while any daily case in the lookahead is unfinished).
+      # A pack stays off the site until Tony approves its contact sheets.
+      - name: Generate Case Packs (leftover budget)
+        if: steps.pull.outcome == 'success' && (github.event_name == 'schedule' || inputs.generate)
+        continue-on-error: true
+        run: python3 gen/imposter_gen.py --packs
 
       - name: Push encrypted state
         if: always() && steps.pull.outcome == 'success'

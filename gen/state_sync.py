@@ -3,7 +3,8 @@
 it readable from the public repo.
 
 The state (private/state.json with the answers, the Commons pools, the
-processed card images and the AI source images of days not yet live) is
+processed card images of days and Case Packs, and the AI source images of
+days not yet live) is
 packed into one tar.gz, encrypted with AES-256 (openssl, PBKDF2, key from
 STATE_KEY or private/state_key.txt) and stored as an asset on the repo's
 "ci-state" release. Only ciphertext ever leaves the machine; without the key
@@ -83,6 +84,12 @@ def members(state):
                 # The AI source is only needed to rebuild a round that is not live yet.
                 if c.get("ai") and c.get("src") and k >= today:
                     files.append(c["src"].removeprefix("private/"))
+    # Case Packs: the card images only (--pack-redo makes a new AI image, never reuses one)
+    for pack in state.get("packs", {}).values():
+        for case in pack.get("cases", {}).values():
+            for rnd in case.get("rounds", []):
+                for c in rnd["cards"] if rnd else []:
+                    files.append(f"img/{c['file']}")
     return [f for f in dict.fromkeys(files) if (PRIV / f).exists()]
 
 

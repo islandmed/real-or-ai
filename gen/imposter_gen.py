@@ -22,6 +22,11 @@ repo is public; never move that state anywhere that gets committed.
   python3 gen/imposter_gen.py --apply-vetoes        # swap photos Tony marked bad
   python3 gen/imposter_gen.py --upload-review       # refresh the review page
   python3 gen/imposter_gen.py --prefetch            # fetch pools for seasons in range
+  python3 gen/imposter_gen.py --packs               # Case Packs, with what the daily run left
+  python3 gen/imposter_gen.py --pack-status         # per pack: generated / approved
+  python3 gen/imposter_gen.py --pack-sheets wildlife
+  python3 gen/imposter_gen.py --pack-approve wildlife:1,2,3
+  python3 gen/imposter_gen.py --pack-redo wildlife:4:2   # case 4, round 2: new photos + new AI
 
 Real photos are approved automatically by a Workers AI vision model (through
 the gen Worker) the first time they are considered; photos a human already
@@ -58,6 +63,8 @@ IMG = PRIV / "img"
 SHEETS = PRIV / "sheets"
 REVIEW = PRIV / "review"
 SEASONS_PATH = ROOT / "gen" / "seasons.json"
+PACKS_PATH = ROOT / "gen" / "packs.json"
+PACK_SHEETS = SHEETS / "packs"
 
 W, H = 960, 720           # every card, real or AI (flux gives 1024, so no upscaling)
 QUALITY = 70              # one WebP quality for every card
@@ -131,6 +138,7 @@ def load_state():
     s.setdefault("vision_rejected", [])  # "pool:pageid" the vision model did not pass
     s.setdefault("vision_log", {})  # "pool:pageid" -> the model's verdict, for audits
     s.setdefault("review_hash", {})  # date -> hash of what the review page shows
+    s.setdefault("packs", {})       # pack id -> {"cases": {"01": {"rounds": [...]}}, "approved": [1, 2, ...]}
     return s
 
 
@@ -954,7 +962,7 @@ def redo(state, seasons, secret, target, mode):
 
 # ---------------------------------------------------------------- sheets
 
-def contact_sheet(key, day, seasons):
+def contact_sheet(key, day, seasons, out=None):
     tw, th, lab = 240, 180, 22
     sheet = Image.new("RGB", (4 * tw + 5 * 4, ROUNDS * (th + lab) + 4), (20, 20, 24))
     dr = ImageDraw.Draw(sheet)
@@ -973,8 +981,8 @@ def contact_sheet(key, day, seasons):
             dr.text((x + 4, y + lab + 4), c["id"] + (" AI" if c["ai"] else ""), fill=(255, 60, 60) if c["ai"] else (255, 255, 255))
             if c["ai"]:
                 dr.rectangle((x, y + lab, x + tw - 1, y + lab + th - 1), outline=(255, 40, 40), width=3)
-    SHEETS.mkdir(parents=True, exist_ok=True)
-    out = SHEETS / f"{key}.jpg"
+    out = Path(out) if out else SHEETS / f"{key}.jpg"
+    out.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(out, quality=82)
     return out
 
@@ -1272,6 +1280,236 @@ def prefetch(seasons, dates):
                 log(f"pool {t['pool']}: {n} matching candidates")
 
 
+# ---------------------------------------------------------------- Case Packs
+# Themed sets of 30 cases (gen/packs.json), built from the same Commons photos,
+# vision check and AI pipeline as a daily case, but only with the neurons the
+# daily lookahead leaves over. State: state["packs"][id] = {"cases": {"01":
+# {"rounds": [...]}}, "approved": [n, ...]}. A pack reaches the site (gen/build.py)
+# only when every case is generated AND a human approved it from the contact
+# sheets (--pack-sheets, --pack-approve). Pack pools have no hand-approved
+# photos, so pack commands always use the vision filter unless --no-vision.
+
+def load_packs():
+    packs = json.loads(PACKS_PATH.read_text())["packs"]
+    for p in packs:
+        for t in p["themes"]:
+            t["pool"] = f"pack-{p['id']}-{t['key']}"
+    return packs
+
+
+def pack_by_id(packs, pid):
+    p = next((x for x in packs if x["id"] == pid), None)
+    if not p:
+        sys.exit(f"no pack {pid!r} in gen/packs.json")
+    return p
+
+
+def pack_state(state, pid):
+    ps = state["packs"].setdefault(pid, {})
+    ps.setdefault("cases", {})
+    ps.setdefault("approved", [])
+    return ps
+
+
+def case_id(n):
+    return f"{int(n):02d}"
+
+
+def pack_done_cases(pack, state):
+    cases = pack_state(state, pack["id"])["cases"]
+    return [n for n in range(1, pack["cases"] + 1) if day_done(cases.get(case_id(n)))]
+
+
+def pack_live(pack, state):
+    """Every case generated and approved: the only packs gen/build.py ships."""
+    done = pack_done_cases(pack, state)
+    ok = set(pack_state(state, pack["id"])["approved"])
+    return len(done) == pack["cases"] and all(n in ok for n in done)
+
+
+def pack_perm(pack):
+    keys = [t["key"] for t in pack["themes"]]
+    random.Random(f"pack-{pack['id']}").shuffle(keys)
+    return keys
+
+
+def choose_pack_theme(pack, n, slot, state, case, tried=()):
+    tk = {t["key"]: t for t in pack["themes"]}
+    perm = pack_perm(pack)
+    want = perm[((n - 1) * ROUNDS + slot) % len(perm)]
+    taken = {r["theme"] for r in case["rounds"] if r}
+    cases = pack_state(state, pack["id"])["cases"]
+    neighbours = {c["rounds"][slot]["theme"] for c in (cases.get(case_id(n - 1)), cases.get(case_id(n + 1)))
+                  if c and c["rounds"][slot]}
+    order = [want] + [k for k in perm if k != want]
+    dropped = {t["key"] for t in pack["themes"] if t.get("dropped")}
+    for strict in (True, False):
+        for k in order:
+            if k in taken or k in tried or k in dropped or (strict and k in neighbours):
+                continue
+            if available(tk[k], state) >= 3:
+                return tk[k]
+    return None
+
+
+def seed_pack_case(pack, n, state, secret):
+    """Builds a pack case's missing rounds. Returns 'done', 'budget' or 'stuck'."""
+    key = f"{pack['id']} #{n}"
+    case = pack_state(state, pack["id"])["cases"].setdefault(case_id(n), {"rounds": [None] * ROUNDS})
+    rng = random.Random(secrets.randbits(64))
+    for slot in range(ROUNDS):
+        if case["rounds"][slot]:
+            continue
+        tried, res = set(), None
+        while res is None:
+            theme = choose_pack_theme(pack, n, slot, state, case, tried)
+            if not theme:
+                log(f"{key} R{slot + 1}: no theme has usable photos left")
+                save_json(STATE_PATH, state)
+                return "stuck"
+            res = build_round(None, slot, theme, state, secret, rng)
+            if res == "budget":
+                save_json(STATE_PATH, state)
+                return "budget"
+            if res is None:
+                log(f"{key} R{slot + 1}: not enough usable photos for {theme['key']}, trying another theme")
+                tried.add(theme["key"])
+        case["rounds"][slot] = res
+        state["used"].extend(c["pageid"] for c in res["cards"] if not c["ai"])
+        save_json(STATE_PATH, state)
+        log(f"{key} R{slot + 1}: {theme['key']} ok (neurons today {state['neurons'].get(utc_today().isoformat(), 0)})")
+    return "done"
+
+
+def pack_sheet_path(pid, n):
+    return PACK_SHEETS / pid / f"{case_id(n)}.jpg"
+
+
+def daily_pending(state, seasons, days=44):
+    """Dates of the daily lookahead (the default generator window) that have a
+    season and are not finished. Packs wait while there are any."""
+    start = max(FIRST_DATE, utc_today() - dt.timedelta(days=1))
+    out = []
+    for i in range(days + 1):
+        d = start + dt.timedelta(days=i)
+        if season_for(d, seasons) and not day_done(state["days"].get(d.isoformat())):
+            out.append(d.isoformat())
+    return out
+
+
+def run_packs(state, seasons, packs, secret):
+    """Fill the packs in gen/packs.json order, case by case, with what is left
+    of today's budget. Daily cases always come first."""
+    pending = daily_pending(state, seasons)
+    if pending:
+        log(f"packs: waiting, {len(pending)} daily case(s) in the lookahead are not finished yet")
+        return
+    for pack in packs:
+        for n in range(1, pack["cases"] + 1):
+            if day_done(pack_state(state, pack["id"])["cases"].get(case_id(n))):
+                continue
+            try:
+                res = seed_pack_case(pack, n, state, secret)
+            except Exception as e:  # keep going; the next run resumes
+                log(f"{pack['id']} #{n}: error {e!r}")
+                save_json(STATE_PATH, state)
+                res = "stuck"
+            if res == "done":
+                contact_sheet(f"{pack['id']}-{case_id(n)}", pack_state(state, pack["id"])["cases"][case_id(n)],
+                              seasons, pack_sheet_path(pack["id"], n))
+            elif res == "budget":
+                log("packs: daily neuron budget reached; the rest wait for the next run")
+                pack_status(state, packs)
+                return
+            else:
+                log(f"{pack['id']}: stuck at case {n}; moving on to the next pack")
+                break
+    pack_status(state, packs)
+
+
+def pack_status(state, packs):
+    out = {}
+    for pack in packs:
+        ps = pack_state(state, pack["id"])
+        done = pack_done_cases(pack, state)
+        partial = [int(k) for k, c in ps["cases"].items() if c and not day_done(c) and any(c["rounds"])]
+        out[pack["id"]] = {"cases": pack["cases"], "generated": len(done),
+                           "approved": len([n for n in done if n in set(ps["approved"])]),
+                           "partial": sorted(partial),
+                           "awaiting_approval": [n for n in done if n not in set(ps["approved"])],
+                           "live": pack_live(pack, state)}
+    log(json.dumps({"packs": out, "neurons_used_today_utc": state["neurons"].get(utc_today().isoformat(), 0)}, indent=1))
+
+
+def pack_sheets(state, seasons, packs, pid):
+    pack = pack_by_id(packs, pid)
+    cases = pack_state(state, pid)["cases"]
+    for n in pack_done_cases(pack, state):
+        log(contact_sheet(f"{pid}-{case_id(n)}", cases[case_id(n)], seasons, pack_sheet_path(pid, n)))
+
+
+def parse_case_list(s, total):
+    if s.strip().lower() == "all":
+        return list(range(1, total + 1))
+    try:
+        out = sorted({int(x) for x in s.split(",") if x.strip()})
+    except ValueError:
+        sys.exit(f"bad case list {s!r}")
+    if not out or out[0] < 1 or out[-1] > total:
+        sys.exit(f"case numbers must be 1..{total}")
+    return out
+
+
+def pack_approve(state, packs, target):
+    pid, _, nums = target.partition(":")
+    pack = pack_by_id(packs, pid)
+    ps = pack_state(state, pid)
+    done = set(pack_done_cases(pack, state))
+    want = parse_case_list(nums, pack["cases"])
+    skip = [n for n in want if n not in done]
+    ps["approved"] = sorted(set(ps["approved"]) | {n for n in want if n in done})
+    save_json(STATE_PATH, state)
+    log(f"{pid}: approved {sorted(set(want) - set(skip))}" + (f"; not generated yet, skipped {skip}" if skip else ""))
+
+
+def pack_redo(state, seasons, packs, secret, target):
+    """--pack-redo <pack>:<case>:<round>: new real photos and a new AI image for
+    one round. The case loses its approval until it is approved again."""
+    pid, n, r = parse_target(target, 3)
+    pack = pack_by_id(packs, pid)
+    n, slot = int(n), int(r) - 1
+    ps = pack_state(state, pid)
+    case = ps["cases"].get(case_id(n))
+    if not case or not (0 <= slot < ROUNDS) or not case["rounds"][slot]:
+        log(f"{target}: no such round")
+        return
+    old = case["rounds"][slot]
+    theme = {t["key"]: t for t in pack["themes"]}[old["theme"]]
+    state["blacklist"].extend(c["pageid"] for c in old["cards"] if not c["ai"])
+    rng = random.Random(secrets.randbits(64))
+    res = build_round(None, slot, theme, state, secret, rng)
+    if res is None:  # this theme ran dry: any other theme the case does not use yet
+        case["rounds"][slot] = None
+        tried = {theme["key"]}
+        while res is None:
+            t = choose_pack_theme(pack, n, slot, state, case, tried)
+            if not t:
+                break
+            res = build_round(None, slot, t, state, secret, rng)
+            tried.add(t["key"])
+        case["rounds"][slot] = old
+    if not isinstance(res, dict):
+        log(f"{target}: not rebuilt ({res or 'no photos'})")
+        save_json(STATE_PATH, state)
+        return
+    drop_round_files(old)
+    case["rounds"][slot] = res
+    state["used"].extend(c["pageid"] for c in res["cards"] if not c["ai"])
+    ps["approved"] = [x for x in ps["approved"] if x != n]
+    save_json(STATE_PATH, state)
+    log(f"{target}: rebuilt; case {n} needs approving again -> {contact_sheet(f'{pid}-{case_id(n)}', case, seasons, pack_sheet_path(pid, n))}")
+
+
 # ---------------------------------------------------------------- main
 
 def main():
@@ -1292,9 +1530,15 @@ def main():
     ap.add_argument("--apply-vetoes", action="store_true", help="swap the photos marked bad on the review page")
     ap.add_argument("--upload-review", action="store_true", help="refresh the review page's upcoming days")
     ap.add_argument("--prefetch", action="store_true", help="fetch pools for every season in the date range")
+    ap.add_argument("--packs", action="store_true", help="build Case Pack cases with the budget the daily run left")
+    ap.add_argument("--pack-status", action="store_true", help="per pack: generated / approved counts")
+    ap.add_argument("--pack-sheets", metavar="PACK", help="contact sheets of a pack's cases -> private/sheets/packs/")
+    ap.add_argument("--pack-approve", action="append", default=[], metavar="PACK:N,N,..", help="approve cases (or PACK:all)")
+    ap.add_argument("--pack-redo", action="append", default=[], metavar="PACK:CASE:ROUND", help="rebuild one round")
     a = ap.parse_args()
     global VISION_ON
-    VISION_ON = (VISION_ON or a.vision) and not a.no_vision
+    pack_cmd = a.packs or a.pack_redo
+    VISION_ON = (VISION_ON or a.vision or pack_cmd) and not a.no_vision
 
     seasons = load_seasons()
     state = load_state()
@@ -1328,6 +1572,14 @@ def main():
     if a.prefetch:
         prefetch(seasons, dates)
         return 0
+    if a.pack_status or a.pack_sheets or a.pack_approve:
+        packs = load_packs()
+        for t in a.pack_approve:
+            pack_approve(state, packs, t)
+        if a.pack_sheets:
+            pack_sheets(state, seasons, packs, a.pack_sheets)
+        pack_status(state, packs)
+        return 0
 
     secret = (os.environ.get("IMPOSTER_GEN_SECRET") or (PRIV / "gen_secret.txt").read_text()).strip()
     if a.apply_vetoes:
@@ -1336,6 +1588,15 @@ def main():
         return 0
     if a.upload_review:
         upload_review(state, seasons, secret)
+        return 0
+    if pack_cmd:
+        packs = load_packs()
+        for t in a.pack_redo:
+            pack_redo(state, seasons, packs, secret, t)
+        if a.packs:
+            run_packs(state, seasons, packs, secret)
+        elif a.pack_redo:
+            pack_status(state, packs)
         return 0
     for mode, targets in (("redo", a.redo), ("redo-ai", a.redo_ai), ("swap", a.swap), ("rereal", a.rereal)):
         for t in targets:

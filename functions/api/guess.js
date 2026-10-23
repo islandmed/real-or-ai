@@ -1,5 +1,6 @@
 import { json, allowedDate, caseFor } from "../../lib/cases.js";
 import { passGate } from "../../lib/pass.js";
+import { parsePackKey, packGate } from "../../lib/packs.js";
 
 // POST {date, round (0-based), card ("A".."D")} -> {correct}
 // A wrong guess returns that photo's credit. A correct one returns the credits
@@ -9,10 +10,12 @@ export async function onRequestPost({ request, env }) {
   let body;
   try { body = await request.json(); } catch (_) { return json({ error: "bad json" }, 400); }
   const { date, round, card } = body || {};
-  if (!allowedDate(date)) return json({ error: "date not available" }, 400);
-  const gate = await passGate(env, request, date, json);
+  // A Case Pack case comes as date "pack:<id>:<nn>" (what /api/case handed out)
+  const pk = parsePackKey(date);
+  if (!pk && !allowedDate(date)) return json({ error: "date not available" }, 400);
+  const gate = pk ? await packGate(env, request, pk.n, json) : await passGate(env, request, date, json);
   if (gate) return gate;
-  const c = caseFor(date);
+  const c = pk ? pk.c : caseFor(date);
   if (!c) return json({ error: "no case for this date" }, 404);
   const r = Number.isInteger(round) ? c.rounds[round] : null;
   const k = r && r.cards.find(x => x.id === card);

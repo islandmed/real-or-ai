@@ -21,6 +21,7 @@ import imposter_gen as g  # noqa: E402
 ROOT = g.ROOT
 DIST = ROOT / "dist"
 DATA = ROOT / "functions" / "_data" / "cases.json"
+PACK_DATA = ROOT / "functions" / "_data" / "packs.json"
 
 # Days later than UTC today + AHEAD_DAYS are left out of the deploy entirely
 # (no images, no answers), so nothing about them is on the public site ahead
@@ -107,6 +108,37 @@ def main():
     DATA.parent.mkdir(parents=True, exist_ok=True)
     DATA.write_text(json.dumps(cases, ensure_ascii=False, separators=(",", ":")))
     print(f"dist/: {len(PUBLIC)} site files, {n_img} images; {len(cases)} cases up to {last} -> {DATA.relative_to(ROOT)}")
+    build_packs(state)
+
+
+def build_packs(state):
+    """Case Packs: only packs whose every case is generated and approved
+    (imposter_gen.pack_live) go in, all their cases with images. Always writes
+    functions/_data/packs.json ({} when none is live): lib/packs.js imports it."""
+    out, n_img = {}, 0
+    for pack in g.load_packs():
+        if not g.pack_live(pack, state):
+            continue
+        tk = {t["key"]: t for t in pack["themes"]}
+        cases = []
+        for n in range(1, pack["cases"] + 1):
+            rounds = []
+            for i, rnd in enumerate(state["packs"][pack["id"]]["cases"][g.case_id(n)]["rounds"]):
+                t = tk[rnd["theme"]]
+                shrink_round([(g.IMG / c["file"], DIST / "img" / c["file"]) for c in rnd["cards"]])
+                cards = []
+                for c in rnd["cards"]:
+                    n_img += 1
+                    card = {"id": c["id"], "image": f"img/{c['file']}", "ai": c["ai"]}
+                    if not c["ai"]:
+                        card["credit"] = c["credit"]
+                    cards.append(card)
+                rounds.append({"theme": f"Round {i + 1} of {g.ROUNDS} · {t['name']}", "shortName": t["short"],
+                               "tagline": "3 real photos. 1 AI imposter.", "cards": cards})
+            cases.append({"rounds": rounds})
+        out[pack["id"]] = {"name": pack["name"], "tagline": pack["tagline"], "emoji": pack["emoji"], "cases": cases}
+    PACK_DATA.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")))
+    print(f"packs: {len(out)} live ({', '.join(out) or 'none'}), {n_img} images -> {PACK_DATA.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

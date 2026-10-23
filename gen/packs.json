@@ -1,0 +1,813 @@
+{
+ "_doc": "Case Packs (gen/imposter_gen.py --packs). Each pack has `cases` cases of 6 rounds; themes rotate like a season. Pools are pack-<id>-<key>. Only packs whose cases are all generated and approved (--pack-approve) are built into the site. `free` is shown in the UI; the server limit is FREE_PACK_CASES in lib/packs.js.",
+ "packs": [
+  {
+   "id": "wildlife",
+   "name": "Wildlife",
+   "emoji": "🦉",
+   "tagline": "30 cases from the field. One creature in every lineup was never born.",
+   "cases": 30,
+   "free": 3,
+   "themes": [
+    {
+     "key": "owls",
+     "name": "Owls",
+     "short": "OWLS",
+     "queries": [
+      "owl",
+      "barn owl",
+      "snowy owl",
+      "tawny owl",
+      "great horned owl"
+     ],
+     "match": "\\bowls?\\b|owlet|strix|bubo|tyto|athene noctua|eule|hibou|chouette|búho|gufo",
+     "prompts": [
+      "a barn owl perched on a wooden fence post",
+      "a tawny owl sitting in the hollow of an old tree",
+      "a snowy owl resting on snowy ground",
+      "a great horned owl on a branch at dusk"
+     ],
+     "cats": [
+      "Strigiformes",
+      "Tyto alba",
+      "Bubo virginianus",
+      "Strix aluco"
+     ],
+     "vision": "a real owl, its face and body large and clear as the main subject. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "foxes",
+     "name": "Foxes",
+     "short": "FOXES",
+     "queries": [
+      "red fox",
+      "fox in the wild",
+      "arctic fox",
+      "fennec fox"
+     ],
+     "match": "\\bfox(es)?\\b|vulpes|\\bfuchs|\\brenard|\\bzorro|\\bvolpe",
+     "prompts": [
+      "a red fox standing in a meadow",
+      "a red fox curled up in the snow",
+      "an arctic fox in a white winter coat",
+      "a young fox at the edge of a forest"
+     ],
+     "cats": [
+      "Vulpes vulpes",
+      "Vulpes lagopus",
+      "Vulpes zerda"
+     ],
+     "vision": "a real fox (red, arctic or other wild fox), the animal large and clear as the main subject. Not a dog. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "deer",
+     "name": "Deer",
+     "short": "DEER",
+     "queries": [
+      "deer",
+      "red deer stag",
+      "white-tailed deer",
+      "roe deer",
+      "fallow deer"
+     ],
+     "match": "\\bdeer\\b|\\bstag\\b|\\bdoe\\b|\\bfawn\\b|cervus|odocoileus|capreolus|dama dama|\\bhirsch|\\breh\\b|\\bcerf\\b|\\bciervo",
+     "prompts": [
+      "a red deer stag with antlers in a misty field",
+      "a white-tailed deer standing at the edge of a forest",
+      "a roe deer in tall summer grass",
+      "a fallow deer herd under old oak trees"
+     ],
+     "cats": [
+      "Cervus elaphus",
+      "Odocoileus virginianus",
+      "Capreolus capreolus",
+      "Dama dama"
+     ],
+     "vision": "a real deer (stag, doe or fawn), the animal large and clear as the main subject. Not a moose sculpture or a reindeer decoration. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "bears",
+     "name": "Bears",
+     "short": "BEARS",
+     "queries": [
+      "brown bear",
+      "grizzly bear",
+      "black bear",
+      "polar bear"
+     ],
+     "match": "\\bbears?\\b|ursus|grizzl|\\bbär|\\bours\\b|\\boso\\b|\\borso\\b",
+     "prompts": [
+      "a brown bear standing in a shallow river",
+      "a black bear walking through a forest clearing",
+      "a polar bear on sea ice",
+      "a grizzly bear in a mountain meadow"
+     ],
+     "cats": [
+      "Ursus arctos",
+      "Ursus americanus",
+      "Ursus maritimus"
+     ],
+     "vision": "a real bear (brown, black, grizzly or polar), the animal large and clear as the main subject. Not a teddy bear, not a panda costume. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "tigers",
+     "name": "Tigers",
+     "short": "TIGERS",
+     "queries": [
+      "tiger",
+      "bengal tiger",
+      "siberian tiger",
+      "sumatran tiger"
+     ],
+     "match": "\\btigers?\\b|panthera tigris|\\btiger|\\btigre",
+     "prompts": [
+      "a Bengal tiger walking through tall grass",
+      "a tiger resting in the shade near water",
+      "a Siberian tiger in the snow",
+      "a tiger looking straight at the camera from the forest"
+     ],
+     "cats": [
+      "Panthera tigris",
+      "Panthera tigris tigris",
+      "Panthera tigris altaica"
+     ],
+     "vision": "a real tiger, the animal large and clear as the main subject, orange with black stripes (or a white tiger). Not a house cat. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "frogs",
+     "name": "Frogs",
+     "short": "FROGS",
+     "queries": [
+      "frog",
+      "tree frog",
+      "poison dart frog",
+      "common frog",
+      "bullfrog"
+     ],
+     "match": "frogs?\\b|\\btoads?\\b|anura|rana\\b|hyla|dendrobat|agalychnis|lithobates|\\bfrosch|grenouille|\\brana\\b",
+     "prompts": [
+      "a green tree frog on a leaf",
+      "a common frog sitting among wet leaves",
+      "a bright poison dart frog on moss",
+      "a bullfrog half in the water of a pond"
+     ],
+     "cats": [
+      "Anura",
+      "Rana temporaria",
+      "Hylidae",
+      "Dendrobatidae"
+     ],
+     "vision": "a real frog or toad, the animal large and clear in sharp focus as the main subject. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "parrots",
+     "name": "Parrots",
+     "short": "PARROTS",
+     "queries": [
+      "parrot",
+      "macaw",
+      "cockatoo",
+      "amazon parrot",
+      "lorikeet"
+     ],
+     "match": "parrot|macaw|\\bara\\b|cockatoo|cacatua|amazona|lorikeet|lory|parakeet|conure|psittac|\\bpapagei|perroquet|loro\\b",
+     "prompts": [
+      "a scarlet macaw perched on a branch",
+      "a pair of blue and yellow macaws",
+      "a sulphur-crested cockatoo on a tree",
+      "a rainbow lorikeet among flowers"
+     ],
+     "cats": [
+      "Psittaciformes",
+      "Ara macao",
+      "Cacatua galerita",
+      "Trichoglossus moluccanus"
+     ],
+     "vision": "a real parrot, macaw, cockatoo or lorikeet, the bird large and clear as the main subject. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "hummingbirds",
+     "name": "Hummingbirds",
+     "short": "HUMMINGBIRDS",
+     "queries": [
+      "hummingbird",
+      "hummingbird flower",
+      "hummingbird feeding"
+     ],
+     "match": "hummingbird|trochil|colibri|kolibri|archilochus|calypte|selasphorus|amazilia",
+     "prompts": [
+      "a hummingbird hovering at a red flower",
+      "a hummingbird perched on a thin twig",
+      "a hummingbird feeding from a tubular flower",
+      "a ruby-throated hummingbird in flight"
+     ],
+     "cats": [
+      "Trochilidae",
+      "Archilochus colubris",
+      "Calypte anna"
+     ],
+     "vision": "a real hummingbird, clearly visible and in focus as the main subject (hovering or perched). Not a sugar-water feeder only. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "butterflies",
+     "name": "Butterflies",
+     "short": "BUTTERFLIES",
+     "queries": [
+      "butterfly",
+      "monarch butterfly",
+      "swallowtail butterfly",
+      "butterfly on flower"
+     ],
+     "match": "butterfl|lepidopter|papilio|danaus|vanessa|morpho|nymphalid|lycaen|pieris|\\bschmetterling|papillon|mariposa|farfalla",
+     "prompts": [
+      "a monarch butterfly on a flower",
+      "a swallowtail butterfly with open wings",
+      "a peacock butterfly on lavender",
+      "a blue butterfly resting on a grass stem"
+     ],
+     "cats": [
+      "Papilionoidea",
+      "Danaus plexippus",
+      "Papilio machaon",
+      "Aglais io"
+     ],
+     "vision": "a real butterfly, alive, large and clear as the main subject. Not a moth trap, a pinned collection or a drawing. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "wolves",
+     "name": "Wolves",
+     "short": "WOLVES",
+     "queries": [
+      "wolf",
+      "grey wolf",
+      "gray wolf",
+      "arctic wolf",
+      "wolf pack"
+     ],
+     "match": "\\bwol(f|ves)\\b|canis lupus\\b|canis lupus (lupus|arctos|lycaon|occidentalis)|\\bloup\\b|\\blobo\\b|\\blupo\\b",
+     "prompts": [
+      "a grey wolf standing in the snow",
+      "a wolf walking along a forest trail",
+      "an arctic wolf on a rocky hillside",
+      "two wolves resting in tall grass"
+     ],
+     "cats": [
+      "Canis lupus",
+      "Canis lupus arctos",
+      "Canis lupus lupus"
+     ],
+     "vision": "a real wolf, the animal large and clear as the main subject. Not a dog, husky or wolfdog. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "turtles",
+     "name": "Sea Turtles",
+     "short": "SEA TURTLES",
+     "queries": [
+      "sea turtle",
+      "green sea turtle",
+      "hawksbill turtle",
+      "loggerhead turtle"
+     ],
+     "match": "sea turtles?|marine turtle|hawksbill|loggerhead|green turtle|leatherback|chelonia|eretmochelys|caretta|lepidochelys|dermochelys|meeresschildkr|tortue marine|tortuga marina",
+     "prompts": [
+      "a green sea turtle swimming over a coral reef",
+      "a hawksbill turtle gliding through blue water",
+      "a loggerhead turtle resting on the sea floor",
+      "a sea turtle near the surface in clear water"
+     ],
+     "cats": [
+      "Cheloniidae",
+      "Chelonia mydas",
+      "Eretmochelys imbricata",
+      "Caretta caretta"
+     ],
+     "vision": "a real sea turtle, alive, large and clear as the main subject, usually underwater or on a beach. Not a tortoise or a freshwater turtle. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "penguins",
+     "name": "Penguins",
+     "short": "PENGUINS",
+     "queries": [
+      "penguin",
+      "emperor penguin",
+      "king penguin",
+      "gentoo penguin",
+      "penguin colony"
+     ],
+     "match": "penguin|spheniscid|aptenodytes|pygoscelis|spheniscus|eudyptes|\\bpinguin|manchot|pingüino",
+     "prompts": [
+      "a king penguin standing on a pebble beach",
+      "a group of gentoo penguins on snow",
+      "an emperor penguin with its chick",
+      "a rockhopper penguin on a rocky shore"
+     ],
+     "cats": [
+      "Spheniscidae",
+      "Aptenodytes patagonicus",
+      "Pygoscelis papua",
+      "Spheniscus demersus"
+     ],
+     "vision": "a real penguin or penguins, large and clear as the main subject. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "elephants",
+     "name": "Elephants",
+     "short": "ELEPHANTS",
+     "queries": [
+      "elephant",
+      "african elephant",
+      "asian elephant",
+      "elephant herd"
+     ],
+     "match": "elephant|loxodonta|elephas maximus|\\belefant|éléphant|elefante",
+     "prompts": [
+      "an African elephant walking across the savanna",
+      "an elephant family at a watering hole",
+      "an Asian elephant in a green forest",
+      "a young elephant beside its mother"
+     ],
+     "cats": [
+      "Loxodonta africana",
+      "Elephas maximus",
+      "Loxodonta"
+     ],
+     "vision": "a real elephant, alive, large and clear as the main subject. Not a statue, not an elephant in a circus act. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "otters",
+     "name": "Otters",
+     "short": "OTTERS",
+     "queries": [
+      "otter",
+      "sea otter",
+      "river otter",
+      "eurasian otter"
+     ],
+     "match": "\\botters?\\b|lutra|lontra|enhydra|aonyx|pteronura|\\botter|loutre|nutria\\b|lontra",
+     "prompts": [
+      "a sea otter floating on its back in kelp",
+      "a river otter on a mossy riverbank",
+      "a Eurasian otter swimming in a stream",
+      "two otters playing at the water's edge"
+     ],
+     "cats": [
+      "Lutrinae",
+      "Enhydra lutris",
+      "Lutra lutra",
+      "Lontra canadensis"
+     ],
+     "vision": "a real otter, large and clear as the main subject, in or near water. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "lizards",
+     "name": "Lizards",
+     "short": "LIZARDS",
+     "queries": [
+      "lizard",
+      "iguana",
+      "chameleon",
+      "gecko",
+      "monitor lizard"
+     ],
+     "match": "lizard|iguan|chamele|gecko|varanus|monitor lizard|\\bagama|anolis|lacerta|podarcis|\\beidechse|lézard|lagarto",
+     "prompts": [
+      "a green iguana resting on a branch",
+      "a chameleon gripping a twig",
+      "a gecko on a sunlit rock",
+      "a wall lizard basking on old stones"
+     ],
+     "cats": [
+      "Lacertilia",
+      "Iguana iguana",
+      "Chamaeleonidae",
+      "Gekkonidae"
+     ],
+     "vision": "a real lizard (iguana, chameleon, gecko, monitor or similar), large and clear as the main subject. Not a snake, crocodile or dinosaur model. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    },
+    {
+     "key": "hedgehogs",
+     "name": "Hedgehogs",
+     "short": "HEDGEHOGS",
+     "queries": [
+      "hedgehog",
+      "european hedgehog",
+      "hedgehog in garden"
+     ],
+     "match": "hedgehog|erinaceus|atelerix|\\bigel\\b|hérisson|erizo|riccio",
+     "prompts": [
+      "a hedgehog walking across a lawn",
+      "a hedgehog among autumn leaves",
+      "a hedgehog sniffing the ground at dusk",
+      "a hedgehog in a garden flower bed"
+     ],
+     "cats": [
+      "Erinaceus europaeus",
+      "Erinaceidae",
+      "Atelerix albiventris"
+     ],
+     "vision": "a real hedgehog, large and clear as the main subject. Not a porcupine, a toy or a brush. Alive and in natural surroundings or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, and not a dead or injured animal."
+    }
+   ]
+  },
+  {
+   "id": "food",
+   "name": "Food",
+   "emoji": "🍜",
+   "tagline": "30 cases from the kitchen. One dish on every table was never cooked.",
+   "cases": 30,
+   "free": 3,
+   "themes": [
+    {
+     "key": "sushi",
+     "name": "Sushi",
+     "short": "SUSHI",
+     "queries": [
+      "sushi",
+      "nigiri",
+      "maki sushi",
+      "sushi platter"
+     ],
+     "match": "sushi|nigiri|maki\\b|makizushi|sashimi|temaki|chirashi|uramaki",
+     "prompts": [
+      "a platter of salmon and tuna nigiri on a wooden board",
+      "maki rolls on a slate plate with pickled ginger",
+      "a sushi set on a lacquered tray",
+      "assorted sashimi on crushed ice"
+     ],
+     "cats": [
+      "Sushi",
+      "Nigirizushi",
+      "Makizushi",
+      "Sashimi"
+     ],
+     "vision": "sushi or sashimi (nigiri, maki rolls or slices of raw fish), the food large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "burgers",
+     "name": "Burgers",
+     "short": "BURGERS",
+     "queries": [
+      "hamburger",
+      "cheeseburger",
+      "burger and fries"
+     ],
+     "match": "burger|hamburg|cheeseburger",
+     "prompts": [
+      "a cheeseburger with lettuce and tomato on a wooden board",
+      "a double burger with fries on a plate",
+      "a burger in a toasted brioche bun",
+      "a bacon burger on a diner plate"
+     ],
+     "cats": [
+      "Hamburgers",
+      "Cheeseburgers"
+     ],
+     "vision": "a hamburger or cheeseburger in a bun, the burger large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "pastries",
+     "name": "Pastries",
+     "short": "PASTRIES",
+     "queries": [
+      "croissant",
+      "danish pastry",
+      "pastry display",
+      "pain au chocolat",
+      "éclair"
+     ],
+     "match": "pastr|croissant|pain au chocolat|danish|viennoiserie|éclair|eclair|strudel|cinnamon roll|kanelbulle|cannoli|baklava|millefeuille|mille-feuille|gebäck|pâtisserie",
+     "prompts": [
+      "fresh croissants on a bakery tray",
+      "a plate of Danish pastries",
+      "chocolate éclairs in a row",
+      "a basket of pain au chocolat"
+     ],
+     "cats": [
+      "Pastries",
+      "Croissants",
+      "Danish pastries",
+      "Viennoiserie"
+     ],
+     "vision": "pastries (croissants, Danish, éclairs, cinnamon rolls or similar), large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "ramen",
+     "name": "Ramen",
+     "short": "RAMEN",
+     "queries": [
+      "ramen",
+      "tonkotsu ramen",
+      "ramen bowl",
+      "shoyu ramen"
+     ],
+     "match": "ramen|rāmen|tonkotsu|shoyu|miso soup noodle|noodle soup",
+     "prompts": [
+      "a bowl of tonkotsu ramen with a soft egg",
+      "shoyu ramen with sliced pork and green onion",
+      "a steaming bowl of miso ramen",
+      "ramen with nori and bamboo shoots"
+     ],
+     "cats": [
+      "Ramen",
+      "Tonkotsu ramen",
+      "Shōyu ramen"
+     ],
+     "vision": "a bowl of ramen or a similar noodle soup, the bowl large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "pizza",
+     "name": "Pizza",
+     "short": "PIZZA",
+     "queries": [
+      "pizza",
+      "margherita pizza",
+      "neapolitan pizza",
+      "pepperoni pizza"
+     ],
+     "match": "pizza",
+     "prompts": [
+      "a Neapolitan margherita pizza with a charred crust",
+      "a pepperoni pizza on a wooden peel",
+      "a slice of pizza being lifted from the pie",
+      "a pizza fresh from a wood-fired oven"
+     ],
+     "cats": [
+      "Pizza",
+      "Pizza Margherita",
+      "Neapolitan pizza"
+     ],
+     "vision": "a pizza or slices of pizza, large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "tacos",
+     "name": "Tacos",
+     "short": "TACOS",
+     "queries": [
+      "tacos",
+      "taco al pastor",
+      "fish tacos",
+      "street tacos"
+     ],
+     "match": "\\btacos?\\b|al pastor|carnitas|barbacoa",
+     "prompts": [
+      "three tacos al pastor with pineapple and cilantro",
+      "fish tacos on a plate with lime",
+      "street tacos on a paper-lined tray",
+      "beef tacos with salsa and onions"
+     ],
+     "cats": [
+      "Tacos",
+      "Tacos al pastor"
+     ],
+     "vision": "tacos (soft or hard tortillas with filling), large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "salads",
+     "name": "Salads",
+     "short": "SALADS",
+     "queries": [
+      "salad",
+      "greek salad",
+      "caesar salad",
+      "salad bowl"
+     ],
+     "match": "salad|salat|salade|ensalada|insalata",
+     "prompts": [
+      "a Greek salad with feta and olives",
+      "a Caesar salad in a white bowl",
+      "a fresh garden salad with tomatoes",
+      "a grain salad bowl with roasted vegetables"
+     ],
+     "cats": [
+      "Salads",
+      "Greek salad",
+      "Caesar salad"
+     ],
+     "vision": "a salad (leaves, vegetables, grains or similar) on a plate or in a bowl, large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "curries",
+     "name": "Curries",
+     "short": "CURRIES",
+     "queries": [
+      "curry",
+      "chicken curry",
+      "thai green curry",
+      "indian curry"
+     ],
+     "match": "curry|curries|korma|masala|vindaloo|rogan josh|massaman|panang|kare\\b|dal\\b|dhal",
+     "prompts": [
+      "a bowl of chicken curry with rice",
+      "Thai green curry in a ceramic bowl",
+      "butter chicken with naan bread",
+      "a vegetable curry in a copper pot"
+     ],
+     "cats": [
+      "Curry",
+      "Indian curries",
+      "Thai curries"
+     ],
+     "vision": "a curry dish, the food large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "dumplings",
+     "name": "Dumplings",
+     "short": "DUMPLINGS",
+     "queries": [
+      "dumplings",
+      "jiaozi",
+      "dim sum",
+      "gyoza",
+      "momo dumplings"
+     ],
+     "match": "dumpling|jiaozi|gyoza|dim sum|xiaolongbao|xiao long bao|momo\\b|pierogi|mandu|har gow|siu mai|shumai|pelmeni",
+     "prompts": [
+      "steamed dumplings in a bamboo basket",
+      "pan-fried gyoza on a plate",
+      "xiaolongbao soup dumplings",
+      "a plate of momo with dipping sauce"
+     ],
+     "cats": [
+      "Dumplings",
+      "Jiaozi",
+      "Dim sum",
+      "Gyoza"
+     ],
+     "vision": "dumplings (jiaozi, gyoza, dim sum, momo, pierogi or similar), large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "cakes",
+     "name": "Cakes",
+     "short": "CAKES",
+     "queries": [
+      "cake",
+      "layer cake",
+      "chocolate cake",
+      "cheesecake",
+      "sponge cake"
+     ],
+     "match": "\\bcakes?\\b|gateau|gâteau|torte|\\btorta|kuchen|cheesecake|sponge|tiramisu|pavlova",
+     "prompts": [
+      "a chocolate layer cake with a slice cut out",
+      "a strawberry cheesecake on a cake stand",
+      "a slice of carrot cake on a plate",
+      "a fruit-topped sponge cake"
+     ],
+     "cats": [
+      "Cakes",
+      "Chocolate cakes",
+      "Cheesecakes",
+      "Layer cakes"
+     ],
+     "vision": "a cake or slice of cake, large and clear as the main subject. Not a cake with a printed photo or readable writing on it. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "streetfood",
+     "name": "Street Food",
+     "short": "STREET FOOD",
+     "queries": [
+      "street food",
+      "food stall",
+      "food market",
+      "street vendor food"
+     ],
+     "match": "street food|street vendor|food stall|hawker|food market|night market|food cart|streetfood|garküche",
+     "prompts": [
+      "skewers grilling on a street food stall",
+      "a night market stall with steaming woks",
+      "a vendor's tray of fried snacks",
+      "noodles cooking at a hawker stall"
+     ],
+     "cats": [
+      "Street food",
+      "Food stalls",
+      "Night markets"
+     ],
+     "vision": "food at a street stall or market, the food itself large and clear in the picture. Faces must not be the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "breakfast",
+     "name": "Breakfast Plates",
+     "short": "BREAKFAST",
+     "queries": [
+      "breakfast",
+      "full breakfast",
+      "pancakes",
+      "eggs benedict",
+      "english breakfast"
+     ],
+     "match": "breakfast|frühstück|petit[- ]d[ée]jeuner|desayuno|pancake|eggs benedict|full english|waffle|brunch",
+     "prompts": [
+      "a full breakfast plate with eggs, bacon and toast",
+      "a stack of pancakes with berries",
+      "eggs benedict with hollandaise",
+      "a breakfast of waffles and fruit"
+     ],
+     "cats": [
+      "Breakfast",
+      "Full breakfast",
+      "Pancakes"
+     ],
+     "vision": "a breakfast plate (eggs, pancakes, waffles, toast or similar), large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "cheese",
+     "name": "Cheese Boards",
+     "short": "CHEESE",
+     "queries": [
+      "cheese board",
+      "cheese platter",
+      "cheese selection",
+      "cheeses"
+     ],
+     "match": "chees|fromage|\\bkäse|queso|formaggi|cheddar|brie|camembert|gouda|parmesan|roquefort|charcuterie",
+     "prompts": [
+      "a wooden cheese board with grapes and crackers",
+      "a selection of French cheeses on slate",
+      "wedges of aged cheese with walnuts",
+      "a cheese and charcuterie platter"
+     ],
+     "cats": [
+      "Cheeses",
+      "Cheese platters",
+      "Cheese plates"
+     ],
+     "vision": "cheese (a board, platter or wheels and wedges), large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "barbecue",
+     "name": "Barbecue",
+     "short": "BARBECUE",
+     "queries": [
+      "barbecue",
+      "grilled meat",
+      "barbecue ribs",
+      "brisket",
+      "grill"
+     ],
+     "match": "barbecue|barbeque|\\bbbq\\b|brisket|spare ?ribs|\\bribs\\b|grill|asado|churrasco|yakitori|kebab|souvlaki|satay|braai",
+     "prompts": [
+      "pork ribs glazed on a smoky grill",
+      "sliced smoked brisket on butcher paper",
+      "skewers of meat over hot coals",
+      "sausages and vegetables on a barbecue grill"
+     ],
+     "cats": [
+      "Barbecue",
+      "Grilled food",
+      "Brisket"
+     ],
+     "vision": "barbecued or grilled food (ribs, brisket, skewers, sausages or similar), large and clear as the main subject. Not raw meat in a butcher's shop. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "icecream",
+     "name": "Ice Cream",
+     "short": "ICE CREAM",
+     "queries": [
+      "ice cream",
+      "gelato",
+      "ice cream cone",
+      "sundae"
+     ],
+     "match": "ice cream|ice-cream|gelato|sundae|sorbet|soft serve|\\beis\\b|\\bglace|helado",
+     "prompts": [
+      "two scoops of gelato in a waffle cone",
+      "an ice cream sundae with chocolate sauce",
+      "a row of gelato tubs in a shop",
+      "a bowl of strawberry ice cream"
+     ],
+     "cats": [
+      "Ice cream",
+      "Gelato",
+      "Ice cream cones"
+     ],
+     "vision": "ice cream or gelato (scoops, cones, sundaes or tubs), large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    },
+    {
+     "key": "bread",
+     "name": "Fresh Bread",
+     "short": "BREAD",
+     "queries": [
+      "bread loaf",
+      "sourdough bread",
+      "baguette",
+      "bakery bread"
+     ],
+     "match": "\\bbread|\\bloaf|loaves|sourdough|baguette|\\bbrot\\b|\\bpain\\b|ciabatta|focaccia|rye bread|challah|brioche",
+     "prompts": [
+      "a crusty sourdough loaf on a wooden board",
+      "baguettes in a bakery basket",
+      "a sliced rye loaf",
+      "a focaccia with rosemary in a pan"
+     ],
+     "cats": [
+      "Bread",
+      "Sourdough",
+      "Baguettes"
+     ],
+     "vision": "bread (loaves, baguettes, rolls or similar), large and clear as the main subject. Real, edible food photographed for its own sake; not packaging, a menu, a sign, a drawing, a plastic display model, or a scene where people or text are the main subject."
+    }
+   ]
+  }
+ ]
+}
