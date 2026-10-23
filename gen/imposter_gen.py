@@ -534,7 +534,8 @@ def build_prompt(theme, reals, ims, rng):
     ref = f" (in the spirit of a photo titled '{refs[0]}')" if refs else ""
     return (f"A real photograph of {scene}{ref}. {describe_light(ims)}. "
             "Amateur documentary photo taken with a DSLR, eye-level horizontal composition, realistic textures, "
-            "slight sensor noise, natural imperfections, nothing staged. No text, no letters, no signs, no watermark.")
+            "slight sensor noise, natural imperfections, nothing staged. No text, no letters, no signs, no watermark."
+            + (f" {theme['style']}" if theme.get("style") else ""))
 
 
 def gen_ai_hf(prompt, seed):
@@ -1330,6 +1331,8 @@ def load_packs():
     for p in packs:
         for t in p["themes"]:
             t["pool"] = f"pack-{p['id']}-{t['key']}"
+            if p.get("style"):  # a pack-wide prompt suffix, e.g. against cartoon faces
+                t["style"] = (p["style"] + " " + t.get("style", "")).strip()
     return packs
 
 
@@ -1513,9 +1516,10 @@ def pack_approve(state, packs, target):
     log(f"{pid}: approved {sorted(set(want) - set(skip))}" + (f"; not generated yet, skipped {skip}" if skip else ""))
 
 
-def pack_redo(state, seasons, packs, secret, target):
+def pack_redo(state, seasons, packs, secret, target, ai_only=False):
     """--pack-redo <pack>:<case>:<round>: new real photos and a new AI image for
-    one round. The case loses its approval until it is approved again."""
+    one round (--pack-redo-ai: a new AI image only, the real photos stay). The
+    case loses its approval until it is approved again."""
     pid, n, r = parse_target(target, 3)
     pack = pack_by_id(packs, pid)
     n, slot = int(n), int(r) - 1
@@ -1526,10 +1530,14 @@ def pack_redo(state, seasons, packs, secret, target):
         return
     old = case["rounds"][slot]
     theme = {t["key"]: t for t in pack["themes"]}[old["theme"]]
-    state["blacklist"].extend(c["pageid"] for c in old["cards"] if not c["ai"])
     rng = random.Random(secrets.randbits(64))
-    res = build_round(None, slot, theme, state, secret, rng)
-    if res is None:  # this theme ran dry: any other theme the case does not use yet
+    if ai_only:
+        res = build_round(None, slot, theme, state, secret, rng,
+                          keep_reals=[c["cand"] for c in old["cards"] if not c["ai"]])
+    else:
+        state["blacklist"].extend(c["pageid"] for c in old["cards"] if not c["ai"])
+        res = build_round(None, slot, theme, state, secret, rng)
+    if res is None and not ai_only:  # this theme ran dry: any other theme the case does not use yet
         case["rounds"][slot] = None
         tried = {theme["key"]}
         while res is None:
@@ -1576,9 +1584,10 @@ def main():
     ap.add_argument("--pack-sheets", metavar="PACK", help="contact sheets of a pack's cases -> private/sheets/packs/")
     ap.add_argument("--pack-approve", action="append", default=[], metavar="PACK:N,N,..", help="approve cases (or PACK:all)")
     ap.add_argument("--pack-redo", action="append", default=[], metavar="PACK:CASE:ROUND", help="rebuild one round")
+    ap.add_argument("--pack-redo-ai", action="append", default=[], metavar="PACK:CASE:ROUND", help="new AI image only")
     a = ap.parse_args()
     global VISION_ON
-    pack_cmd = a.packs or a.pack_redo
+    pack_cmd = a.packs or a.pack_redo or a.pack_redo_ai
     VISION_ON = (VISION_ON or a.vision or pack_cmd) and not a.no_vision
 
     seasons = load_seasons()
@@ -1634,6 +1643,8 @@ def main():
         packs = load_packs()
         for t in a.pack_redo:
             pack_redo(state, seasons, packs, secret, t)
+        for t in a.pack_redo_ai:
+            pack_redo(state, seasons, packs, secret, t, ai_only=True)
         if a.packs:
             run_packs(state, seasons, packs, secret)
         elif a.pack_redo:

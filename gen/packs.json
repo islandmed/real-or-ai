@@ -429,10 +429,10 @@
      ],
      "match": "sushi|nigiri|maki\\b|makizushi|sashimi|temaki|chirashi|uramaki",
      "prompts": [
-      "a platter of salmon and tuna nigiri on a wooden board",
-      "maki rolls on a slate plate with pickled ginger",
-      "a sushi set on a lacquered tray",
-      "assorted sashimi on crushed ice"
+      "a plate of mixed nigiri and maki at a sushi restaurant counter, casual snapshot",
+      "maki rolls on a plain plate with pickled ginger and wasabi",
+      "a takeaway sushi box with mixed rolls, photographed on a desk",
+      "assorted sashimi on a plain ceramic plate with shredded daikon"
      ],
      "cats": [
       "Sushi",
@@ -479,8 +479,9 @@
      "prompts": [
       "fresh croissants on a bakery tray",
       "a plate of Danish pastries",
-      "chocolate éclairs in a row",
-      "a basket of pain au chocolat"
+      "cinnamon rolls cooling on a rack",
+      "a basket of pain au chocolat",
+      "apple turnovers on a baking sheet"
      ],
      "cats": [
       "Pastries",
@@ -502,10 +503,10 @@
      ],
      "match": "ramen|rāmen|tonkotsu|shoyu|miso soup noodle|noodle soup",
      "prompts": [
-      "a bowl of tonkotsu ramen with a soft egg",
-      "shoyu ramen with sliced pork and green onion",
-      "a steaming bowl of miso ramen",
-      "ramen with nori and bamboo shoots"
+      "a bowl of tonkotsu ramen with a halved soft egg in a plain white bowl on a restaurant counter, phone photo from above",
+      "shoyu ramen with sliced pork and green onion in a plain dark bowl, casual restaurant snapshot",
+      "a bowl of miso ramen with corn and butter on a wooden table, photographed at an angle",
+      "ramen with nori and bamboo shoots in a plain bowl, chopsticks resting on the rim"
      ],
      "cats": [
       "Ramen",
@@ -526,10 +527,11 @@
      ],
      "match": "pizza",
      "prompts": [
-      "a Neapolitan margherita pizza with a charred crust",
-      "a pepperoni pizza on a wooden peel",
-      "a slice of pizza being lifted from the pie",
-      "a pizza fresh from a wood-fired oven"
+      "a Neapolitan margherita pizza with a charred crust on a plate in a pizzeria",
+      "a pepperoni pizza in an open plain cardboard box",
+      "a half-eaten pizza on a kitchen table",
+      "a mushroom and ham pizza on a metal tray",
+      "a slice of cheese pizza on a paper plate"
      ],
      "cats": [
       "Pizza",
@@ -573,10 +575,12 @@
      ],
      "match": "salad|salat|salade|ensalada|insalata",
      "prompts": [
-      "a Greek salad with feta and olives",
-      "a Caesar salad in a white bowl",
-      "a fresh garden salad with tomatoes",
-      "a grain salad bowl with roasted vegetables"
+      "a Greek salad with feta and olives on a taverna table",
+      "a Caesar salad in a white bowl on a cafe table",
+      "a fresh garden salad with tomatoes and cucumber in a glass bowl",
+      "a caprese salad with tomato and mozzarella slices on a plate",
+      "a Waldorf salad with apple and walnuts",
+      "a coleslaw side salad at a picnic"
      ],
      "cats": [
       "Salads",
@@ -622,10 +626,11 @@
      ],
      "match": "dumpling|jiaozi|gyoza|dim sum|xiaolongbao|xiao long bao|momo\\b|pierogi|mandu|har gow|siu mai|shumai|pelmeni",
      "prompts": [
-      "steamed dumplings in a bamboo basket",
-      "pan-fried gyoza on a plate",
-      "xiaolongbao soup dumplings",
-      "a plate of momo with dipping sauce"
+      "steamed dumplings in a bamboo basket on a restaurant table",
+      "pan-fried gyoza on a plate with dipping sauce",
+      "a plate of boiled jiaozi with chili oil",
+      "a plate of momo with tomato chutney",
+      "pierogi fried with onions on a plate"
      ],
      "cats": [
       "Dumplings",
@@ -748,9 +753,10 @@
      "match": "barbecue|barbeque|\\bbbq\\b|brisket|spare ?ribs|\\bribs\\b|grill|asado|churrasco|yakitori|kebab|souvlaki|satay|braai",
      "prompts": [
       "pork ribs glazed on a smoky grill",
-      "sliced smoked brisket on butcher paper",
       "skewers of meat over hot coals",
-      "sausages and vegetables on a barbecue grill"
+      "sausages and vegetables on a backyard barbecue grill",
+      "burgers and corn cooking on a charcoal grill",
+      "a plate of pulled pork with coleslaw"
      ],
      "cats": [
       "Barbecue",
@@ -833,7 +839,7 @@
      "prompts": [
       "a tabby cat mid-yawn on a sofa, mouth wide open, eyes squeezed shut",
       "a lioness yawning hugely in golden savanna grass",
-      "a puppy yawning on a wooden floor, tongue curled",
+      "a dog yawning while lying on a worn rug",
       "a baboon yawning on a rock, showing its long teeth"
      ],
      "cats": [
@@ -859,7 +865,7 @@
      ],
      "match": "(?s)^(?!.*(?:blue[- ]?tongue|tiliqua|soup|salad|taco|kalbs|kalvetunge|rinder|beef|ox tongue|lingua de|dil çorbası|kue lidah|wellcome|buckle|belt\\b|overdoor|newel|figure|foo lion|matchsafe|mount \\(|thongue|la tongue|montblanc|lipoma|immunostain|tumou?r|tongue mass|geographic tongue|terracotta|einstein|zungenzeig|girl|woman|\\bboy\\b|\\bman\\b|child|kid\\b|baby|doctor|smile noah|redaktionstreffen|alona beach|snake eating|cooking|restaurant|kalbskopf|steinbockbraten|cactus|prickly|templom|gnm\\b|mattes|usmc)).*?(?:tongue|zunge|langue|lengua|lingua|j[eę]zyk|menjulurkan lidah|\\bblep)",
      "prompts": [
-      "a small dog sitting on grass with the tip of its pink tongue sticking out",
+      "a small mixed-breed dog panting with its tongue out after a walk in a park",
       "a giraffe reaching out its long dark tongue toward the camera",
       "a cat lying on a blanket with a tiny bit of tongue poking out",
       "a calf licking its own nose with a long tongue in a barn"
@@ -913,10 +919,10 @@
      ],
      "match": "(?s)^(?!.*(?:petroglyph|rock art|carving|statue|sculpture|brunnen|fountain|braten|skull|\\bmort\\b|dead|trussed|museum|coat of arms|drawing|painting|willow|christmas tree|goat fire|moth\\b|catkin|geograph|betlém|ndebele|leiden|airbus|plowing|\\bbus\\b|nagoya|\\btoy|tibetaanse|castle|market|woman|shepherd|hiker|visitors|goat island|goat hill|grotte|nilgiri tahr|bharal)).*?(?:goats?\\b|capra|ibex|oreamnos|ziegen?\\b|steinb[oö]ck|chèvres?|chevres?|bouquetin|cabras?\\b|stambecc)",
      "prompts": [
-      "several goats standing in the branches of an argan tree",
+      "several domestic goats standing in the branches of an argan tree in Morocco, seen from the road",
       "a white mountain goat balanced on a narrow cliff ledge",
-      "a goat standing on the roof of a wooden farm shed",
-      "an alpine ibex standing on a near-vertical rocky slope"
+      "a domestic farm goat standing on the roof of a wooden shed",
+      "a domestic goat standing on top of a large boulder in a field"
      ],
      "cats": [
       "Goats in trees",
@@ -937,10 +943,10 @@
      ],
      "match": "(?s)^(?!.*(?:lanz|tractor|traktor|revolver|pistol|plaque|statue|sculpture|drawing|engraving)).*?(?:\\bpugs?\\b|\\bmops\\b|carlin|bulldog|bouledogue)",
      "prompts": [
-      "a pug with a wrinkled face tilting its head on a sofa",
-      "a French bulldog with big bat ears sitting on a lawn",
+      "a fawn pug, a small dog with a flat black muzzle, wrinkled forehead and tightly curled tail, walking on a lead along a pavement",
+      "a black pug with a curled tail sniffing around a backyard lawn",
       "an English bulldog lying flat on a cool kitchen floor",
-      "a pug puppy sleeping on its back in a dog bed"
+      "a fawn pug lying on a dog bed in a living room"
      ],
      "cats": [
       "Pug",
@@ -961,7 +967,7 @@
      ],
      "match": "(?s)^(?!.*(?:sloth bear|melursus|lippenbär|lippenbaer|ours lippu|oso bezudo|skeleton|skull|fossil|megatherium|ground sloth)).*?(?:sloths?\\b|bradypus|choloepus|faultier|paresseux|perezoso|bradipo|preguiça|preguica)",
      "prompts": [
-      "a three-toed sloth hanging from a branch, smiling sleepily",
+      "a three-toed sloth hanging from a branch high in a tree, seen from below",
       "a two-toed sloth hanging upside down in the rainforest",
       "a sloth clinging to a tree trunk and looking over its shoulder",
       "a baby sloth holding on to its mother's fur"
@@ -987,9 +993,9 @@
      ],
      "match": "(?s)^(?!.*(?:teddy|steiff|plush|yarn|wool\\b|garn|knit|stofftier|sweater|textile|poncho|blanket)).*?(?:alpacas?|alpakas?|\\bllamas?\\b|lama glama|vicugna pacos)",
      "prompts": [
-      "a fluffy white alpaca staring straight at the camera with a big tuft of hair",
-      "a llama chewing with its lower teeth showing in a field",
-      "a brown alpaca with a freshly shorn body and a fluffy head",
+      "a fluffy white alpaca with a big tuft of hair grazing in a muddy paddock",
+      "a llama chewing hay at a farm fence",
+      "a brown alpaca with a freshly shorn body and a fluffy head standing in a farm field",
       "two alpacas standing cheek to cheek by a farm fence"
      ],
      "cats": [
@@ -1012,7 +1018,7 @@
      "match": "puffins?|fratercula|papageitaucher|macareux|frailecillo|pulcinella di mare|lundi",
      "prompts": [
       "an Atlantic puffin standing on a cliff top with a beak full of small fish",
-      "a puffin landing on grass with its orange feet out",
+      "a puffin flying low over the sea, seen from a boat",
       "two puffins standing side by side on a rock by the sea",
       "a tufted puffin with blond head plumes on a rocky ledge"
      ],
@@ -1034,10 +1040,10 @@
      ],
      "match": "proboscis|nasalis|nasenaffe|nasique|mono narigudo|bekantan",
      "prompts": [
-      "a male proboscis monkey with a huge drooping nose sitting in a tree",
-      "a proboscis monkey eating leaves in a mangrove forest",
-      "a proboscis monkey sitting on a branch with its belly out",
-      "a proboscis monkey looking down from the canopy by a river"
+      "a male proboscis monkey, orange-brown fur, grey legs and a long fleshy nose hanging over its mouth, sitting in a mangrove tree, photographed from a riverboat",
+      "a group of proboscis monkeys with long drooping noses feeding in mangrove trees in Borneo, seen from a distance",
+      "a proboscis monkey with a big pot belly and a long pendulous nose resting on a branch at a zoo",
+      "a proboscis monkey leaping between trees over a muddy river in Borneo"
      ],
      "cats": [
       "Nasalis larvatus"
@@ -1059,7 +1065,7 @@
      "prompts": [
       "a brown pelican on a wooden pier post with its pouch bulging",
       "an Australian pelican swimming and looking sideways at the camera",
-      "a white pelican stretching its huge beak wide open",
+      "a white pelican swimming on a lake with its beak open",
       "a pelican scratching its head with its foot on a dock"
      ],
      "cats": [
@@ -1083,10 +1089,10 @@
      ],
      "match": "sea ?lions?|\\bseals?\\b|zalophus|mirounga|otaria|phoca|halichoerus|seelöwe|robbe|phoque|otarie|lobo marino|foca\\b|leone marino",
      "prompts": [
-      "a pile of sea lions sprawled across a wooden dock",
-      "an elephant seal lying on a beach flicking sand onto its back",
+      "several California sea lions lying on a wooden dock, photographed from the pier",
+      "an elephant seal lying on a beach flicking sand onto its back, seen from a distance",
       "a harbor seal lying on a rock in a banana shape, head and tail raised",
-      "a sea lion asleep on its back on the sand with its flippers in the air"
+      "a sea lion asleep on a sandy beach among others"
      ],
      "cats": [
       "Zalophus californianus at Pier 39",
@@ -1111,7 +1117,7 @@
       "a capybara sitting calmly in a warm pond up to its chin",
       "a capybara lying on grass with a small bird standing on its back",
       "a family of capybaras resting together by a riverbank",
-      "a capybara chewing grass with a completely relaxed face"
+      "a capybara grazing on a riverbank, seen from the side"
      ],
      "cats": [
       "Hydrochoerus hydrochaeris"
@@ -1130,10 +1136,10 @@
      ],
      "match": "meerkats?|suricat|erdmännchen|erdmaennchen",
      "prompts": [
-      "a meerkat standing bolt upright on its hind legs, keeping watch",
-      "three meerkats standing in a row on a sandy mound",
+      "a meerkat standing bolt upright on its hind legs on a rock, keeping watch",
       "a meerkat sunbathing with its belly out on warm sand",
-      "a young meerkat peeking out of its burrow"
+      "a group of meerkats foraging in a sandy zoo enclosure",
+      "a meerkat digging in dry sand at a zoo"
      ],
      "cats": [
       "Suricata suricatta"
@@ -1176,10 +1182,10 @@
      ],
      "match": "(?s)^(?!.*(?:plush|mascot|stuffed|soft toy|wikimania|eseap|conference|meetup|user group|state of the map|puppet|kuscheltier|bus\\b|coach|skull|placard|tobu|interior|side car|gate on)).*?(?:quokkas?|setonix)",
      "prompts": [
-      "a quokka looking up at the camera with its smiling face",
-      "a quokka sitting on its hind legs nibbling a leaf",
+      "a quokka, a small cat-sized brown marsupial with short round ears, hopping across a sandy path on Rottnest Island, photographed from standing height",
+      "a quokka sitting on its hind legs nibbling a leaf in dry scrub",
       "a quokka resting in the shade of a bush on sandy ground",
-      "a mother quokka with a joey peeking out of her pouch"
+      "two quokkas foraging under low bushes on Rottnest Island"
      ],
      "cats": [
       "Setonix brachyurus"
@@ -1198,17 +1204,18 @@
      ],
      "match": "lemurs?\\b|lemur catta|katta\\b|maki\\b",
      "prompts": [
-      "a ring-tailed lemur sitting upright sunbathing with its arms spread wide",
-      "a ring-tailed lemur hugging its striped tail",
-      "several ring-tailed lemurs huddled in a ball on a branch",
-      "a ring-tailed lemur staring with wide orange eyes from a rock"
+      "a ring-tailed lemur sitting upright sunbathing with its arms spread wide at a zoo",
+      "a ring-tailed lemur hugging its striped tail on a branch",
+      "two ring-tailed lemurs sitting on a wooden platform at a zoo",
+      "a ring-tailed lemur walking on all fours with its striped tail raised, at a zoo"
      ],
      "cats": [
       "Lemur catta"
      ],
      "vision": "a real lemur, the animal large and clear as the main subject. Alive and in natural surroundings, a home or a natural-looking enclosure; not a drawing, statue, toy, taxidermy or museum specimen, not wearing a costume, and not a dead or injured animal. No readable text."
     }
-   ]
+   ],
+   "style": "Candid snapshot taken from a few metres away at a zoo, farm, beach or home, the whole animal in frame, anatomically accurate for its species, not looking into the lens, not cute, not a portrait, not symmetrical, muted natural colours, cluttered ordinary background, not cartoon, not 3D render, not illustration."
   }
  ]
 }
