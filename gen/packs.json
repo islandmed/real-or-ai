@@ -48,8 +48,8 @@
      "match": "\\bfox(es)?\\b|vulpes|\\bfuchs|\\brenard|\\bzorro|\\bvolpe",
      "prompts": [
       "a red fox standing in a meadow",
-      "a red fox curled up in the snow",
-      "an arctic fox in a white winter coat",
+      "a red fox hunting in a snowy field",
+      "an arctic fox on tundra rocks in its brown summer coat",
       "a young fox at the edge of a forest"
      ],
      "cats": [
@@ -72,10 +72,10 @@
      ],
      "match": "\\bdeer\\b|\\bstag\\b|\\bdoe\\b|\\bfawn\\b|cervus|odocoileus|capreolus|dama dama|\\bhirsch|\\breh\\b|\\bcerf\\b|\\bciervo",
      "prompts": [
-      "a red deer stag with antlers in a misty field",
+      "a red deer stag grazing on moorland, seen from a distance",
       "a white-tailed deer standing at the edge of a forest",
       "a roe deer in tall summer grass",
-      "a fallow deer herd under old oak trees"
+      "a fallow deer grazing in a park"
      ],
      "cats": [
       "Cervus elaphus",
@@ -100,7 +100,7 @@
       "a brown bear standing in a shallow river",
       "a black bear walking through a forest clearing",
       "a polar bear on sea ice",
-      "a grizzly bear in a mountain meadow"
+      "a grizzly bear digging in a mountain meadow, photographed from far away"
      ],
      "cats": [
       "Ursus arctos",
@@ -124,7 +124,7 @@
       "a Bengal tiger walking through tall grass",
       "a tiger resting in the shade near water",
       "a Siberian tiger in the snow",
-      "a tiger looking straight at the camera from the forest"
+      "a tiger walking along a dusty forest track"
      ],
      "cats": [
       "Panthera tigris",
@@ -173,9 +173,9 @@
      "match": "parrot|macaw|\\bara\\b|cockatoo|cacatua|amazona|lorikeet|lory|parakeet|conure|psittac|\\bpapagei|perroquet|loro\\b",
      "prompts": [
       "a scarlet macaw perched on a branch",
-      "a pair of blue and yellow macaws",
+      "a blue and yellow macaw on a branch in a zoo aviary",
       "a sulphur-crested cockatoo on a tree",
-      "a rainbow lorikeet among flowers"
+      "a rainbow lorikeet perched on a eucalyptus branch"
      ],
      "cats": [
       "Psittaciformes",
@@ -249,7 +249,7 @@
       "a grey wolf standing in the snow",
       "a wolf walking along a forest trail",
       "an arctic wolf on a rocky hillside",
-      "two wolves resting in tall grass"
+      "a grey wolf lying down in tall grass"
      ],
      "cats": [
       "Canis lupus",
@@ -322,9 +322,9 @@
      "match": "elephant|loxodonta|elephas maximus|\\belefant|éléphant|elefante",
      "prompts": [
       "an African elephant walking across the savanna",
-      "an elephant family at a watering hole",
+      "an elephant drinking at a muddy watering hole, seen from a safari vehicle",
       "an Asian elephant in a green forest",
-      "a young elephant beside its mother"
+      "an elephant throwing dust over its back on dry ground"
      ],
      "cats": [
       "Loxodonta africana",
@@ -345,10 +345,10 @@
      ],
      "match": "\\botters?\\b|lutra|lontra|enhydra|aonyx|pteronura|\\botter|loutre|nutria\\b|lontra",
      "prompts": [
-      "a sea otter floating on its back in kelp",
+      "a sea otter floating on its back in calm grey water",
       "a river otter on a mossy riverbank",
       "a Eurasian otter swimming in a stream",
-      "two otters playing at the water's edge"
+      "an otter eating a fish on a rock"
      ],
      "cats": [
       "Lutrinae",
@@ -372,7 +372,7 @@
      "match": "lizard|iguan|chamele|gecko|varanus|monitor lizard|\\bagama|anolis|lacerta|podarcis|\\beidechse|lézard|lagarto",
      "prompts": [
       "a green iguana resting on a branch",
-      "a chameleon gripping a twig",
+      "a chameleon on a branch in a zoo enclosure",
       "a gecko on a sunlit rock",
       "a wall lizard basking on old stones"
      ],
@@ -396,9 +396,9 @@
      "match": "hedgehog|erinaceus|atelerix|\\bigel\\b|hérisson|erizo|riccio",
      "prompts": [
       "a hedgehog walking across a lawn",
-      "a hedgehog among autumn leaves",
+      "a hedgehog crossing short grass and bare soil",
       "a hedgehog sniffing the ground at dusk",
-      "a hedgehog in a garden flower bed"
+      "a hedgehog on a garden path at night, lit by camera flash"
      ],
      "cats": [
       "Erinaceus europaeus",

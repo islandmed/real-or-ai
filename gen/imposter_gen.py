@@ -70,7 +70,7 @@ W, H = 960, 720           # every card, real or AI (flux gives 1024, so no upsca
 QUALITY = 70              # one WebP quality for every card
 MAX_REAL_BYTES = 165_000  # skip very detailed photos so a day stays light
 NEURONS_PER_IMAGE = 120   # measured: 85 images used the 10,000 free neurons (2026-10-11)
-DAILY_NEURON_CAP = 9000   # free tier is 10,000 per UTC day
+DAILY_NEURON_CAP = int(os.environ.get("IMPOSTER_NEURON_CAP", 9000))  # free tier is 10,000 per UTC day; Workers Paid bills past it
 FIRST_DATE = dt.date(2026, 10, 11)
 FIRST_CASE_NUMBER = 71
 ROUNDS = 6
@@ -142,11 +142,24 @@ def load_state():
     return s
 
 
+# IMPOSTER_AI=hf draws the AI images on Hugging Face's free FLUX.1-schnell
+# ZeroGPU space instead of the Worker (needs gradio_client and an HF token in
+# HF_TOKEN). Local runs only: it is how a day with no Workers AI quota left
+# still makes cases. The Worker budget is then not touched.
+HF_MODE = os.environ.get("IMPOSTER_AI", "").lower() == "hf"
+HF_SPACE = "black-forest-labs/FLUX.1-schnell"
+_hf = {"client": None, "gone": False}
+
+
 def neurons_left(state):
+    if HF_MODE:
+        return 0 if _hf["gone"] else DAILY_NEURON_CAP
     return DAILY_NEURON_CAP - state["neurons"].get(utc_today().isoformat(), 0)
 
 
 def charge(state, n=NEURONS_PER_IMAGE):
+    if HF_MODE:
+        return
     k = utc_today().isoformat()
     state["neurons"][k] = state["neurons"].get(k, 0) + n
 
@@ -524,7 +537,26 @@ def build_prompt(theme, reals, ims, rng):
             "slight sensor noise, natural imperfections, nothing staged. No text, no letters, no signs, no watermark.")
 
 
+def gen_ai_hf(prompt, seed):
+    from gradio_client import Client
+    if _hf["client"] is None:
+        _hf["client"] = Client(HF_SPACE, token=os.environ.get("HF_TOKEN"))
+    try:
+        out = _hf["client"].predict(prompt=prompt, seed=seed, randomize_seed=False, width=1024, height=768,
+                                    num_inference_steps=4, api_name="/infer")
+    except Exception as e:
+        if "quota" in str(e).lower():
+            _hf["gone"] = True
+            log(f"    Hugging Face quota used up: {str(e)[:160]}")
+        raise
+    buf = io.BytesIO()
+    Image.open(out[0]).convert("RGB").save(buf, "JPEG", quality=92)
+    return buf.getvalue()
+
+
 def gen_ai(prompt, secret, seed):
+    if HF_MODE:
+        return gen_ai_hf(prompt, seed)
     req = urllib.request.Request(GEN_URL, data=json.dumps({"prompt": prompt, "seed": seed}).encode(),
                                  headers={"content-type": "application/json", "x-gen-secret": secret, "User-Agent": UA})
     with urllib.request.urlopen(req, timeout=120) as r:
@@ -766,6 +798,8 @@ def make_ai(prompt, theme, state, secret, rng):
             continue
         except Exception as e:
             log(f"    AI attempt {attempt + 1} failed: {e}")
+            if HF_MODE and _hf["gone"]:
+                return "budget"
             time.sleep(4)
             continue
         if VISION_ON:
