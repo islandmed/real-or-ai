@@ -4890,7 +4890,7 @@ async function renderSpread() {
     } catch (_) {}
   }
   let data;
-  try { data = await (await fetch(`/api/score?date=${d}`)).json(); } catch (_) { return; }
+  try { data = await (await fetch(`/api/score?date=${d}&score=${res.score}&time=${res.time}`)).json(); } catch (_) { return; }
   const b = Array.isArray(data?.buckets) ? data.buckets.map(x => Math.max(0, +x || 0)) : [];
   const n = b.reduce((a, x) => a + x, 0);
   if ((n < SPREAD_MIN && !data.est) || !b.length) return;
@@ -4898,12 +4898,19 @@ async function renderSpread() {
   const i = Math.min(b.length - 1, Math.floor(res.score / SPREAD_W));
   const frac = Math.min(1, (res.score - i * SPREAD_W) / SPREAD_W);
   const below = b.slice(0, i).reduce((a, x) => a + x, 0) + b[i] * frac;
-  // A perfect score can only be tied, so it gets a full ring instead of a share
+  // Once the day has real results, rank exactly as the boards do: score, then the
+  // faster time, so a 700 in 18s beats a 700 in 25s. Exact ties count half.
+  const rk = data.rank, others = n - 1;
+  let pct = Math.max(0, Math.min(99, Math.round(100 * below / n)));
+  if (!data.est && rk && others > 0) {
+    const share = (rk.below + Math.max(0, rk.tie - 1) / 2) / others;
+    pct = rk.below >= others ? 100 : Math.min(99, Math.round(100 * share));
+  }
   const perfect = res.score >= maxScoreFor(res);
-  const pct = perfect ? 100 : Math.max(0, Math.min(99, Math.round(100 * below / n)));
-  $("spreadLine").innerHTML = perfect ? `<small>Perfect score</small>Nobody can do better than 700`
-    : `<small>${pct >= 90 ? "Top of the precinct" : pct >= 50 ? "Sharp eye" : "Today's ranking"}</small>You beat ${pct}% of today's detectives`;
-  $("spPct").textContent = perfect ? "💯" : `${pct}%`;
+  const label = perfect ? `💯 Perfect score in ${Number(res.time).toFixed(1)}s`
+    : pct >= 90 ? "Top of the precinct" : pct >= 50 ? "Sharp eye" : "Today's ranking";
+  $("spreadLine").innerHTML = `<small>${label}</small>${pct >= 100 ? "You beat every detective so far today" : `You beat ${pct}% of today's detectives`}`;
+  $("spPct").textContent = `${pct}%`;
   // Accuracy and speed, each as the share of today's detectives you did better than
   // (ties count half). Score = fakes caught (more for first tries) + speed bonus.
   const won = Array.isArray(data.won) ? data.won.map(x => Math.max(0, +x || 0)) : [];

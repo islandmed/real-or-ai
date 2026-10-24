@@ -4,7 +4,10 @@ import { json, allowedDate } from "../../lib/cases.js";
 // daily result (repeats are ignored). GET ?date=YYYY-MM-DD -> {n, est, buckets, won, times}:
 // buckets = BUCKETS score counts of width WIDTH over 0-800, last bucket open-ended;
 // won = counts of 0..6 fakes caught; times = TBUCKETS time counts of TWIDTH seconds,
-// last bucket open-ended.
+// last bucket open-ended. With &score=&time= (the caller's own result) it also returns
+// rank = {below, tie}: players ranked under that result (lower score, or the same score
+// in a slower time, as the boards rank) and players with exactly that result, the
+// caller included. rank only counts real results, never the placeholder spread.
 const ID = /^[a-z0-9]{6,12}$/, BUCKETS = 20, WIDTH = 40, TBUCKETS = 60, TWIDTH = 2;
 
 // Only today's case counts: UTC yesterday to tomorrow covers every time zone.
@@ -33,9 +36,17 @@ export async function onRequestGet({ request, env }) {
   for (const r of await q(`SELECT MIN(score / ${WIDTH}, ${BUCKETS - 1}) AS b, COUNT(*) AS c FROM scores_daily WHERE date = ? GROUP BY b`)) { buckets[r.b] = r.c; n += r.c; }
   for (const r of await q("SELECT won AS k, COUNT(*) AS c FROM scores_daily WHERE date = ? GROUP BY k")) if (r.k >= 0 && r.k <= 6) won[r.k] = r.c;
   for (const r of await q(`SELECT MIN(CAST(time / ${TWIDTH} AS INTEGER), ${TBUCKETS - 1}) AS k, COUNT(*) AS c FROM scores_daily WHERE date = ? GROUP BY k`)) if (r.k >= 0) times[r.k] = r.c;
+  let rank;
+  const sp = new URL(request.url).searchParams, ms = Number(sp.get("score")), mt = Math.round(Number(sp.get("time")) * 10) / 10;
+  if (sp.has("score") && ms >= 0 && ms <= 800 && mt > 0 && mt < 10000) {
+    const r = await env.DB.prepare(
+      "SELECT SUM(score < ?1 OR (score = ?1 AND time > ?2)) AS below, SUM(score = ?1 AND time = ?2) AS tie FROM scores_daily WHERE date = ?3"
+    ).bind(Math.round(ms), mt, date).first();
+    rank = { below: r?.below || 0, tie: r?.tie || 0 };
+  }
   const v = Math.max(0, BASE_N - n);
   const mix = (real, base) => real.map((x, k) => Math.round((x + v * base[k]) * 100) / 100);
-  return json({ n, est: v > 0, buckets: mix(buckets, BASE.buckets), won: mix(won, BASE.won), times: mix(times, BASE.times) },
+  return json({ n, est: v > 0, buckets: mix(buckets, BASE.buckets), won: mix(won, BASE.won), times: mix(times, BASE.times), rank },
     200, { "cache-control": "public, max-age=60" });
 }
 
