@@ -3771,6 +3771,7 @@ const CAREER_RANKS = [
 const ALL_BADGES = [
   { id: "lightning_instinct", icon: "⚡", name: "Lightning Instinct", desc: "Fast forensic unmasking under 12s total" },
   { id: "flawless_case", icon: "🎯", name: "Flawless Case", desc: "Ace every round of a daily case on the first try" },
+  { id: "perfect_case", icon: "⭐", name: "Perfect Case", desc: "Score a perfect 700 on a daily case: every fake first try, under 30s" },
   { id: "eagle_eye", icon: "🦅", name: "Eagle Eye", desc: "Flawless unmasking with 100% first-guess accuracy" },
   { id: "streak_master", icon: "🔥", name: "Streak Master", desc: "Maintain a 3-day active daily streak" },
   { id: "top_detective", icon: "🏆", name: "Top Detective", desc: "Score 600+ points in a single daily case" },
@@ -3808,6 +3809,8 @@ function historyMedals(run) {
   if ((playerStats.aces || 0) >= 50) out.push("sharpshooter");
   if ((playerStats.aces || 0) >= 250) out.push("fake_finder");
   if (Object.keys(archiveRecords()).length >= 5) out.push("cold_case");
+  // 700 was out of reach before the 2026-10-23 scoring, so any saved 700 is a real perfect
+  if (Object.values(playerStats.history || {}).some(h => h && h.score >= maxScoreFor())) out.push("perfect_case");
   const months = new Set(days.map(([d]) => d.slice(5, 7)));
   if (months.has("10")) out.push("spooky_season");
   if (months.has("11")) out.push("harvest_hunter");
@@ -4207,6 +4210,7 @@ function showAlreadyCompletedToday(record) {
   $("starsRow").textContent = record.stars || "";
   $("resultTitle").textContent = record.title || "Today's Case Complete! 🕵️";
   $("resultDesc").textContent = "You already cracked today's case. A new one drops at midnight!";
+  unlockBadges(historyMedals(null)); // medals added since this case was played
   renderResultsExtras(score, time);
   startMidnightCountdown();
 }
@@ -5484,6 +5488,7 @@ function showFinalResults() {
   const medals = [];
   if (firstTryCount === totalRounds) medals.push("flawless_case", "eagle_eye");
   if (finalScore >= (totalRounds * 100)) medals.push("top_detective");
+  if (finalScore >= maxScoreFor({ total: totalRounds })) medals.push("perfect_case");
   if (playerStats.currentStreak >= 3) medals.push("streak_master");
   if (playerStats.won >= 7) medals.push("case_veteran");
   if (finalSecs < 20.0 && firstTryCount >= (totalRounds - 1)) medals.push("lightning_instinct");
