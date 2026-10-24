@@ -3285,7 +3285,9 @@ function showCountdownReadyState() {
   const activeTitle = $("cdActiveTitle");
 
   if (dailyCaseData) {
-    const badgeText = ARCHIVE_DATE
+    const badgeText = PACK_CASE
+      ? `${dailyCaseData.eventBadge || "CASE PACK"} · CASE ${PACK_CASE.n}`
+      : ARCHIVE_DATE
       ? `PAST CASE #${dailyCaseData.caseNumber} · ${shortDate(ARCHIVE_DATE).toUpperCase()}`
       : dailyCaseData.eventBadge
       ? `${dailyCaseData.eventBadge} · CASE #${dailyCaseData.caseNumber}`
@@ -3293,7 +3295,8 @@ function showCountdownReadyState() {
     if (badgeEl) badgeEl.textContent = badgeText;
     if (activeBadge) activeBadge.textContent = badgeText;
     if (activeTitle) activeTitle.textContent = `${dailyCaseData.title.toUpperCase()} · ${dailyCaseData.rounds.length} ROUNDS`;
-    if (ARCHIVE_DATE && $("cdStartBtn")) $("cdStartBtn").textContent = `▶ START CASE #${dailyCaseData.caseNumber}`;
+    if (PACK_CASE && $("cdStartBtn")) $("cdStartBtn").textContent = `▶ START CASE ${PACK_CASE.n}`;
+    else if (ARCHIVE_DATE && $("cdStartBtn")) $("cdStartBtn").textContent = `▶ START CASE #${dailyCaseData.caseNumber}`;
   }
 
   if (briefing) briefing.style.display = "flex";
