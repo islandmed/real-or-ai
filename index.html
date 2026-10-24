@@ -905,6 +905,12 @@
   }
   .btn-challenge:active { transform: scale(0.98); }
   @media (max-width: 420px) { .btn-challenge { font-size: 12px; padding: 14px 6px; } }
+  .icon-btn.today-pill { width: auto; padding: 0 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--fg); text-decoration: none; }
+  /* Packs and past cases earn no XP, so the level pill gives its place to the way back */
+  body.archive-mode #btnUserAccount { display: none; }
+  @media (max-width: 480px) { body.archive-mode .logo-sub { display: none; } }
+  @media (max-width: 340px) { .icon-btn.today-pill { padding: 0 5px; font-size: 11px; } }
+  .cd-back { display: inline-block; margin-top: 14px; font-size: 14px; font-weight: 700; color: var(--fg); position: relative; z-index: 2; }
   .icon-btn.level-pill { width: auto; padding: 0 8px; gap: 4px; font-family: 'JetBrains Mono', monospace;
     font-weight: 800; font-size: 11px; color: var(--accent); white-space: nowrap; }
   .results-level { all: unset; cursor: pointer; display: block; box-sizing: border-box; width: 100%; margin-top: 14px; text-align: left; }
@@ -4450,6 +4456,18 @@ function hideDailyOnlyResults() {
   back.textContent = "← Back to today's case";
   back.style.marginTop = "10px";
   $("pastCases").after(back);
+  // And a way out before and during the case: under the start button and in the header
+  const cdBack = document.createElement("a");
+  cdBack.className = "cd-back";
+  cdBack.href = "/";
+  cdBack.textContent = "← Back to today's case";
+  $("cdStartBtn").after(cdBack);
+  const pill = document.createElement("a");
+  pill.className = "icon-btn today-pill";
+  pill.href = "/";
+  pill.title = "Back to today's case";
+  pill.textContent = "← Today";
+  document.querySelector(".header-actions").prepend(pill);
 }
 // ===== Case Packs =====
 // ?k=<pack>-<n> plays case n of a themed pack (lib/packs.js). Like a past case it
