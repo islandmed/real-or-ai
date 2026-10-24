@@ -794,6 +794,19 @@
   .sh-num { font: 900 76px/0.95 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: -0.04em;
     background: linear-gradient(180deg, #fff 10%, var(--accent) 95%); -webkit-background-clip: text; background-clip: text; color: transparent;
     filter: drop-shadow(0 4px 18px rgb(var(--accent-rgb) / 0.45)); font-variant-numeric: tabular-nums; }
+  .sh-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+  .sh-max { font: 800 22px 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--fg-muted); }
+  .sh-tier { max-width: 340px; margin: 12px auto 0; }
+  .sh-tier-bar { position: relative; height: 8px; border-radius: 999px; background: rgb(255 255 255 / 0.08); }
+  .sh-tier-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 0.9s cubic-bezier(.2,.8,.2,1); }
+  .sh-tier-bar b { z-index: 2; position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #fff;
+    box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgb(var(--accent-rgb) / 0.7); transition: left 0.9s cubic-bezier(.2,.8,.2,1); }
+  .sh-tier-bar::before { content: ""; position: absolute; inset: 0; border-radius: 999px;
+    background: linear-gradient(90deg, transparent calc(25% - 1px), rgb(0 0 0 / 0.5) 25%, transparent calc(25% + 1px), transparent calc(50% - 1px), rgb(0 0 0 / 0.5) 50%, transparent calc(50% + 1px), transparent calc(75% - 1px), rgb(0 0 0 / 0.5) 75%, transparent calc(75% + 1px)); z-index: 1; }
+  .sh-tier-labels { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 7px; font: 800 10px 'JetBrains Mono', monospace; letter-spacing: 0.02em; color: var(--fg-muted); }
+  .sh-tier-labels span { text-align: center; white-space: nowrap; }
+  .sh-tier-labels span.on { color: var(--accent); }
+  .sh-break { margin-top: 6px; font: 700 11px 'JetBrains Mono', monospace; color: var(--fg-muted); }
   .sh-unit { font: 800 12px 'JetBrains Mono', monospace; letter-spacing: 0.32em; text-transform: uppercase; color: var(--accent); margin-top: 2px; }
   .sh-chips { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
   .sh-chips span { font: 800 13px 'JetBrains Mono', monospace; padding: 6px 11px; border-radius: 999px;
@@ -2608,8 +2621,12 @@
         <h2 class="result-title" id="resultTitle">Case Closed!</h2>
         <span class="summary-score-badge" id="summaryScoreBadge" hidden>6 / 6 CLEARED</span>
         <div class="score-hero" id="scoreHero" hidden>
-          <div class="sh-num" id="heroScore">0</div>
-          <div class="sh-unit">points</div>
+          <div class="sh-row"><div class="sh-num" id="heroScore">0</div><div class="sh-max" id="heroMax">/ 700</div></div>
+          <div class="sh-tier" id="heroTier">
+            <div class="sh-tier-bar"><i id="heroTierFill"></i><b id="heroTierMark"></b></div>
+            <div class="sh-tier-labels" id="heroTierLabels"></div>
+          </div>
+          <div class="sh-break" id="heroBreak"></div>
           <div class="sh-chips"><span id="heroCaught"></span><span id="heroTime"></span><span id="heroStreak" hidden></span></div>
         </div>
         <div class="rival-box" id="rivalBox" hidden>
@@ -3462,9 +3479,10 @@ window.addEventListener("keydown", (e) => {
 function calculateSpeedBonus(secs, resultsOrCount) {
   const totalRounds = dailyCaseData?.rounds?.length || 6;
   const cutoff = totalRounds * 15; // 90 seconds for 6 rounds
+  const par = totalRounds * 5; // 30 seconds for 6 rounds: the full bonus, so 700 is reachable
   if (secs >= cutoff) return 0;
 
-  const raw = Math.max(0, Math.min(100, Math.round(100 * (1 - (secs / cutoff)))));
+  const raw = secs <= par ? 100 : Math.max(0, Math.min(100, Math.round(100 * (cutoff - secs) / (cutoff - par))));
 
   let accuracyMult = 1.0;
   if (Array.isArray(resultsOrCount)) {
@@ -5493,12 +5511,13 @@ function getTodayResult() {
   // The saved record is the first result for this day, and it is what we share
   try {
     const rec = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}")[dailyCaseData.date || localDayStr()];
-    if (rec && rec.solved && (!rec.caseNumber || rec.caseNumber === dailyCaseData.caseNumber)) return { won: rec.won || 0, total: rec.total || totalRounds, score: rec.score || 0, time: typeof rec.time === "number" ? rec.time : 0, grid: rec.grid || "" };
+    if (rec && rec.solved && (!rec.caseNumber || rec.caseNumber === dailyCaseData.caseNumber)) return { won: rec.won || 0, total: rec.total || totalRounds, score: rec.score || 0, time: typeof rec.time === "number" ? rec.time : 0, grid: rec.grid || "", speedBonus: typeof rec.speedBonus === "number" ? rec.speedBonus : null };
   } catch (_) {}
   if (roundResults.length > 0 && roundResults.length === totalRounds) {
     const firstTry = roundResults.filter(r => r.solved && r.attempts === 1).length;
     const base = (firstTry * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
-    return { won: roundResults.filter(r => r.solved).length, total: totalRounds, score: base + calculateSpeedBonus(elapsedSeconds, roundResults), time: elapsedSeconds, grid: buildEmojiGrid(roundResults) };
+    const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
+    return { won: roundResults.filter(r => r.solved).length, total: totalRounds, score: base + speedBonus, time: elapsedSeconds, grid: buildEmojiGrid(roundResults), speedBonus };
   }
   return null;
 }
@@ -5532,7 +5551,8 @@ function getShareParts() {
   head = head.filter(Boolean);
   if (playerStats.currentStreak >= 2) head.push(`🔥 ${playerStats.currentStreak} day streak`);
   // The posted message is the dare (one button does share and challenge); head stays for titles
-  const dare = [`🕵️ I caught ${won} of ${total} AI fakes in ${T} on today's Imposter. Can you beat me?`, grid];
+  const tier = tierOf(res.score);
+  const dare = [`${tier.icon} ${tier.name} · ${res.score}/${maxScoreFor(res)} on today's Imposter`, `I caught ${won} of ${total} AI fakes in ${T}. Can you beat me?`, grid];
   if (boardRank && boardRank.rank === 1 && boardRank.of >= 2) dare.push(`👑 #1 of ${boardRank.of} friends today`);
   if (playerStats.currentStreak >= 2) dare.push(`🔥 ${playerStats.currentStreak} day streak`);
   return { res, head, link, text: dare.concat(link).join("\n"), title: "Think you can beat my Imposter score?" };
@@ -5615,8 +5635,34 @@ async function submitNameSheet(e) {
 }
 
 // Results-screen extras: streak, friend comparison, ad slot
+// Ranks on the 0-700 score. 700 = all 6 caught first try in 30s or less.
+const TIERS = [[0, "Rookie", "🔰"], [250, "Detective", "🕵️"], [450, "Inspector", "🔎"], [600, "Mastermind", "👑"], [700, "Perfect", "💯"]];
+function tierOf(score) { let t = TIERS[0]; for (const x of TIERS) if (score >= x[0]) t = x; return { name: t[1], icon: t[2] }; }
+function maxScoreFor(res) { return ((res && res.total) || 6) * 100 + 100; }
+function renderScoreTier(score, res) {
+  const max = maxScoreFor(res);
+  $("heroMax").textContent = `/ ${max}`;
+  // Four equal bands (Rookie, Detective, Inspector, Mastermind); the marker sits within its band
+  const edges = [0, 250, 450, 600, max];
+  let i = 0; while (i < 3 && score >= edges[i + 1]) i++;
+  const pos = `${Math.min(100, 25 * (i + Math.min(1, (score - edges[i]) / (edges[i + 1] - edges[i]))))}%`;
+  const labels = $("heroTierLabels");
+  labels.innerHTML = "";
+  TIERS.slice(0, 4).forEach((t, k) => {
+    const sp = document.createElement("span");
+    sp.textContent = t[1];
+    if (k === i) sp.className = "on";
+    labels.appendChild(sp);
+  });
+  requestAnimationFrame(() => { $("heroTierFill").style.width = pos; $("heroTierMark").style.left = pos; });
+  const bonus = res && typeof res.speedBonus === "number" ? res.speedBonus : null;
+  $("heroBreak").textContent = bonus === null ? `${cur} · perfect is ${max}`
+    : score >= max ? "💯 Perfect case: every fake first try, under 30s"
+    : `${score - bonus} catches + ${bonus} speed · 💯 = 6/6 first try, ≤30s`;
+}
 function renderScoreHero(score, time) {
   const res = getTodayResult();
+  renderScoreTier(Math.max(0, Math.round(score || 0)), res);
   $("heroCaught").textContent = `🎯 ${res ? res.won : "?"}/${res ? res.total : 6} caught`;
   $("heroTime").textContent = `⚡ ${Number(time || 0).toFixed(1)}s`;
   const streak = playerStats.currentStreak || 0;
