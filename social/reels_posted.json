@@ -5,5 +5,6 @@
 {"post_date": "2026-10-21", "slot": "pm", "case": "2026-10-19", "round": 0, "theme": "pumpkinpatch", "video_id": "1098459852794288"},
 {"post_date": "2026-10-22", "slot": "pm", "kind": "photo", "case": "2026-10-20", "round": 0, "theme": "abandoned", "post_id": "1436699176184540_122111751339505076"},
 {"post_date": "2026-10-23", "slot": "am", "kind": "reel", "case": "2026-10-12", "round": 1, "theme": "gargoyles", "video_id": "2388492201974913"},
-{"post_date": "2026-10-23", "slot": "pm", "kind": "photo", "case": "2026-10-21", "round": 1, "theme": "cornmazes", "post_id": "1436699176184540_122112285585505076"}
+{"post_date": "2026-10-23", "slot": "pm", "kind": "photo", "case": "2026-10-21", "round": 1, "theme": "cornmazes", "post_id": "1436699176184540_122112285585505076"},
+{"post_date": "2026-10-24", "slot": "am", "kind": "reel", "case": "2026-10-13", "round": 2, "theme": "candles", "video_id": "1641006957428641"}
 ]
