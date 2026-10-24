@@ -816,6 +816,8 @@
   .board-rows li { display: grid; grid-template-columns: 18px 1fr auto auto; gap: 8px; align-items: center;
     padding: 6px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #fff; }
   .board-rows li.me { background: rgb(var(--accent-rgb) / 0.15); }
+  .board-rows li.waiting { opacity: 0.55; }
+  .board-empty { margin: 4px 0 0; font-size: 12px; line-height: 1.45; color: var(--fg-muted); }
   .board-rows li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .board-rows li .g { letter-spacing: 1px; font-size: 11px; }
   .board-rows li .s { font-weight: 800; }
@@ -2575,8 +2577,9 @@
         <div class="spread-sub" id="spreadSub"></div>
       </div>
       <div class="board" id="friendsBoard" hidden>
-        <div class="board-title">Today's board</div>
+        <div class="board-title">👥 Friends · today</div>
         <ol class="board-rows" id="boardRows"></ol>
+        <p class="board-empty" id="boardEmpty" hidden>Share your result: anyone who opens your link joins your friends board, and you see each other's scores every day.</p>
         <form class="board-name" id="boardNameForm" hidden onsubmit="saveBoardName(event, 'boardNameInput')">
           <input id="boardNameInput" maxlength="20" placeholder="Add your name" autocomplete="nickname">
           <button type="submit">Save</button>
@@ -4449,6 +4452,11 @@ function joinBoardFromUrl() {
     const b = new URLSearchParams(location.search).get("b");
     const x = JSON.parse(localStorage.getItem("imposter_board") || "null");
     if (BOARD_ID.test(b || "") && !(x && x.d === boardDay())) localStorage.setItem("imposter_board", JSON.stringify({ d: boardDay(), b }));
+    // A friend's link (b = their player id) also makes you friends for good (Friends leaderboard)
+    if (BOARD_ID.test(b || "") && b !== playerId()) {
+      fetch("/api/friends", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ pid: playerId(), friend: b }) }).catch(() => {});
+    }
   } catch (_) {}
 }
 function boardName() { try { return localStorage.getItem("imposter_name") || ""; } catch (_) { return ""; } }
@@ -4462,23 +4470,34 @@ async function postBoard() {
     return r.ok;
   } catch (_) { return false; }
 }
+// Friends leaderboard (Krillion style): you plus everyone who opened your link or
+// whose link you opened, ranked on today's case. Scores show once you have played.
 async function renderBoard() {
   const box = $("friendsBoard");
-  if (!box) return;
-  let rows = [];
-  try { rows = (await (await fetch(`/api/board?b=${boardToday()}&d=${boardDay()}`)).json()).rows || []; } catch (_) {}
-  box.hidden = rows.length < 2;
-  if (box.hidden) return;
+  if (!box || ARCHIVE_DATE) return;
+  let data = null;
+  try { data = await (await fetch(`/api/friends?pid=${playerId()}&d=${boardDay()}`)).json(); } catch (_) {}
+  const rows = (data && data.rows) || [];
+  if (!rows.length) { box.hidden = true; return; }
   const me = playerId(), list = $("boardRows");
+  rows.sort((x, y) => (y.played - x.played) || ((y.score ?? -1) - (x.score ?? -1)) || ((x.time ?? 1e9) - (y.time ?? 1e9)));
   list.innerHTML = "";
-  rows.forEach((r, i) => {
+  let rank = 0;
+  rows.forEach(r => {
     const li = document.createElement("li");
     if (r.pid === me) li.className = "me";
-    [["", `${i + 1}`], ["n", r.pid === me ? (r.name ? `${r.name} (you)` : "You") : (r.name || "Detective")], ["g", r.grid], ["s", `${r.score}`]].forEach(([c, t]) => {
-      const sp = document.createElement("span"); if (c) sp.className = c; sp.textContent = t; li.appendChild(sp);
-    });
+    if (!r.played) li.classList.add("waiting");
+    const name = r.pid === me ? (r.name ? `${r.name} (you)` : "You") : (r.name || "Detective");
+    const cells = r.played
+      ? [["", `${++rank}`], ["n", name], ["g", r.grid || ""], ["s", r.score != null ? `${r.score}` : "✓"]]
+      : [["", "·"], ["n", name], ["g", "Yet to play"], ["s", ""]];
+    cells.forEach(([c, t]) => { const sp = document.createElement("span"); if (c) sp.className = c; sp.textContent = t; li.appendChild(sp); });
     list.appendChild(li);
   });
+  const alone = rows.length < 2;
+  $("boardEmpty").hidden = !alone;
+  list.hidden = alone;
+  box.hidden = false;
   $("boardNameForm").hidden = !!boardName();
 }
 async function saveBoardName(e, inputId) {
@@ -5169,7 +5188,8 @@ function getChallengeLink(res) {
   const tenths = Math.min(16383, Math.max(1, Math.round(res.time * 10)));
   const won = Math.min(6, Math.max(0, res.won | 0));
   const packed = ((c * 4096 + sc) * 16384 + tenths) * 8 + won;
-  return `${window.location.origin}/v/${packed.toString(36)}/${boardToday()}`;
+  // Ends with your own player id: whoever opens it becomes your friend (Friends leaderboard)
+  return `${window.location.origin}/v/${packed.toString(36)}/${playerId()}`;
 }
 
 // Result-dependent share copy. Older saved grids used 🟦/🟥; map them to the current set.
