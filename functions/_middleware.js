@@ -50,6 +50,20 @@ function decodeShort(token) {
 const PROBE = /(^|\/)\.(env|git|aws|ssh)|\/wp-|\.php$|\/xmlrpc|\/phpmyadmin/i;
 const BAD_UA = /CoinCreator/i;
 
+// Group invite preview: "Join Family on Imposter" in the chat that got the link
+async function groupPreview(context, g) {
+  const res = await context.next();
+  if (!res.ok || !(res.headers.get("content-type") || "").includes("text/html")) return res;
+  let name = "";
+  try { name = (await context.env.DB.prepare("SELECT name FROM groups WHERE id = ?").bind(g).first())?.name || ""; } catch (_) {}
+  if (!name) return res;
+  const title = `🕵️ Join "${name}" on Imposter: one daily case, who spots the AI fakes best?`;
+  return new HTMLRewriter()
+    .on('meta[property="og:title"]', new SetContent(title))
+    .on('meta[name="twitter:title"]', new SetContent(title))
+    .transform(res);
+}
+
 export async function onRequest(context) {
   const { request } = context;
   const url = new URL(request.url);
@@ -63,8 +77,13 @@ export async function onRequest(context) {
     const board = target && short[2] ? `&b=${short[2]}` : "";
     return Response.redirect(url.origin + (target ? target + board : "/"), 302);
   }
+  // /g/<group>: a group board invite (functions/api/groups.js)
+  const grp = url.pathname.match(/^\/g\/([a-z0-9]{8})\/?$/);
+  if (grp && (request.method === "GET" || request.method === "HEAD")) return Response.redirect(`${url.origin}/?g=${grp[1]}`, 302);
   if (request.method !== "GET") return context.next();
   if (url.pathname !== "/" && url.pathname !== "/index.html") return context.next();
+  const g = url.searchParams.get("g");
+  if (g && /^[a-z0-9]{8}$/.test(g)) return groupPreview(context, g);
   const ch = parseChallenge(url.searchParams);
   if (!ch) return context.next();
 

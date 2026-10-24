@@ -1,4 +1,5 @@
 import { json } from "../../lib/cases.js";
+import { standings } from "../../lib/standings.js";
 
 // Friends leaderboard, Krillion style. Opening a friend's share link adds the
 // pair (both ways) for good; each day the results screen ranks you and your
@@ -6,7 +7,7 @@ import { json } from "../../lib/cases.js";
 // POST {pid, friend} adds, DELETE {pid, friend} removes,
 // GET ?pid=&d=YYYY-MM-DD -> {locked, rows: [{pid, name, played, score, time, won, grid}]};
 // GET ?who=<pid> -> {name}, for the "X invited you" prompt.
-// Names and results come from the scores table (/api/board), first result of the day.
+// Names and results come from the scores table (/api/board), first result of the day (lib/standings.js).
 const ID = /^[a-z0-9]{6,12}$/, DATE = /^\d{4}-\d{2}-\d{2}$/, MAX_FRIENDS = 100;
 const ok = id => ID.test(id || "") && id !== "guest00000";
 
@@ -44,22 +45,5 @@ export async function onRequestGet({ request, env }) {
   if (!ok(pid) || !DATE.test(d || "")) return json({ error: "bad request" }, 400);
   const { results: fr } = await env.DB.prepare("SELECT b FROM friends WHERE a = ? LIMIT ?").bind(pid, MAX_FRIENDS).all();
   const ids = [pid, ...fr.map(r => r.b)];
-  const marks = ids.map(() => "?").join(",");
-  // Each player's first result today (any board), and their latest non-empty name
-  const { results: played } = await env.DB.prepare(
-    `SELECT pid, score, time, won, grid, MIN(created) AS c FROM scores WHERE date = ? AND pid IN (${marks}) GROUP BY pid`
-  ).bind(d, ...ids).all();
-  const { results: names } = await env.DB.prepare(
-    `SELECT pid, name, MAX(created) AS c FROM scores WHERE pid IN (${marks}) AND name != '' GROUP BY pid`
-  ).bind(...ids).all();
-  const byPid = Object.fromEntries(played.map(r => [r.pid, r]));
-  const nameOf = Object.fromEntries(names.map(r => [r.pid, r.name]));
-  const locked = !byPid[pid];
-  const rows = ids.map(id => {
-    const r = byPid[id];
-    const row = { pid: id, name: nameOf[id] || "", played: !!r };
-    if (r && (!locked || id === pid)) Object.assign(row, { score: r.score, time: r.time, won: r.won, grid: r.grid });
-    return row;
-  });
-  return json({ locked, rows }, 200, { "cache-control": "no-store" });
+  return json(await standings(env, pid, ids, d), 200, { "cache-control": "no-store" });
 }
