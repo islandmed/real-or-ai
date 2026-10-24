@@ -826,6 +826,21 @@
   .board-invite button { font: 800 12px 'JetBrains Mono', monospace; padding: 7px 10px; border-radius: 8px; cursor: pointer;
     background: transparent; color: var(--fg); border: 1px solid var(--border); }
   .board-invite button.add { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .board-rows .nudge { font: 800 11px 'JetBrains Mono', monospace; padding: 4px 8px; border-radius: 6px; cursor: pointer;
+    background: var(--accent); color: var(--on-accent); border: 0; white-space: nowrap; }
+  .board-rank { margin: 0 0 8px; font-size: 13px; font-weight: 800; color: var(--fg); }
+  .rival-box { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 0 auto 12px; }
+  .rival-box .challenge-result { margin: 0; font-size: 15px; }
+  .btn-reply { font: 800 13px 'JetBrains Mono', monospace; padding: 9px 14px; border-radius: 10px; cursor: pointer;
+    background: var(--accent); color: var(--on-accent); border: 0; }
+  .name-sheet { position: fixed; inset: 0; z-index: 10050; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(0,0,0,0.7); }
+  .name-sheet.open { display: flex; }
+  .name-sheet-card { width: 100%; max-width: 360px; padding: 22px 18px 18px; border-radius: 16px; text-align: center;
+    background: var(--panel, #15151c); border: 1px solid var(--border); color: var(--fg); }
+  .name-sheet-card h3 { margin: 0 0 6px; font-size: 20px; }
+  .name-sheet-card p { margin: 0 0 14px; font-size: 13px; line-height: 1.45; color: var(--fg-muted); }
+  .name-sheet-card .board-name { margin: 0 0 10px; }
+  .name-sheet-card .skip { background: none; border: 0; color: var(--fg-muted); font-size: 12px; cursor: pointer; text-decoration: underline; }
   .board-empty { margin: 4px 0 0; font-size: 12px; line-height: 1.45; color: var(--fg-muted); }
   .board-rows li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .board-rows li .g { letter-spacing: 1px; font-size: 11px; }
@@ -2565,7 +2580,10 @@
         <div class="sh-unit">points</div>
         <div class="sh-chips"><span id="heroCaught"></span><span id="heroTime"></span></div>
       </div>
-      <div class="challenge-result" id="challengeResult" hidden></div>
+      <div class="rival-box" id="rivalBox" hidden>
+        <div class="challenge-result" id="challengeResult"></div>
+        <button class="btn-reply" id="btnReply" type="button" onclick="shareReply()"></button>
+      </div>
       <div class="result-grid" id="resultGrid"></div>
       <button class="btn-see-rounds" id="btnSeeRounds" type="button" onclick="openRoundsModal()">🔍 See rounds · review the AI fakes</button>
       <div class="career-stats">
@@ -2591,6 +2609,7 @@
           <span class="board-invite-btns"><button type="button" class="add" onclick="answerInvite(true)">Add friend</button><button type="button" onclick="answerInvite(false)">Dismiss</button></span>
         </div>
         <div class="board-title">👥 Friends · today</div>
+        <div class="board-rank" id="boardRank" hidden></div>
         <ol class="board-rows" id="boardRows"></ol>
         <p class="board-empty" id="boardEmpty" hidden>Share your result: anyone who opens your link joins your friends board, and you see each other's scores every day.</p>
         <form class="board-name" id="boardNameForm" hidden onsubmit="saveBoardName(event, 'boardNameInput')">
@@ -2661,6 +2680,18 @@
 </div>
 
 <!-- Result Card Preview Modal (Desktop Share) -->
+<!-- First share: sign the dare, so the friend sees who challenged them -->
+<div class="name-sheet" id="nameSheet" onclick="if (event.target === this) closeNameSheet(true)">
+  <div class="name-sheet-card">
+    <h3>✍️ Sign your dare</h3>
+    <p>Friends who open your link see "<b id="nameSheetEx">Sam</b> challenged you" and join your friends board.</p>
+    <form class="board-name" onsubmit="submitNameSheet(event)">
+      <input id="nameSheetInput" maxlength="20" placeholder="Your name" autocomplete="nickname">
+      <button type="submit">Share</button>
+    </form>
+    <button class="skip" type="button" onclick="closeNameSheet(true)">Share without a name</button>
+  </div>
+</div>
 <div class="card-preview-modal" id="cardPreviewModal">
   <div class="card-preview-card">
     <div class="modal-close-x" onclick="closeCardPreviewModal()">✕</div>
@@ -4091,7 +4122,7 @@ function showAlreadyCompletedToday(record) {
 }
 
 // --- Initialization ---
-let friendChallenge = null; // { s: number, t: number } when a valid link for today's case
+let friendChallenge = null; // { s, t, b, name } when a valid link for today's case (kept for the day)
 
 function clearStaleLeaderboardKeys() {
   try {
@@ -4106,6 +4137,10 @@ function clearStaleLeaderboardKeys() {
 
 function readChallengeParams() {
   try {
+    const kept = JSON.parse(localStorage.getItem("imposter_rival") || "null");
+    if (kept && dailyCaseData && kept.c === Number(dailyCaseData.caseNumber)) friendChallenge = kept;
+  } catch (_) {}
+  try {
     const params = new URLSearchParams(window.location.search);
     if (!params.has("c") && !params.has("s") && !params.has("t")) return;
     const c = params.get("c"), sc = params.get("s"), t = params.get("t");
@@ -4115,7 +4150,21 @@ function readChallengeParams() {
     if (!/^\d{1,6}$/.test(c || "") || !/^\d{1,5}$/.test(sc || "")) return;
     if (!dailyCaseData || Number(c) !== Number(dailyCaseData.caseNumber)) return;
     const tNum = /^\d{1,5}(\.\d{1,2})?$/.test(t || "") ? Number(t) : null;
-    friendChallenge = { s: Number(sc), t: tNum };
+    const b = params.get("b") || new URLSearchParams(location.search).get("b");
+    friendChallenge = { c: Number(c), s: Number(sc), t: tNum, b: BOARD_ID.test(b || "") && b !== playerId() ? b : null, name: "" };
+    localStorage.setItem("imposter_rival", JSON.stringify(friendChallenge));
+  } catch (_) {}
+}
+function rivalName() { return (friendChallenge && friendChallenge.name) || "your friend"; }
+// The challenger's name, once, for the banner and the head-to-head result
+async function loadRivalName() {
+  if (!friendChallenge || !friendChallenge.b || friendChallenge.name) return;
+  try {
+    const name = (await (await fetch(`/api/friends?who=${friendChallenge.b}`)).json()).name || "";
+    if (!name) return;
+    friendChallenge.name = name;
+    localStorage.setItem("imposter_rival", JSON.stringify(friendChallenge));
+    renderChallengeBanner();
   } catch (_) {}
 }
 
@@ -4124,7 +4173,8 @@ function renderChallengeBanner() {
   if (!el) return;
   if (!friendChallenge) { el.hidden = true; return; }
   const timePart = friendChallenge.t !== null ? ` in ${friendChallenge.t.toFixed(1)}s` : "";
-  el.textContent = `Your friend scored ${friendChallenge.s} pts${timePart}. Can you beat them?`;
+  const who = friendChallenge.name || "Your friend";
+  el.textContent = `🕵️ ${who} challenged you: ${friendChallenge.s} pts${timePart}. Can you beat that?`;
   el.hidden = false;
 }
 
@@ -4531,6 +4581,7 @@ async function removeFriend(btn, pid) {
 
 // Friends leaderboard (Krillion style): you plus everyone who opened your link or
 // whose link you opened, ranked on today's case. Scores show once you have played.
+let boardRank = null; // { rank, of } among friends who played today
 async function renderBoard() {
   const box = $("friendsBoard");
   if (!box || ARCHIVE_DATE) return;
@@ -4543,6 +4594,7 @@ async function renderBoard() {
   rows.sort((x, y) => (y.played - x.played) || ((y.score ?? -1) - (x.score ?? -1)) || ((x.time ?? 1e9) - (y.time ?? 1e9)));
   list.innerHTML = "";
   let rank = 0;
+  const iPlayed = rows.some(r => r.pid === me && r.played);
   rows.forEach(r => {
     const li = document.createElement("li");
     if (r.pid === me) li.className = "me";
@@ -4551,7 +4603,16 @@ async function renderBoard() {
     const cells = r.played
       ? [["", `${++rank}`], ["n", name], ["g", r.grid || ""], ["s", r.score != null ? `${r.score}` : "✓"]]
       : [["", "·"], ["n", name], ["g", "Yet to play"], ["s", ""]];
-    cells.forEach(([c, t]) => { const sp = document.createElement("span"); if (c) sp.className = c; sp.textContent = t; li.appendChild(sp); });
+    cells.forEach(([c, t]) => {
+      const sp = document.createElement("span"); if (c) sp.className = c;
+      if (c === "g" && !r.played && iPlayed) {
+        const nb = document.createElement("button");
+        nb.type = "button"; nb.className = "nudge"; nb.textContent = "👉 Nudge";
+        nb.onclick = () => nudgeFriend(r.name || "");
+        sp.appendChild(nb);
+      } else sp.textContent = t;
+      li.appendChild(sp);
+    });
     const x = document.createElement("button");
     x.type = "button"; x.className = "rm";
     if (r.pid === me) x.disabled = true;
@@ -4560,6 +4621,13 @@ async function renderBoard() {
     list.appendChild(li);
   });
   const alone = rows.length < 2;
+  const played = rows.filter(r => r.played), mine = played.findIndex(r => r.pid === me);
+  boardRank = mine >= 0 && played.length >= 2 && played.every(r => r.score != null) ? { rank: mine + 1, of: played.length } : null;
+  const waiting = rows.length - played.length;
+  const rk = $("boardRank");
+  rk.textContent = !boardRank ? "" : boardRank.rank === 1 ? `👑 You're #1 of ${boardRank.of} today${waiting ? ` · ${waiting} still to play` : ""}`
+    : `You're #${boardRank.rank} of ${boardRank.of} · ${(played[0].name || "a friend")} leads with ${played[0].score}`;
+  rk.hidden = !boardRank;
   $("boardEmpty").hidden = !alone;
   list.hidden = alone;
   box.hidden = false;
@@ -4671,6 +4739,7 @@ async function init() {
     joinBoardFromUrl();
     readChallengeParams();
     renderChallengeBanner();
+    loadRivalName();
 
     if ($("caseTag")) {
       $("caseTag").textContent = dailyCaseData.eventBadge || `CASE #${dailyCaseData.caseNumber}`;
@@ -5276,6 +5345,7 @@ function getShareParts() {
   if (playerStats.currentStreak >= 2) head.push(`🔥 ${playerStats.currentStreak} day streak`);
   // The posted message is the dare (one button does share and challenge); head stays for titles
   const dare = [`🕵️ I caught ${won} of ${total} AI fakes in ${T} on today's Imposter. Can you beat me?`, grid];
+  if (boardRank && boardRank.rank === 1 && boardRank.of >= 2) dare.push(`👑 #1 of ${boardRank.of} friends today`);
   if (playerStats.currentStreak >= 2) dare.push(`🔥 ${playerStats.currentStreak} day streak`);
   return { res, head, link, text: dare.concat(link).join("\n"), title: "Think you can beat my Imposter score?" };
 }
@@ -5283,6 +5353,77 @@ function getShareParts() {
 function getDailyShareText() {
   const parts = getShareParts();
   return parts ? parts.text : `${SEASON.emoji} 3 photos are real. 1 is AI. Can you spot the fake? 👇\n${window.location.origin}`;
+}
+
+// Head to head with whoever dared you, and a one-tap reply that sends it back to them
+function rivalOutcome(score, time) {
+  const f = friendChallenge;
+  const beat = score > f.s || (score === f.s && f.t !== null && time < f.t);
+  const tie = score === f.s && (f.t === null || time === f.t);
+  return { beat, tie, diff: Math.abs(score - f.s) };
+}
+function renderRival(score, time) {
+  const box = $("rivalBox");
+  if (!box) return;
+  if (!friendChallenge || ARCHIVE_DATE) { box.hidden = true; return; }
+  const o = rivalOutcome(score, time), who = rivalName(), Who = who[0].toUpperCase() + who.slice(1);
+  const cmp = $("challengeResult");
+  cmp.textContent = o.tie ? `🤝 Dead even with ${who}: ${friendChallenge.s} pts each`
+    : o.beat ? `🏆 You beat ${who} by ${o.diff || "a few seconds"}${o.diff ? " pts" : ""}`
+    : `😤 ${Who} beat you by ${o.diff} pts`;
+  cmp.className = "challenge-result " + (o.beat || o.tie ? "won" : "lost");
+  $("btnReply").textContent = o.beat ? `😎 Rub it in${friendChallenge.name ? ", tell " + friendChallenge.name : ""}` : `📨 Tell ${friendChallenge.name || "them"} you took the dare`;
+  box.hidden = false;
+}
+function replyText() {
+  const p = getShareParts(), res = p && p.res;
+  if (!res || !friendChallenge) return getDailyShareText();
+  const o = rivalOutcome(res.score, res.time), mine = `${res.score} pts`, theirs = `${friendChallenge.s}`;
+  const line = o.tie ? `🤝 We tied on today's Imposter: ${mine} each. Tiebreaker tomorrow?`
+    : o.beat ? `😎 Took your dare on Imposter: ${mine} vs your ${theirs}. Better luck tomorrow.`
+    : `😤 You got me on Imposter today: ${mine} vs your ${theirs}. Rematch tomorrow.`;
+  return [line, (res.grid || "").replace(/🟦/g, "🟧").replace(/🟥/g, "🤖"), p.link].join("\n");
+}
+// A text-only share: the system sheet on phones, else copy it
+async function quickShare(text, copied) {
+  playSound("tap");
+  if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+    try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(text); showToast(copied); } catch (_) { showToast("Couldn't copy. Use Share result instead."); }
+}
+function shareReply() {
+  shareXpOnce();
+  quickShare(replyText(), `Copied. Paste it to ${friendChallenge && friendChallenge.name || "your friend"}.`);
+}
+// Board: a friend who hasn't played yet gets a nudge with your score and your link
+function nudgeFriend(name) {
+  const p = getShareParts();
+  if (!p) return;
+  const text = [`👀 ${name ? name + ", your" : "Your"} move. I got ${p.res.score} pts on today's Imposter (${p.res.won}/${p.res.total} AI fakes caught). Beat it:`, p.link].join("\n");
+  quickShare(text, `Copied. Send it to ${name || "your friend"}.`);
+}
+
+// First Share tap with no name: ask once (Skip remembers), then carry on with the share
+function wantsName() {
+  if (boardName()) return false;
+  try { return !localStorage.getItem("imposter_name_asked"); } catch (_) { return false; }
+}
+function openNameSheet() {
+  $("nameSheetInput").value = "";
+  $("nameSheet").classList.add("open");
+  setTimeout(() => $("nameSheetInput").focus(), 50);
+}
+function closeNameSheet(share) {
+  try { localStorage.setItem("imposter_name_asked", "1"); } catch (_) {}
+  $("nameSheet").classList.remove("open");
+  if (share) $("btnShareMain").onclick();
+}
+async function submitNameSheet(e) {
+  e.preventDefault();
+  const v = $("nameSheetInput").value.trim().slice(0, 20);
+  if (v) { try { localStorage.setItem("imposter_name", v); } catch (_) {} postBoard().then(renderBoard); }
+  closeNameSheet(true);
 }
 
 // Results-screen extras: streak, friend comparison, ad slot
@@ -5314,18 +5455,7 @@ function renderResultsExtras(score, time) {
     streakEl.textContent = n >= 2 ? `🔥 ${n} day streak` : "";
     streakEl.hidden = n < 1;
   }
-  const cmp = $("challengeResult");
-  if (cmp) {
-    if (friendChallenge) {
-      const beat = score > friendChallenge.s || (score === friendChallenge.s && friendChallenge.t !== null && time < friendChallenge.t);
-      const tie = score === friendChallenge.s && (friendChallenge.t === null || time === friendChallenge.t);
-      cmp.textContent = tie ? `You tied your friend's ${friendChallenge.s} pts` : `You ${beat ? "beat" : "didn't beat"} your friend's ${friendChallenge.s} pts`;
-      cmp.className = "challenge-result " + (beat ? "won" : "lost");
-      cmp.hidden = false;
-    } else {
-      cmp.hidden = true;
-    }
-  }
+  renderRival(score, time);
   renderResultsAd();
   renderPastCases();
 }
@@ -5619,6 +5749,7 @@ function prepareShareCard() {
 }
 
 $("btnShareMain").onclick = async () => {
+  if (getTodayResult() && wantsName()) { playSound("tap"); return openNameSheet(); }
   playSound("tap");
   shareXpOnce();
   const text = getDailyShareText();
