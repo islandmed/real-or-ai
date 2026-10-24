@@ -4898,9 +4898,12 @@ async function renderSpread() {
   const i = Math.min(b.length - 1, Math.floor(res.score / SPREAD_W));
   const frac = Math.min(1, (res.score - i * SPREAD_W) / SPREAD_W);
   const below = b.slice(0, i).reduce((a, x) => a + x, 0) + b[i] * frac;
-  const pct = Math.max(0, Math.min(99, Math.round(100 * below / n)));
-  $("spreadLine").innerHTML = `<small>${pct >= 90 ? "Top of the precinct" : pct >= 50 ? "Sharp eye" : "Today's ranking"}</small>You beat ${pct >= 99 ? 99 : pct}% of today's detectives`;
-  $("spPct").textContent = `${pct}%`;
+  // A perfect score can only be tied, so it gets a full ring instead of a share
+  const perfect = res.score >= maxScoreFor(res);
+  const pct = perfect ? 100 : Math.max(0, Math.min(99, Math.round(100 * below / n)));
+  $("spreadLine").innerHTML = perfect ? `<small>Perfect case</small>Nobody can beat 700, only tie it`
+    : `<small>${pct >= 90 ? "Top of the precinct" : pct >= 50 ? "Sharp eye" : "Today's ranking"}</small>You beat ${pct}% of today's detectives`;
+  $("spPct").textContent = perfect ? "💯" : `${pct}%`;
   // Accuracy and speed, each as the share of today's detectives you did better than
   // (ties count half). Score = fakes caught (more for first tries) + speed bonus.
   const won = Array.isArray(data.won) ? data.won.map(x => Math.max(0, +x || 0)) : [];
