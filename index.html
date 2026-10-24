@@ -780,10 +780,11 @@
   .spread { margin: 14px 0 4px; text-align: center; }
   .spread-line { font-size: 14px; font-weight: 800; color: var(--fg); }
   .spread-line b { color: var(--accent); }
-  .spread svg { display: block; width: 100%; max-width: 280px; height: auto; margin: 6px auto 2px; overflow: visible; }
-  .spread .sp-area { fill: rgb(var(--accent-rgb) / 0.18); stroke: var(--accent); stroke-width: 1.5; stroke-linejoin: round; }
-  .spread .sp-you { stroke: var(--fg); stroke-width: 1.5; stroke-dasharray: 3 2; }
-  .spread .sp-dot { fill: var(--accent); stroke: var(--fg); stroke-width: 1.5; }
+  .spread-bars { max-width: 320px; margin: 8px auto 4px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 7px 8px; text-align: left; }
+  .sp-row { display: contents; white-space: nowrap; font-size: 12px; font-weight: 700; }
+  .sp-track { height: 8px; border-radius: 4px; background: rgb(var(--accent-rgb) / 0.15); overflow: hidden; }
+  .sp-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+  .sp-note { grid-column: 2; font-size: 11px; font-weight: 600; color: var(--fg-muted); margin-top: -4px; }
   .spread-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--fg-muted); }
   .board { margin: 14px 0 4px; text-align: left; }
   .board-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
@@ -2536,7 +2537,7 @@
       </div>
       <div class="spread" id="scoreSpread" hidden>
         <div class="spread-line" id="spreadLine"></div>
-        <svg id="spreadCurve" viewBox="0 0 200 44" role="img" aria-label="Today's score spread"></svg>
+        <div class="spread-bars" id="spreadBars"></div>
         <div class="spread-sub" id="spreadSub"></div>
       </div>
       <div class="board" id="friendsBoard" hidden>
@@ -4485,24 +4486,27 @@ async function renderSpread() {
   const pct = Math.max(0, Math.min(99, Math.round(100 * below / n)));
   $("spreadLine").innerHTML = pct >= 99 ? "Top of the precinct: you beat <b>99%</b> of today's detectives"
     : `You beat <b>${pct}%</b> of today's detectives`;
-  $("spreadSub").textContent = `${n.toLocaleString()} cases filed today · your score ${res.score}`;
-  // Smooth curve over the buckets anyone (or you) reached
-  let last = i;
-  b.forEach((x, k) => { if (x) last = Math.max(last, k); });
-  const span = (last + 1) * SPREAD_W, max = Math.max(...b.slice(0, last + 1)), W = 200, H = 44;
-  const pts = b.slice(0, last + 1).map((x, k) => [((k + 0.5) * SPREAD_W / span) * W, H - 2 - (x / max) * (H - 6)]);
-  pts.unshift([0, H - 2]); pts.push([W, H - 2]);
-  let path = `M0 ${H}L${pts[0][0]} ${pts[0][1]}`;
-  for (let k = 1; k < pts.length; k++) {
-    const [x0, y0] = pts[k - 1], [x1, y1] = pts[k], mx = (x0 + x1) / 2;
-    path += `C${mx.toFixed(1)} ${y0.toFixed(1)} ${mx.toFixed(1)} ${y1.toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+  // Accuracy and speed, each as the share of today's detectives you did better than
+  // (ties count half). Score = fakes caught (more for first tries) + speed bonus.
+  const won = Array.isArray(data.won) ? data.won.map(x => Math.max(0, x | 0)) : [];
+  const times = Array.isArray(data.times) ? data.times.map(x => Math.max(0, x | 0)) : [];
+  const rows = [];
+  const wn = won.reduce((a, x) => a + x, 0);
+  if (wn) {
+    const k = Math.max(0, Math.min(6, res.won | 0));
+    const acc = Math.round(100 * (won.slice(0, k).reduce((a, x) => a + x, 0) + won[k] / 2) / wn);
+    rows.push(["🎯 Accuracy", acc, `${res.won}/${res.total} caught · better than ${acc}%`]);
   }
-  path += `L${W} ${H}Z`;
-  const yx = Math.min(W, (res.score / span) * W);
-  let yy = H - 2;
-  for (let k = 1; k < pts.length; k++) if (pts[k][0] >= yx) { const [x0, y0] = pts[k - 1], [x1, y1] = pts[k]; yy = y0 + (y1 - y0) * ((yx - x0) / ((x1 - x0) || 1)); break; }
-  $("spreadCurve").innerHTML = `<path class="sp-area" d="${path}"/><line class="sp-you" x1="${yx.toFixed(1)}" y1="0" x2="${yx.toFixed(1)}" y2="${H}"/>` +
-    `<circle class="sp-dot" cx="${yx.toFixed(1)}" cy="${yy.toFixed(1)}" r="3"/>`;
+  const tn = times.reduce((a, x) => a + x, 0);
+  if (tn) {
+    const k = Math.min(times.length - 1, Math.floor(res.time / 2));
+    const f = k === times.length - 1 ? 0.5 : Math.min(1, (res.time - k * 2) / 2);
+    const fast = Math.round(100 * (times.slice(k + 1).reduce((a, x) => a + x, 0) + times[k] * (1 - f)) / tn);
+    rows.push(["⚡ Speed", fast, `${res.time.toFixed(1)}s · faster than ${fast}%`]);
+  }
+  $("spreadBars").innerHTML = rows.map(([lab, v, note]) =>
+    `<div class="sp-row"><span>${lab}</span><div class="sp-track"><div class="sp-fill" style="width:${Math.max(2, Math.min(100, v))}%"></div></div><span class="sp-note">${note}</span></div>`).join("");
+  $("spreadSub").textContent = `${n.toLocaleString()} cases filed today · your score ${res.score} (catches + speed bonus)`;
   $("scoreSpread").hidden = false;
   ev("s-shown");
 }
