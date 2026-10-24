@@ -852,6 +852,15 @@
   .name-sheet-card h3 { margin: 0 0 6px; font-size: 20px; }
   .name-sheet-card p { margin: 0 0 14px; font-size: 13px; line-height: 1.45; color: var(--fg-muted); }
   .name-sheet-card .board-name { margin: 0 0 10px; }
+  .gi-card { position: relative; max-width: 420px; text-align: left; }
+  .gi-card h3, .gi-card > p { text-align: center; }
+  .gi-text { white-space: pre-wrap; font-size: 12px; line-height: 1.45; color: var(--fg-muted); padding: 10px 12px; margin: 0 0 12px;
+    border-radius: 8px; background: rgb(0 0 0 / 0.25); border: 1px solid var(--border); }
+  .gi-nets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gi-nets button { font: 800 12px 'JetBrains Mono', monospace; padding: 10px; border-radius: 8px; cursor: pointer; text-align: left;
+    background: transparent; color: var(--fg); border: 1px solid var(--border); }
+  .gi-nets button:hover { border-color: var(--accent); }
+  .gi-nets button:last-child:nth-child(odd) { grid-column: span 2; }
   .name-sheet-card .skip { background: none; border: 0; color: var(--fg-muted); font-size: 12px; cursor: pointer; text-decoration: underline; }
   .board-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 0 10px; padding-bottom: 2px; }
   .board-tabs::-webkit-scrollbar { display: none; }
@@ -2717,6 +2726,23 @@
 </div>
 
 <!-- Result Card Preview Modal (Desktop Share) -->
+<!-- Group invite on desktop (inviteToGroup) -->
+<div class="name-sheet" id="groupInviteSheet" onclick="if (event.target === this) closeGroupInvite()">
+  <div class="name-sheet-card gi-card">
+    <div class="modal-close-x" onclick="closeGroupInvite()">✕</div>
+    <h3>📨 Invite to <span id="giName"></span></h3>
+    <p>Anyone who opens this link joins the board and gets ranked with you every day.</p>
+    <div class="board-name gi-link"><input id="giLink" readonly onclick="this.select()"><button type="button" onclick="copyGroupInvite()">Copy</button></div>
+    <div class="gi-text" id="giText"></div>
+    <div class="gi-nets">
+      <button type="button" onclick="sendGroupInvite('sms')">💬 Text message</button>
+      <button type="button" onclick="sendGroupInvite('whatsapp')">🟢 WhatsApp</button>
+      <button type="button" onclick="sendGroupInvite('messenger')">🔵 Messenger</button>
+      <button type="button" onclick="sendGroupInvite('slack')">💼 Slack</button>
+      <button type="button" onclick="sendGroupInvite('email')">✉️ Email</button>
+    </div>
+  </div>
+</div>
 <!-- First share: sign the dare, so the friend sees who challenged them -->
 <div class="name-sheet" id="nameSheet" onclick="if (event.target === this) closeNameSheet(true)">
   <div class="name-sheet-card">
@@ -4644,11 +4670,38 @@ async function joinGroupFromUrl() {
   } catch (_) {}
 }
 function groupLink(id) { return `${location.origin}/g/${id}`; }
+// Phones: the system share sheet (pick the group chat). Desktop: a small sheet with
+// the link, Copy, and buttons that open each app with the invite ready.
+let groupInvite = null; // { name, text }
 function inviteToGroup(gr) {
   const p = getShareParts();
   const mine = p ? ` I got ${p.res.score} today.` : "";
-  quickShare(`🕵️ Join our "${gr.name}" board on Imposter: one daily case, 3 real photos and 1 AI fake per round. See who spots them best.${mine}\n${groupLink(gr.id)}`,
-    `Invite copied. Paste it in the ${gr.name} chat.`);
+  const text = `🕵️ Join our "${gr.name}" board on Imposter: one daily case, 3 real photos and 1 AI fake per round. See who spots them best.${mine}\n${groupLink(gr.id)}`;
+  groupInvite = { name: gr.name, text };
+  if (navigator.share && matchMedia("(pointer: coarse)").matches) return quickShare(text, `Invite copied. Paste it in the ${gr.name} chat.`);
+  playSound("tap");
+  $("giName").textContent = gr.name;
+  $("giLink").value = groupLink(gr.id);
+  $("giText").textContent = text;
+  $("groupInviteSheet").classList.add("open");
+}
+function closeGroupInvite() { $("groupInviteSheet").classList.remove("open"); }
+async function copyGroupInvite(then) {
+  try { await navigator.clipboard.writeText(groupInvite.text); } catch (_) { if (!then) return showToast("Couldn't copy. Select the link and copy it."); }
+  if (!then) showToast(`Invite copied. Paste it in the ${groupInvite.name} chat.`);
+}
+function sendGroupInvite(net) {
+  playSound("tap");
+  const e = encodeURIComponent, t = groupInvite.text;
+  if (net === "sms") location.href = `sms:?&body=${e(t)}`;
+  else if (net === "email") location.href = `mailto:?subject=${e(`Join "${groupInvite.name}" on Imposter`)}&body=${e(t)}`;
+  else if (net === "whatsapp") window.open(`https://api.whatsapp.com/send?text=${e(t)}`, "_blank", "noopener,noreferrer");
+  else {
+    // Messenger and Slack take no prefilled text from a link: copy it, then open the app
+    copyGroupInvite(true);
+    showToast(`Invite copied. Paste it in ${net === "slack" ? "Slack" : "Messenger"}.`);
+    window.open(net === "slack" ? "https://app.slack.com/client" : "https://www.messenger.com/", "_blank", "noopener,noreferrer");
+  }
 }
 async function createGroup(e) {
   e.preventDefault();
