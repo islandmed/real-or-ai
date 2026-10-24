@@ -4476,9 +4476,9 @@ async function renderSpread() {
   }
   let data;
   try { data = await (await fetch(`/api/score?date=${d}`)).json(); } catch (_) { return; }
-  const b = Array.isArray(data?.buckets) ? data.buckets.map(x => Math.max(0, x | 0)) : [];
+  const b = Array.isArray(data?.buckets) ? data.buckets.map(x => Math.max(0, +x || 0)) : [];
   const n = b.reduce((a, x) => a + x, 0);
-  if (n < SPREAD_MIN || !b.length) return;
+  if ((n < SPREAD_MIN && !data.est) || !b.length) return;
   // Share below your score, spreading your own bucket evenly across its width
   const i = Math.min(b.length - 1, Math.floor(res.score / SPREAD_W));
   const frac = Math.min(1, (res.score - i * SPREAD_W) / SPREAD_W);
@@ -4488,8 +4488,8 @@ async function renderSpread() {
     : `You beat <b>${pct}%</b> of today's detectives`;
   // Accuracy and speed, each as the share of today's detectives you did better than
   // (ties count half). Score = fakes caught (more for first tries) + speed bonus.
-  const won = Array.isArray(data.won) ? data.won.map(x => Math.max(0, x | 0)) : [];
-  const times = Array.isArray(data.times) ? data.times.map(x => Math.max(0, x | 0)) : [];
+  const won = Array.isArray(data.won) ? data.won.map(x => Math.max(0, +x || 0)) : [];
+  const times = Array.isArray(data.times) ? data.times.map(x => Math.max(0, +x || 0)) : [];
   const rows = [];
   const wn = won.reduce((a, x) => a + x, 0);
   if (wn) {
@@ -4506,7 +4506,8 @@ async function renderSpread() {
   }
   $("spreadBars").innerHTML = rows.map(([lab, v, note]) =>
     `<div class="sp-row"><span>${lab}</span><div class="sp-track"><div class="sp-fill" style="width:${Math.max(2, Math.min(100, v))}%"></div></div><span class="sp-note">${note}</span></div>`).join("");
-  $("spreadSub").textContent = `${n.toLocaleString()} cases filed today · your score ${res.score} (catches + speed bonus)`;
+  // While the server mixes in its placeholder spread (est), n is not a real head count: show none
+  $("spreadSub").textContent = `${data.est ? "" : `${Math.round(n).toLocaleString()} cases filed today · `}your score ${res.score} (catches + speed bonus)`;
   $("scoreSpread").hidden = false;
   ev("s-shown");
 }

@@ -1,7 +1,7 @@
 import { json, allowedDate } from "../../lib/cases.js";
 
 // Daily score spread. POST {date, pid, score, time, won} keeps a player's first
-// daily result (repeats are ignored). GET ?date=YYYY-MM-DD -> {n, buckets, won, times}:
+// daily result (repeats are ignored). GET ?date=YYYY-MM-DD -> {n, est, buckets, won, times}:
 // buckets = BUCKETS score counts of width WIDTH over 0-800, last bucket open-ended;
 // won = counts of 0..6 fakes caught; times = TBUCKETS time counts of TWIDTH seconds,
 // last bucket open-ended.
@@ -12,23 +12,31 @@ function recent(date) {
   return allowedDate(date) && date >= new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 }
 
+// Placeholder spread while the player count ramps up: an estimated typical day
+// (most catch 4-5 of 6, ~60s, ~380 pts), weighted as BASE_N - n virtual players so
+// it fades out and is gone once a day has BASE_N real results. The response says
+// est: true while any of it is mixed in, and n stays the real count.
+const BASE_N = 30;
+const norm = (len, at) => { const v = Array.from({ length: len }, (_, k) => at(k)); const t = v.reduce((a, x) => a + x, 0); return v.map(x => x / t); };
+const BASE = {
+  buckets: norm(BUCKETS, k => Math.exp(-(((k + 0.5) * WIDTH - 380) ** 2) / (2 * 140 ** 2))),
+  won: norm(7, k => [1, 2, 5, 12, 24, 32, 24][k]),
+  times: norm(TBUCKETS, k => { const t = (k + 0.5) * TWIDTH; return Math.exp(-((Math.log(t) - Math.log(62)) ** 2) / (2 * 0.4 ** 2)) / t; }),
+};
+
 export async function onRequestGet({ request, env }) {
   const date = new URL(request.url).searchParams.get("date");
   if (!allowedDate(date)) return json({ error: "bad date" }, 400);
-  const { results } = await env.DB.prepare(
-    `SELECT MIN(score / ${WIDTH}, ${BUCKETS - 1}) AS b, COUNT(*) AS c FROM scores_daily WHERE date = ? GROUP BY b`
-  ).bind(date).all();
-  const buckets = new Array(BUCKETS).fill(0);
+  const q = (sql) => env.DB.prepare(sql).bind(date).all().then(r => r.results);
+  const buckets = new Array(BUCKETS).fill(0), won = new Array(7).fill(0), times = new Array(TBUCKETS).fill(0);
   let n = 0;
-  for (const r of results) { buckets[r.b] = r.c; n += r.c; }
-  const won = new Array(7).fill(0), times = new Array(TBUCKETS).fill(0);
-  const w = await env.DB.prepare("SELECT won AS k, COUNT(*) AS c FROM scores_daily WHERE date = ? GROUP BY k").bind(date).all();
-  for (const r of w.results) if (r.k >= 0 && r.k <= 6) won[r.k] = r.c;
-  const t = await env.DB.prepare(
-    `SELECT MIN(CAST(time / ${TWIDTH} AS INTEGER), ${TBUCKETS - 1}) AS k, COUNT(*) AS c FROM scores_daily WHERE date = ? GROUP BY k`
-  ).bind(date).all();
-  for (const r of t.results) if (r.k >= 0) times[r.k] = r.c;
-  return json({ n, buckets, won, times }, 200, { "cache-control": "public, max-age=60" });
+  for (const r of await q(`SELECT MIN(score / ${WIDTH}, ${BUCKETS - 1}) AS b, COUNT(*) AS c FROM scores_daily WHERE date = ? GROUP BY b`)) { buckets[r.b] = r.c; n += r.c; }
+  for (const r of await q("SELECT won AS k, COUNT(*) AS c FROM scores_daily WHERE date = ? GROUP BY k")) if (r.k >= 0 && r.k <= 6) won[r.k] = r.c;
+  for (const r of await q(`SELECT MIN(CAST(time / ${TWIDTH} AS INTEGER), ${TBUCKETS - 1}) AS k, COUNT(*) AS c FROM scores_daily WHERE date = ? GROUP BY k`)) if (r.k >= 0) times[r.k] = r.c;
+  const v = Math.max(0, BASE_N - n);
+  const mix = (real, base) => real.map((x, k) => Math.round((x + v * base[k]) * 100) / 100);
+  return json({ n, est: v > 0, buckets: mix(buckets, BASE.buckets), won: mix(won, BASE.won), times: mix(times, BASE.times) },
+    200, { "cache-control": "public, max-age=60" });
 }
 
 export async function onRequestPost({ request, env }) {
