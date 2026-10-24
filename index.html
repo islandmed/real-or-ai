@@ -1134,12 +1134,12 @@
     margin-bottom: 14px;
     display: flex;
     justify-content: center;
-    max-height: 52vh;
-    overflow-y: auto;
+    overflow: hidden;
   }
   .card-preview-stage img {
     max-width: 100%;
-    max-height: 48vh;
+    /* Fit the whole sheet on screen: no inner or outer scrollbar */
+    max-height: max(200px, calc(92vh - 360px));
     border-radius: 6px;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
   }
