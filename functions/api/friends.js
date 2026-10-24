@@ -4,7 +4,8 @@ import { json } from "../../lib/cases.js";
 // pair (both ways) for good; each day the results screen ranks you and your
 // friends on that day's case. Friends' scores stay hidden until you have played.
 // POST {pid, friend} adds, DELETE {pid, friend} removes,
-// GET ?pid=&d=YYYY-MM-DD -> {locked, rows: [{pid, name, played, score, time, won, grid}]}.
+// GET ?pid=&d=YYYY-MM-DD -> {locked, rows: [{pid, name, played, score, time, won, grid}]};
+// GET ?who=<pid> -> {name}, for the "X invited you" prompt.
 // Names and results come from the scores table (/api/board), first result of the day.
 const ID = /^[a-z0-9]{6,12}$/, DATE = /^\d{4}-\d{2}-\d{2}$/, MAX_FRIENDS = 100;
 const ok = id => ID.test(id || "") && id !== "guest00000";
@@ -33,6 +34,12 @@ export async function onRequestDelete({ request, env }) {
 
 export async function onRequestGet({ request, env }) {
   const u = new URL(request.url);
+  const who = u.searchParams.get("who");
+  if (who !== null) {
+    if (!ok(who)) return json({ error: "bad request" }, 400);
+    const r = await env.DB.prepare("SELECT name FROM scores WHERE pid = ? AND name != '' ORDER BY created DESC LIMIT 1").bind(who).first();
+    return json({ name: r ? r.name : "" }, 200, { "cache-control": "public, max-age=300" });
+  }
   const pid = u.searchParams.get("pid"), d = u.searchParams.get("d");
   if (!ok(pid) || !DATE.test(d || "")) return json({ error: "bad request" }, 400);
   const { results: fr } = await env.DB.prepare("SELECT b FROM friends WHERE a = ? LIMIT ?").bind(pid, MAX_FRIENDS).all();

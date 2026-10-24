@@ -813,10 +813,19 @@
   .board-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--accent); margin-bottom: 6px; text-align: center; }
   .board-rows { list-style: none; margin: 0; padding: 0; }
-  .board-rows li { display: grid; grid-template-columns: 18px 1fr auto auto; gap: 8px; align-items: center;
+  .board-rows li { display: grid; grid-template-columns: 18px 1fr auto auto auto; gap: 8px; align-items: center;
     padding: 6px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #fff; }
   .board-rows li.me { background: rgb(var(--accent-rgb) / 0.15); }
   .board-rows li.waiting { opacity: 0.55; }
+  .board-rows .rm { background: none; border: 0; color: var(--fg-muted); font: 700 11px 'JetBrains Mono', monospace; cursor: pointer; padding: 2px 4px; min-width: 18px; border-radius: 4px; }
+  .board-rows .rm:disabled { visibility: hidden; }
+  .board-rows .rm.armed { color: #fff; background: var(--neon-red); }
+  .board-invite { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 12px; padding: 10px 12px;
+    border-radius: 10px; background: rgb(var(--accent2-rgb) / 0.14); border: 1px solid rgb(var(--accent2-rgb) / 0.45); font-size: 13px; font-weight: 700; color: var(--fg); }
+  .board-invite-btns { display: flex; gap: 6px; }
+  .board-invite button { font: 800 12px 'JetBrains Mono', monospace; padding: 7px 10px; border-radius: 8px; cursor: pointer;
+    background: transparent; color: var(--fg); border: 1px solid var(--border); }
+  .board-invite button.add { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
   .board-empty { margin: 4px 0 0; font-size: 12px; line-height: 1.45; color: var(--fg-muted); }
   .board-rows li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .board-rows li .g { letter-spacing: 1px; font-size: 11px; }
@@ -2577,6 +2586,10 @@
         <div class="spread-sub" id="spreadSub"></div>
       </div>
       <div class="board" id="friendsBoard" hidden>
+        <div class="board-invite" id="boardInvite" hidden>
+          <span id="boardInviteText"></span>
+          <span class="board-invite-btns"><button type="button" class="add" onclick="answerInvite(true)">Add friend</button><button type="button" onclick="answerInvite(false)">Dismiss</button></span>
+        </div>
         <div class="board-title">👥 Friends · today</div>
         <ol class="board-rows" id="boardRows"></ol>
         <p class="board-empty" id="boardEmpty" hidden>Share your result: anyone who opens your link joins your friends board, and you see each other's scores every day.</p>
@@ -4452,11 +4465,8 @@ function joinBoardFromUrl() {
     const b = new URLSearchParams(location.search).get("b");
     const x = JSON.parse(localStorage.getItem("imposter_board") || "null");
     if (BOARD_ID.test(b || "") && !(x && x.d === boardDay())) localStorage.setItem("imposter_board", JSON.stringify({ d: boardDay(), b }));
-    // A friend's link (b = their player id) also makes you friends for good (Friends leaderboard)
-    if (BOARD_ID.test(b || "") && b !== playerId()) {
-      fetch("/api/friends", { method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ pid: playerId(), friend: b }) }).catch(() => {});
-    }
+    // A friend's link (b = their player id) is an invite: the results screen asks Add or Dismiss
+    if (BOARD_ID.test(b || "") && b !== playerId() && !inviteSeen(b)) localStorage.setItem("imposter_invite", b);
   } catch (_) {}
 }
 function boardName() { try { return localStorage.getItem("imposter_name") || ""; } catch (_) { return ""; } }
@@ -4470,11 +4480,61 @@ async function postBoard() {
     return r.ok;
   } catch (_) { return false; }
 }
+// Invites already answered (added or dismissed) are not asked about again
+function inviteSeen(b) { try { return (JSON.parse(localStorage.getItem("imposter_invites_done") || "[]")).includes(b); } catch (_) { return false; } }
+function inviteDone(b) {
+  try {
+    const l = JSON.parse(localStorage.getItem("imposter_invites_done") || "[]").filter(x => x !== b).concat(b).slice(-200);
+    localStorage.setItem("imposter_invites_done", JSON.stringify(l));
+    if (localStorage.getItem("imposter_invite") === b) localStorage.removeItem("imposter_invite");
+  } catch (_) {}
+}
+async function renderInvite() {
+  const box = $("boardInvite");
+  let b = null;
+  try { b = localStorage.getItem("imposter_invite"); } catch (_) {}
+  if (!box || !BOARD_ID.test(b || "") || b === playerId() || inviteSeen(b)) { if (box) box.hidden = true; return; }
+  let name = "";
+  try { name = (await (await fetch(`/api/friends?who=${b}`)).json()).name || ""; } catch (_) {}
+  $("boardInviteText").textContent = `${name || "A friend"} invited you to their friends board.`;
+  box.dataset.b = b;
+  box.hidden = false;
+}
+async function answerInvite(add) {
+  const b = $("boardInvite").dataset.b;
+  if (!BOARD_ID.test(b || "")) return;
+  playSound("tap");
+  inviteDone(b);
+  $("boardInvite").hidden = true;
+  if (!add) return;
+  try {
+    const r = await fetch("/api/friends", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ pid: playerId(), friend: b }) });
+    showToast(r.ok ? "Friend added. You'll see each other here every day." : "Couldn't add that friend. Try again later.");
+  } catch (_) { showToast("Couldn't add that friend. Try again later."); }
+  renderBoard();
+}
+// Remove takes two taps: ✕, then "Remove" (resets after 3s)
+async function removeFriend(btn, pid) {
+  if (!btn.classList.contains("armed")) {
+    btn.classList.add("armed"); btn.textContent = "Remove";
+    setTimeout(() => { if (btn.isConnected) { btn.classList.remove("armed"); btn.textContent = "✕"; } }, 3000);
+    return;
+  }
+  playSound("tap");
+  try {
+    await fetch("/api/friends", { method: "DELETE", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ pid: playerId(), friend: pid }) });
+  } catch (_) {}
+  renderBoard();
+}
+
 // Friends leaderboard (Krillion style): you plus everyone who opened your link or
 // whose link you opened, ranked on today's case. Scores show once you have played.
 async function renderBoard() {
   const box = $("friendsBoard");
   if (!box || ARCHIVE_DATE) return;
+  renderInvite();
   let data = null;
   try { data = await (await fetch(`/api/friends?pid=${playerId()}&d=${boardDay()}`)).json(); } catch (_) {}
   const rows = (data && data.rows) || [];
@@ -4492,6 +4552,11 @@ async function renderBoard() {
       ? [["", `${++rank}`], ["n", name], ["g", r.grid || ""], ["s", r.score != null ? `${r.score}` : "✓"]]
       : [["", "·"], ["n", name], ["g", "Yet to play"], ["s", ""]];
     cells.forEach(([c, t]) => { const sp = document.createElement("span"); if (c) sp.className = c; sp.textContent = t; li.appendChild(sp); });
+    const x = document.createElement("button");
+    x.type = "button"; x.className = "rm";
+    if (r.pid === me) x.disabled = true;
+    else { x.textContent = "✕"; x.title = "Remove friend"; x.onclick = () => removeFriend(x, r.pid); }
+    li.appendChild(x);
     list.appendChild(li);
   });
   const alone = rows.length < 2;
@@ -5516,7 +5581,7 @@ async function copyShareText() {
 function shareToApp(appName) {
   const text = getDailyShareText();
   try { navigator.clipboard && navigator.clipboard.writeText(text).catch(() => {}); } catch (_) {}
-  if (navigator.share && shareCardFile && navigator.canShare && navigator.canShare({ files: [shareCardFile] })) {
+  if (phoneCanShareCard()) {
     showToast(`Caption copied. Pick ${appName}, then paste it.`);
     navigator.share({ files: [shareCardFile] }).catch(() => {});
     return;
@@ -5632,6 +5697,12 @@ const CARD_NETS = [
   ["instagram", "Instagram"], ["tiktok", "TikTok"], ["sms", "Text message"], ["signal", "Signal"], ["x", "X"], ["facebook", "Facebook"], ["whatsapp", "WhatsApp"], ["reddit", "Reddit"],
   ["linkedin", "LinkedIn"], ["bluesky", "Bluesky"], ["slack", "Slack"], ["email", "Email"]
 ];
+// Apps without a web share link (Slack, Signal, Instagram, TikTok) go through the
+// share sheet on phones only; on a Mac the sheet does not list them, so desktop
+// copies or saves the card and opens the app instead.
+function phoneCanShareCard() {
+  return cardCanNativeShare() && matchMedia("(pointer: coarse)").matches;
+}
 function cardCanNativeShare() {
   return !!(navigator.share && shareCardFile && navigator.canShare && navigator.canShare({ files: [shareCardFile] }));
 }
@@ -5660,7 +5731,7 @@ function shareCardTo(net) {
   // Slack has no public share link either: share sheet on phones, otherwise copy
   // the card and open Slack so it can be pasted into a channel.
   if (net === "slack") {
-    if (cardCanNativeShare()) return shareToApp("Slack");
+    if (phoneCanShareCard()) return shareToApp("Slack");
     if (currentCardBlob && navigator.clipboard && window.ClipboardItem) {
       try { navigator.clipboard.write([new ClipboardItem({ "image/png": currentCardBlob })]).catch(() => {}); } catch (_) {}
     }
@@ -5669,7 +5740,7 @@ function shareCardTo(net) {
     return;
   }
   if (net === "signal") {
-    if (cardCanNativeShare()) return shareToApp("Signal");
+    if (phoneCanShareCard()) return shareToApp("Signal");
     if (currentCardBlob && navigator.clipboard && window.ClipboardItem) {
       navigator.clipboard.write([new ClipboardItem({ "image/png": currentCardBlob })])
         .then(() => showToast("Card copied. Paste it into a Signal chat."))
@@ -5679,7 +5750,7 @@ function shareCardTo(net) {
   }
   if (net === "instagram" || net === "tiktok") {
     const name = net === "instagram" ? "Instagram" : "TikTok";
-    if (cardCanNativeShare()) return shareToApp(name);
+    if (phoneCanShareCard()) return shareToApp(name);
     // Desktop: neither has a share link, so save the card and open the site to upload it.
     shareToApp(name);
     window.open(net === "instagram" ? "https://www.instagram.com/" : "https://www.tiktok.com/upload", "_blank", "noopener,noreferrer");
