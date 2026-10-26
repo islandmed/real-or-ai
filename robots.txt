@@ -1,3 +1,11 @@
 User-agent: *
 Allow: /
+# Write-only and per-player API routes: nothing to index, and a bare GET is a 4xx.
+# /api/case, /api/archive, /api/packs and /api/score stay open so Google can render the game.
+Disallow: /api/board
+Disallow: /api/guess
+Disallow: /api/ev/
+Disallow: /api/friends
+Disallow: /api/groups
+Disallow: /api/pass/
 Sitemap: https://play-imposter.lol/sitemap.xml
