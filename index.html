@@ -3145,7 +3145,7 @@ const SEASONS = {
     p: { bg: "#0b0710", bg2: "#1a0f24", panel: "#1a1222", line: "#3a2752", accent: "#ff7a1a", accent2: "#b45cff", badge: "#ff9d1a", fg: "#f3e9ff", muted: "#a996c2", third: "#ff9a3c" }
   },
   thanksgiving: {
-    id: "thanksgiving", emoji: "🦃", badge: "🦃 THANKSGIVING SPECIAL", og: "og-thanksgiving.png", fx: "leaves",
+    id: "thanksgiving", emoji: "🍂", badge: "🍂 HARVEST SPECIAL", og: "og-thanksgiving.png", fx: "leaves",
     p: { bg: "#1a0f08", bg2: "#2c1a0e", panel: "#2a1a10", line: "#5a3a22", accent: "#ffb547", accent2: "#e8692a", badge: "#ffc56b", fg: "#f6ead2", muted: "#c4ab8a", third: "#ff8a3d" }
   },
   christmas: {
@@ -3177,7 +3177,7 @@ document.documentElement.setAttribute("data-season", SEASON.id);
   const tc = document.querySelector('meta[name="theme-color"]');
   if (tc) tc.setAttribute("content", SEASON.p.bg);
   // Case data may carry a seasonal badge; the player's season wins.
-  const re = /\p{Extended_Pictographic}️?\s*(HALLOWEEN|THANKSGIVING|CHRISTMAS)( SPECIAL)?/u;
+  const re = /\p{Extended_Pictographic}️?\s*(HALLOWEEN|THANKSGIVING|HARVEST|CHRISTMAS)( SPECIAL)?/u;
   ["caseTag", "cdBadge", "cdActiveBadge"].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;

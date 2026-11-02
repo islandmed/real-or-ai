@@ -353,8 +353,8 @@
    "id": "thanksgiving",
    "start": "11-01",
    "end": "11-30",
-   "badge": "🦃 THANKSGIVING SPECIAL",
-   "label": "Thanksgiving",
+   "badge": "🍂 HARVEST SPECIAL",
+   "label": "Harvest",
    "themes": [
     {
      "key": "pies",
