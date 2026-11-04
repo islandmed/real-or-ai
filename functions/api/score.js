@@ -16,7 +16,8 @@ function recent(date) {
 }
 
 // Placeholder spread while the player count ramps up: an estimated typical day
-// (most catch 4-5 of 6, ~60s, ~380 pts), weighted as BASE_N - n virtual players so
+// (time trial since 2026-11-03: median ~38s incl. wrong-tap penalties, so a
+// 25s run beats ~90% and a 50s run ~20%; old score buckets kept for old clients), weighted as BASE_N - n virtual players so
 // it fades out and is gone once a day has BASE_N real results. The response says
 // est: true while any of it is mixed in, and n stays the real count.
 const BASE_N = 30;
@@ -24,7 +25,7 @@ const norm = (len, at) => { const v = Array.from({ length: len }, (_, k) => at(k
 const BASE = {
   buckets: norm(BUCKETS, k => Math.exp(-(((k + 0.5) * WIDTH - 380) ** 2) / (2 * 140 ** 2))),
   won: norm(7, k => [1, 2, 5, 12, 24, 32, 24][k]),
-  times: norm(TBUCKETS, k => { const t = (k + 0.5) * TWIDTH; return Math.exp(-((Math.log(t) - Math.log(62)) ** 2) / (2 * 0.4 ** 2)) / t; }),
+  times: norm(TBUCKETS, k => { const t = (k + 0.5) * TWIDTH; return Math.exp(-((Math.log(t) - Math.log(38)) ** 2) / (2 * 0.35 ** 2)) / t; }),
 };
 
 export async function onRequestGet({ request, env }) {
