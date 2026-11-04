@@ -28,10 +28,13 @@ export async function onRequestPost({ request, env }) {
     const picks = await countPick(env, date, round, card);
     return json({ correct: false, credit: k.credit, ai: r.cards.find(x => x.ai).id, credits, picks });
   }
-  if (!k.ai) return json({ correct: false, credit: k.credit });
+  // Time-trial clients send first: true on a round's first tap only. It counts toward
+  // the pick tally but never names the fake; the round goes on until they find it.
+  const counted = body.reveal === true || body.first === true;
+  if (!k.ai) return json({ correct: false, credit: k.credit, picks: counted ? await countPick(env, date, round, card) : undefined });
   const credits = {};
   for (const x of r.cards) if (!x.ai) credits[x.id] = x.credit;
-  const picks = body.reveal === true ? await countPick(env, date, round, card) : undefined;
+  const picks = counted ? await countPick(env, date, round, card) : undefined;
   return json({ correct: true, credits, picks });
 }
 

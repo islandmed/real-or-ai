@@ -405,6 +405,17 @@
   .imposter-card.eliminated .card-status-badge { border-top-color: var(--neon-green); }
   .imposter-card.caught .card-status-badge { border-top-color: var(--neon-pink); }
   .imposter-card.round-over { cursor: zoom-in; }
+  /* Time trial: a wrong tap shakes red and shows the +5s it cost */
+  .imposter-card.wrong-tap { animation: wrongShake .42s ease; box-shadow: 0 0 0 4px #ff3344, 0 0 22px rgba(255, 51, 68, .55) !important; }
+  @keyframes wrongShake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-9px); } 40% { transform: translateX(9px); } 60% { transform: translateX(-6px); } 80% { transform: translateX(6px); } }
+  .penalty-pop { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 6;
+    font: 800 52px 'JetBrains Mono', monospace; color: #ff3344; text-shadow: 0 2px 14px rgba(0,0,0,.9), 0 0 6px rgba(0,0,0,.9); animation: penPop 1.1s ease-out forwards; }
+  @keyframes penPop { 0% { opacity: 0; transform: scale(.5); } 18% { opacity: 1; transform: scale(1.2); } 65% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: translateY(-24px); } }
+  .live-timer-hit { color: #ff3344 !important; transition: none; }
+  /* A wrong tap stays red: the real-photo green is for the reveal, not for a mistake */
+  .imposter-card.eliminated.wrong-tap { border-color: #ff3344 !important; }
+  .imposter-card.eliminated.wrong-tap .card-status-badge { border-top-color: #ff3344; background: rgba(60, 6, 12, .92); }
+  .imposter-card.eliminated.wrong-tap .badge-title { color: #ff5566; text-shadow: 0 0 6px rgba(255, 51, 68, .8); }
   .badge-icon { font-size: 16px; grid-row: span 2; line-height: 1; }
   .badge-title {
     font-family: var(--retro-font);
@@ -2613,7 +2624,7 @@
     <!-- Warm-up only: ad visitors land here with no intro, so say what to do -->
     <div class="warmup-prompt" id="warmupPrompt" hidden>
       <h2>1 of these 4 is <span>AI</span>.</h2>
-      <p>Tap the fake. You get one guess.</p>
+      <p>Tap the fake. Fastest time wins.</p>
     </div>
     <!-- 2x2 Grid (Fills square cards with edge-to-edge photos) -->
     <div class="grid-wrap" id="gridWrap">
@@ -2637,7 +2648,7 @@
         <h2 class="result-title" id="resultTitle">Case Closed!</h2>
         <span class="summary-score-badge" id="summaryScoreBadge" hidden>6 / 6 CLEARED</span>
         <div class="score-hero" id="scoreHero" hidden>
-          <div class="sh-row"><div class="sh-num" id="heroScore">0</div><div class="sh-max" id="heroMax">/ 700</div></div>
+          <div class="sh-row"><div class="sh-num" id="heroScore">0</div><div class="sh-max" id="heroMax">seconds</div></div>
           <div class="sh-tier" id="heroTier">
             <div class="sh-tier-bar"><i id="heroTierFill"></i><b id="heroTierMark"></b></div>
             <div class="sh-tier-labels" id="heroTierLabels"></div>
@@ -2990,13 +3001,13 @@
 
     <div class="how-section">
       <div class="how-sec-badge">SCORING</div>
-      <h4>One Guess Per Round (700 PTS Max)</h4>
+      <h4>Fastest Time Wins</h4>
       <div class="how-score-grid">
-        <div class="score-pill"><span>Spotted</span><strong>+100 PTS</strong></div>
-        <div class="score-pill"><span>Fooled</span><strong>0 PTS</strong></div>
-        <div class="score-pill highlight"><span>Speed Bonus</span><strong>+100 PTS</strong></div>
+        <div class="score-pill"><span>Spot the fake</span><strong>Next photos</strong></div>
+        <div class="score-pill"><span>Wrong tap</span><strong>+5s</strong></div>
+        <div class="score-pill highlight"><span>Your result</span><strong>Total time</strong></div>
       </div>
-      <p class="score-note">🎯 <strong>One shot:</strong> tap the photo you think is AI. Pick a real one and the round is lost, so look before you tap.</p>
+      <p class="score-note">⏱️ <strong>Race the clock:</strong> tap the AI photo and the next round appears instantly. Tap a real one and it costs you 5 seconds, so be quick but not careless.</p>
     </div>
 
     <button class="how-play-btn" onclick="closeHowModal()">Got it, Let's Play!</button>
@@ -3017,7 +3028,7 @@
     
     <div class="cd-hook-box">
       <div class="cd-hook-heading">3 Real Photos · 1 Synthetic AI Fake</div>
-      <div class="cd-hook-sub">6 rounds a day, 1 AI fake in each. You get one guess per round. Faster means more points.</div>
+      <div class="cd-hook-sub">6 rounds a day, 1 AI fake in each. Find all 6 as fast as you can. Wrong taps cost 5 seconds.</div>
     </div>
 
     <div class="cd-challenge" id="cdChallenge" hidden></div>
@@ -3056,7 +3067,7 @@
     </div>
 
     <div class="cd-label" id="cdLabel">CALIBRATING FORENSIC MATRIX</div>
-    <div class="cd-hint" id="cdHint">Max +100 Speed Bonus · Be quick, be right</div>
+    <div class="cd-hint" id="cdHint">Wrong tap = +5s · Fastest time wins</div>
   </div>
 </div>
 
@@ -3291,6 +3302,7 @@ function showCountdownReadyState() {
   caseStartTime = null;
   elapsedSeconds = 0;
   revealHoldAt = null;
+  wrongTapCount = 0;
   isCountingDown = false;
 
   const overlay = $("countdownOverlay");
@@ -3428,6 +3440,7 @@ function startSpeedTimer() {
   caseStartTime = Date.now();
   caseEndTime = null;
   elapsedSeconds = 0;
+  wrongTapCount = 0;
   updateLiveTimerUI(0);
   timerInterval = setInterval(() => {
     if (!caseStartTime) return;
@@ -3457,6 +3470,11 @@ function updateLiveTimerUI(secs) {
   }
   const bonusEl = $("liveSpeedBonus");
   if (bonusEl) {
+    bonusEl.textContent = wrongTapCount ? `${wrongTapCount} wrong · +${wrongTapCount * PENALTY_S}s` : "No wrong taps";
+    bonusEl.style.color = wrongTapCount ? "#ff4466" : "#39ff14";
+    bonusEl.style.textShadow = "none";
+  }
+  if (false) {
     const liveBonus = calculateSpeedBonus(secs);
     if (liveBonus > 0) {
       bonusEl.textContent = `+${liveBonus} PTS`;
@@ -3495,6 +3513,14 @@ window.addEventListener("keydown", (e) => {
 // Challenging speed bonus formula:
 // 100 max points, begins decaying after 3s, hits 0 at cutoff (15s per round average).
 // Heavily weighted by 1st-try accuracy to reward careful observation over panic clicking.
+// Time trial (2026-11-03): the result is the finish time, and each wrong tap adds
+// PENALTY_S (caseStartTime moves back, so every clock read includes it). The
+// servers still rank on "score", so score is derived from time: faster = higher.
+const PENALTY_S = 5;
+let wrongTapCount = 0;
+function scoreFor(secs) { return Math.max(0, 800 - Math.round(secs)); }
+function wrongTaps(results) { return (results || []).reduce((a, r) => a + (r.solved ? Math.max(0, (r.attempts || 1) - 1) : 0), 0); }
+function fmtS(secs) { return `${Number(secs || 0).toFixed(1)}s`; }
 function calculateSpeedBonus(secs, resultsOrCount) {
   const totalRounds = dailyCaseData?.rounds?.length || 6;
   const cutoff = totalRounds * 15; // 90 seconds for 6 rounds
@@ -3781,10 +3807,10 @@ const CAREER_RANKS = [
 const ALL_BADGES = [
   { id: "lightning_instinct", icon: "⚡", name: "Lightning Instinct", desc: "Fast forensic unmasking under 12s total" },
   { id: "flawless_case", icon: "🎯", name: "Flawless Case", desc: "Ace every round of a daily case on the first try" },
-  { id: "perfect_case", icon: "⭐", name: "Perfect Case", desc: "Score a perfect 700 on a daily case: every fake first try, under 30s" },
+  { id: "perfect_case", icon: "⭐", name: "Perfect Case", desc: "Finish a daily case in 30s or less without a wrong tap" },
   { id: "eagle_eye", icon: "🦅", name: "Eagle Eye", desc: "Flawless unmasking with 100% first-guess accuracy" },
   { id: "streak_master", icon: "🔥", name: "Streak Master", desc: "Maintain a 3-day active daily streak" },
-  { id: "top_detective", icon: "🏆", name: "Top Detective", desc: "Score 600+ points in a single daily case" },
+  { id: "top_detective", icon: "🏆", name: "Top Detective", desc: "Finish a daily case in 45s or less" },
   { id: "case_veteran", icon: "🎖️", name: "Case Veteran", desc: "Solve 7 daily cases" },
   { id: "week_beat", icon: "🗓️", name: "Week on the Beat", desc: "Reach a 7-day daily streak" },
   { id: "month_beat", icon: "📅", name: "Month on the Beat", desc: "Reach a 30-day daily streak" },
@@ -3820,7 +3846,7 @@ function historyMedals(run) {
   if ((playerStats.aces || 0) >= 250) out.push("fake_finder");
   if (Object.keys(archiveRecords()).length >= 5) out.push("cold_case");
   // 700 was out of reach before the 2026-10-23 scoring, so any saved 700 is a real perfect
-  if (Object.values(playerStats.history || {}).some(h => h && h.score >= maxScoreFor())) out.push("perfect_case");
+  if (Object.values(playerStats.history || {}).some(h => h && (h.perfect || (!h.timeTrial && h.score >= maxScoreFor())))) out.push("perfect_case");
   const months = new Set(days.map(([d]) => d.slice(5, 7)));
   if (months.has("10")) out.push("spooky_season");
   if (months.has("11")) out.push("harvest_hunter");
@@ -4156,7 +4182,7 @@ function renderRoundBreakdown() {
     let tag = `<span class="rb-res fail">❌ Fooled</span>`;
     if (r.solved && r.attempts === 1) tag = `<span class="rb-res pass-flawless">🎯 Aced (1st Guess)</span>`;
     else if (r.solved && r.attempts === 2) tag = `<span class="rb-res pass-great">⚡ Caught (2nd Guess)</span>`;
-    else if (r.solved) tag = `<span class="rb-res pass-close">🔍 Caught (3rd Guess)</span>`;
+    else if (r.solved) tag = `<span class="rb-res pass-close">🔍 Caught (${r.attempts === 3 ? "3rd" : r.attempts + "th"} Guess)</span>`;
     const pics = reviewPics(r);
     return `
       <div class="rb-row${pics ? " has-pics" : ""}">
@@ -4206,16 +4232,16 @@ function showAlreadyCompletedToday(record) {
     if (typeof record.time === "number") elapsedSeconds = record.time;
     renderRoundBreakdown();
   }
-  const score = record.score || (totalRounds * 100);
   const time = typeof record.time === "number" ? record.time : 35.0;
+  const score = record.score || scoreFor(time);
   const won = record.won || totalRounds;
 
-  if ($("statScoreVal")) $("statScoreVal").textContent = `${score}`;
+  if ($("statScoreVal")) $("statScoreVal").textContent = fmtS(time);
   if ($("statCaughtVal")) $("statCaughtVal").textContent = `${won}/${totalRounds}`;
   if ($("summaryTimeVal")) $("summaryTimeVal").textContent = `${time.toFixed(1)}s`;
   if ($("summarySpeedBonusVal")) $("summarySpeedBonusVal").textContent = typeof record.speedBonus === "number" ? `+${record.speedBonus}` : "–";
 
-  $("summaryScoreBadge").textContent = `CASE #${dailyCaseData?.caseNumber || '66'} COMPLETE · ${score} PTS`;
+  $("summaryScoreBadge").textContent = `CASE #${dailyCaseData?.caseNumber || '66'} COMPLETE · ${fmtS(time)}`;
   $("summaryScoreBadge").className = "summary-score-badge";
   $("starsRow").textContent = record.stars || "";
   $("resultTitle").textContent = record.title || "Today's Case Complete! 🕵️";
@@ -4278,7 +4304,7 @@ function renderChallengeBanner() {
   if (!friendChallenge) { el.hidden = true; return; }
   const timePart = friendChallenge.t !== null ? ` in ${friendChallenge.t.toFixed(1)}s` : "";
   const who = friendChallenge.name || "Your friend";
-  el.textContent = `🕵️ ${who} challenged you: ${friendChallenge.s} pts${timePart}. Can you beat that?`;
+  el.textContent = friendChallenge.t !== null ? `🕵️ ${who} finished in ${friendChallenge.t.toFixed(1)}s. Can you beat that?` : `🕵️ ${who} challenged you: ${friendChallenge.s} pts${timePart}. Can you beat that?`;
   el.hidden = false;
 }
 
@@ -4436,12 +4462,11 @@ function showArchiveResults() {
   const total = dailyCaseData.rounds.length;
   const won = roundResults.filter(r => r.solved).length;
   const firstTry = roundResults.filter(r => r.solved && r.attempts === 1).length;
-  const score = firstTry * 100 + roundResults.filter(r => r.solved && r.attempts === 2).length * 45
-    + roundResults.filter(r => r.solved && r.attempts === 3).length * 15 + calculateSpeedBonus(finalSecs, roundResults);
+  const score = scoreFor(finalSecs), wt = wrongTaps(roundResults);
 
   $("resultTitle").textContent = `Case #${dailyCaseData.caseNumber} · ${shortDate(dailyCaseData.date)}`;
-  $("summaryScoreBadge").textContent = `${won}/${total} CAUGHT · ${score} PTS · ${finalSecs.toFixed(1)}s`;
-  $("summaryScoreBadge").className = "summary-score-badge" + (firstTry === total ? " flawless" : "");
+  $("summaryScoreBadge").textContent = `${won}/${total} FOUND · ${fmtS(finalSecs)}${wt ? ` · ${wt} WRONG` : ""}`;
+  $("summaryScoreBadge").className = "summary-score-badge" + (wt === 0 ? " flawless" : "");
   $("resultGrid").textContent = buildEmojiGrid(roundResults);
   renderRoundBreakdown();
   renderPhotoCredits();
@@ -4581,11 +4606,10 @@ function showPackResults() {
   const total = dailyCaseData.rounds.length;
   const won = roundResults.filter(r => r.solved).length;
   const firstTry = roundResults.filter(r => r.solved && r.attempts === 1).length;
-  const score = firstTry * 100 + roundResults.filter(r => r.solved && r.attempts === 2).length * 45
-    + roundResults.filter(r => r.solved && r.attempts === 3).length * 15 + calculateSpeedBonus(finalSecs, roundResults);
+  const score = scoreFor(finalSecs), wt = wrongTaps(roundResults);
   $("resultTitle").textContent = dailyCaseData.title;
-  $("summaryScoreBadge").textContent = `${won}/${total} CAUGHT · ${score} PTS · ${finalSecs.toFixed(1)}s`;
-  $("summaryScoreBadge").className = "summary-score-badge" + (firstTry === total ? " flawless" : "");
+  $("summaryScoreBadge").textContent = `${won}/${total} FOUND · ${fmtS(finalSecs)}${wt ? ` · ${wt} WRONG` : ""}`;
+  $("summaryScoreBadge").className = "summary-score-badge" + (wt === 0 ? " flawless" : "");
   $("resultGrid").textContent = buildEmojiGrid(roundResults);
   renderRoundBreakdown();
   renderPhotoCredits();
@@ -4728,7 +4752,7 @@ function groupLink(id) { return `${location.origin}/g/${id}`; }
 let groupInvite = null; // { name, text }
 function inviteToGroup(gr) {
   const p = getShareParts();
-  const mine = p ? ` I got ${p.res.score} today.` : "";
+  const mine = p ? ` I finished in ${fmtS(p.res.time)} today.` : "";
   const text = `🕵️ Join our "${gr.name}" board on Imposter: one daily case, 3 real photos and 1 AI fake per round. See who spots them best.${mine}\n${groupLink(gr.id)}`;
   groupInvite = { name: gr.name, text };
   if (navigator.share && matchMedia("(pointer: coarse)").matches) return quickShare(text, `Invite copied. Paste it in the ${gr.name} chat.`);
@@ -4838,7 +4862,7 @@ function drawBoard() {
     if (!r.played) li.classList.add("waiting");
     const name = r.pid === me ? (r.name ? `${r.name} (you)` : "You") : (r.name || "Detective");
     const cells = r.played
-      ? [["", `${++rank}`], ["n", name], ["g", r.grid || ""], ["s", r.score != null ? `${r.score}` : "✓"]]
+      ? [["", `${++rank}`], ["n", name], ["g", r.grid || ""], ["s", r.time != null ? fmtS(r.time) : "✓"]]
       : [["", "·"], ["n", name], ["g", "Yet to play"], ["s", ""]];
     cells.forEach(([c, t]) => {
       const sp = document.createElement("span"); if (c) sp.className = c;
@@ -4864,7 +4888,7 @@ function drawBoard() {
   const waiting = rows.length - played.length;
   const rk = $("boardRank");
   rk.textContent = !rankHere ? "" : rankHere.rank === 1 ? `👑 You're #1 of ${rankHere.of} today${waiting ? ` · ${waiting} still to play` : ""}`
-    : `You're #${rankHere.rank} of ${rankHere.of} · ${(played[0].name || "a friend")} leads with ${played[0].score}`;
+    : `You're #${rankHere.rank} of ${rankHere.of} · ${(played[0].name || "a friend")} leads with ${played[0].time != null ? fmtS(played[0].time) : played[0].score}`;
   rk.hidden = !rankHere;
   $("boardEmpty").hidden = !(alone && !isNew);
   $("boardEmpty").textContent = group ? `Just you so far. Invite the ${group.name} chat and you'll all be ranked here every day.`
@@ -4904,46 +4928,38 @@ async function renderSpread() {
   const b = Array.isArray(data?.buckets) ? data.buckets.map(x => Math.max(0, +x || 0)) : [];
   const n = b.reduce((a, x) => a + x, 0);
   if ((n < SPREAD_MIN && !data.est) || !b.length) return;
-  // Share below your score, spreading your own bucket evenly across its width
-  const i = Math.min(b.length - 1, Math.floor(res.score / SPREAD_W));
-  const frac = Math.min(1, (res.score - i * SPREAD_W) / SPREAD_W);
-  const below = b.slice(0, i).reduce((a, x) => a + x, 0) + b[i] * frac;
+  // Time trial: the share of today's times slower than yours (placeholder spread included)
+  const times = Array.isArray(data.times) ? data.times.map(x => Math.max(0, +x || 0)) : [];
+  const tn = times.reduce((a, x) => a + x, 0);
+  let fast = 50;
+  if (tn) {
+    const k = Math.min(times.length - 1, Math.floor(res.time / 2));
+    const f = k === times.length - 1 ? 0.5 : Math.min(1, (res.time - k * 2) / 2);
+    fast = Math.min(99, Math.round(100 * (times.slice(k + 1).reduce((a, x) => a + x, 0) + times[k] * (1 - f)) / tn));
+  }
   // Once the day has real results, rank exactly as the boards do: score, then the
   // faster time, so a 700 in 18s beats a 700 in 25s. Exact ties count half.
   const rk = data.rank, others = n - 1;
-  let pct = Math.max(0, Math.min(99, Math.round(100 * below / n)));
+  let pct = Math.max(0, Math.min(99, fast));
   if (!data.est && rk && others > 0) {
     const share = (rk.below + Math.max(0, rk.tie - 1) / 2) / others;
     pct = rk.below >= others ? 100 : Math.min(99, Math.round(100 * share));
   }
-  const perfect = res.score >= maxScoreFor(res);
-  const label = perfect ? `💯 Perfect score in ${Number(res.time).toFixed(1)}s`
+  const perfect = res.wrong === 0 && res.time <= 30;
+  const label = perfect ? `💯 Clean run in ${fmtS(res.time)}`
     : pct >= 90 ? "Top of the precinct" : pct >= 50 ? "Sharp eye" : "Today's ranking";
   $("spreadLine").innerHTML = `<small>${label}</small>${pct >= 100 ? "You beat every detective so far today" : `You beat ${pct}% of today's detectives`}`;
   $("spPct").textContent = `${pct}%`;
   // Accuracy and speed, each as the share of today's detectives you did better than
   // (ties count half). Score = fakes caught (more for first tries) + speed bonus.
-  const won = Array.isArray(data.won) ? data.won.map(x => Math.max(0, +x || 0)) : [];
-  const times = Array.isArray(data.times) ? data.times.map(x => Math.max(0, +x || 0)) : [];
   const rows = [];
-  const wn = won.reduce((a, x) => a + x, 0);
-  if (wn) {
-    const k = Math.max(0, Math.min(6, res.won | 0));
-    const acc = Math.min(99, Math.round(100 * (won.slice(0, k).reduce((a, x) => a + x, 0) + won[k] / 2) / wn));
-    rows.push(["🎯 Accuracy", `${res.won}/${res.total}<small>caught</small>`, Math.round(100 * res.won / (res.total || 6)), `better than ${acc}%`]);
-  }
-  const tn = times.reduce((a, x) => a + x, 0);
-  if (tn) {
-    const k = Math.min(times.length - 1, Math.floor(res.time / 2));
-    const f = k === times.length - 1 ? 0.5 : Math.min(1, (res.time - k * 2) / 2);
-    const fast = Math.min(99, Math.round(100 * (times.slice(k + 1).reduce((a, x) => a + x, 0) + times[k] * (1 - f)) / tn));
-    rows.push(["⚡ Speed", `${fast}%<small>beaten</small>`, fast, `${res.time.toFixed(1)}s total`]);
-  }
+  if (tn) rows.push(["⚡ Speed", `${fast}%<small>beaten</small>`, fast, `${fmtS(res.time)} total`]);
+  if (typeof res.wrong === "number") rows.push(["🎯 Wrong taps", `${res.wrong}<small>× +${PENALTY_S}s</small>`, Math.max(3, 100 - res.wrong * 20), res.wrong ? `+${res.wrong * PENALTY_S}s added` : "clean run"]);
   // [label, big number html, bar %, note]: accuracy shows the catch count, speed the share beaten
   $("spreadBars").innerHTML = rows.map(([lab, big, bar, note]) =>
     `<div class="sp-tile"><div class="sp-tile-lab">${lab}</div><div class="sp-tile-num">${big}</div><div class="sp-track"><div class="sp-fill" data-w="${Math.max(3, Math.min(100, bar))}"></div></div><div class="sp-tile-note">${note}</div></div>`).join("");
   // While the server mixes in its placeholder spread (est), n is not a real head count: show none
-  $("spreadSub").textContent = `${data.est ? "" : `${Math.round(n).toLocaleString()} cases filed today · `}score = catches + speed bonus`;
+  $("spreadSub").textContent = `${data.est ? "" : `${Math.round(n).toLocaleString()} cases filed today · `}time = clock + ${PENALTY_S}s per wrong tap`;
   $("scoreSpread").hidden = false;
   // Animate in: the ring fills to pct, the bars grow to their width
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -5255,7 +5271,7 @@ async function postGuess(round, card) {
   const res = await fetch("/api/guess", {
     method: "POST",
     headers: passHeaders({ "content-type": "application/json" }),
-    body: JSON.stringify({ date: dailyCaseData.date, round, card, reveal: true })
+    body: JSON.stringify({ date: dailyCaseData.date, round, card, first: attemptsUsedThisRound === 0 })
   });
   if (!res.ok) throw new Error(`guess ${res.status}`);
   return res.json();
@@ -5272,7 +5288,7 @@ function markImposter(cardId, caughtByPlayer, picks) {
 
 async function selectCard(id) {
   if (warmup) return warmupGuess(id);
-  if (isCurrentRoundOver) return inspectRevealed(id);
+  if (isCurrentRoundOver) return; // the next round is already on its way
   if (prerollShowing || guessInFlight) return;
   if (prerollNeeded() && !caseStartTime) { dismissCountdown(); return; }
 
@@ -5322,25 +5338,29 @@ async function selectCard(id) {
     roundResults.push({ roundIndex: roundIdx + 1, theme, solved: true, attempts: attemptsUsedThisRound, aiId: id, pickedId: id });
     finishRoundUI(true);
   } else {
-    // Wrong guess: one guess per round, so the round is lost and the fake revealed
+    // Wrong tap: it costs PENALTY_S, the photo is marked real, and the round goes on
     playSound("strike");
-    isCurrentRoundOver = true;
+    wrongTapCount++;
+    if (caseStartTime) caseStartTime -= PENALTY_S * 1000;
     cardEl.classList.add("eliminated");
-    roundCredits = { ...roundCredits, ...(result.credits || {}) };
-    if (result.credit) roundCredits[id] = result.credit;
-    $(`badgeIcon_${id}`).textContent = "🏛️";
-    $(`badgeTitle_${id}`).textContent = "100% REAL";
+    cardEl.classList.remove("wrong-tap"); void cardEl.offsetWidth; cardEl.classList.add("wrong-tap");
+    const pop = document.createElement("div");
+    pop.className = "penalty-pop"; pop.textContent = `+${PENALTY_S}s`;
+    cardEl.appendChild(pop); setTimeout(() => pop.remove(), 1200);
+    const lt = $("liveTimer");
+    if (lt) { lt.classList.add("live-timer-hit"); setTimeout(() => lt.classList.remove("live-timer-hit"), 900); }
+    if (navigator.vibrate) try { navigator.vibrate(120); } catch (_) {}
+    if (result.credit) { roundCredits[id] = result.credit; renderRoundCredits(); }
+    $(`badgeIcon_${id}`).textContent = "❌";
+    $(`badgeTitle_${id}`).textContent = "✗ WRONG · REAL PHOTO · +5s";
     $(`badgeDesc_${id}`).innerHTML = `<div class="badge-deception">👥 ${deceptionRate(id, false, result.picks)}% fell for this real one</div>`;
-    const lostPip = $("dot1");
+    const lostPip = $(`dot${Math.min(3, attemptsUsedThisRound)}`);
     if (lostPip) { lostPip.className = "heart-pip lost"; lostPip.textContent = "💔"; }
-    if (result.ai) markImposter(result.ai, false, result.picks);
-    renderRoundCredits();
-    roundResults.push({ roundIndex: roundIdx + 1, theme, solved: false, attempts: 1, aiId: result.ai || null, pickedId: id });
-    finishRoundUI(false);
+    updateLiveTimerUI(caseStartTime ? (Date.now() - caseStartTime) / 1000 : elapsedSeconds);
   }
 }
 
-const REVEAL_MS = 2600;
+const REVEAL_MS = 450; // time trial: a quick green flash, then the next round
 let revealHoldAt = null; // the clock stops here while the player studies a reveal past REVEAL_MS
 
 function finishRoundUI(didWin) {
@@ -5352,8 +5372,8 @@ function finishRoundUI(didWin) {
   if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
   autoAdvanceTimeout = null;
   dayCredits.push({ round: currentRoundIndex + 1, credits: { ...roundCredits } });
-  // Scoring stays as before: the first REVEAL_MS of a reveal counts, any longer look is free
-  revealHoldAt = Date.now() + REVEAL_MS;
+  // The flash between rounds is not on the clock
+  revealHoldAt = Date.now();
 
   // Either way the case keeps moving; studying the fakes is what the results review is for.
   // A tap on a photo during the reveal still pauses it (inspectRevealed).
@@ -5423,58 +5443,27 @@ function showFinalResults() {
   setTimeout(prepareShareCard, 300);
 
   const totalRounds = dailyCaseData.rounds.length;
-  const maxScore = (totalRounds * 100) + 100;
   const totalWon = roundResults.filter(r => r.solved).length;
   const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
   const secondTryCount = roundResults.filter(r => r.solved && r.attempts === 2).length;
-  const thirdTryCount = roundResults.filter(r => r.solved && r.attempts === 3).length;
+  const thirdTryCount = roundResults.filter(r => r.solved && r.attempts >= 3).length;
+  const wt = wrongTaps(roundResults);
+  const finalScore = scoreFor(finalSecs); // for the boards only: faster = higher
+  const speedBonus = 0;
+  const T = fmtS(finalSecs), tier = tierOf(finalSecs);
 
-  // Base forensic score: 1st try = 100pts, 2nd try = 45pts, 3rd try = 15pts, fail = 0pts
-  const baseScore = (firstTryCount * 100) + (secondTryCount * 45) + (thirdTryCount * 15);
-  // Speed bonus: up to 100 bonus pts based on solve time, weighted by accuracy
-  const speedBonus = calculateSpeedBonus(finalSecs, roundResults);
-  const finalScore = baseScore + speedBonus;
-
-  if ($("statScoreVal")) $("statScoreVal").textContent = `${finalScore}`;
+  if ($("statScoreVal")) $("statScoreVal").textContent = T;
   if ($("statCaughtVal")) $("statCaughtVal").textContent = `${totalWon}/${totalRounds}`;
-  if ($("summaryTimeVal")) $("summaryTimeVal").textContent = `${finalSecs.toFixed(1)}s`;
-  if ($("summarySpeedBonusVal")) $("summarySpeedBonusVal").textContent = `+${speedBonus}`;
+  if ($("summaryTimeVal")) $("summaryTimeVal").textContent = T;
+  if ($("summarySpeedBonusVal")) $("summarySpeedBonusVal").textContent = `+${wt * PENALTY_S}s`;
 
-  let stars = "⭐⭐⭐⭐";
-  let title = "Grand Detective 🕵️‍♂️";
-  let desc = `You unmasked ${totalWon} of ${totalRounds} AI imposters in ${finalSecs.toFixed(1)}s today.`;
-
-  if (firstTryCount === totalRounds) {
-    $("summaryScoreBadge").textContent = `FLAWLESS · ${finalScore} PTS`;
-    $("summaryScoreBadge").className = "summary-score-badge flawless";
-    stars = "⭐⭐⭐⭐⭐";
-    title = "Master Detective · Flawless Run 🏆";
-    desc = `Incredible forensics! You aced all ${totalRounds} rounds on your first guess (+${speedBonus} speed bonus).`;
-  } else if (totalWon === totalRounds) {
-    $("summaryScoreBadge").textContent = `${totalRounds}/${totalRounds} CLEARED · ${finalScore} PTS`;
-    $("summaryScoreBadge").className = "summary-score-badge";
-    stars = "⭐⭐⭐⭐";
-    title = `All ${totalRounds} Imposters Caught 🎯`;
-    desc = `You caught every single AI imposter in ${finalSecs.toFixed(1)}s! (${firstTryCount} on 1st guess, +${speedBonus} speed bonus).`;
-  } else if (totalWon >= Math.ceil(totalRounds * 0.75)) {
-    $("summaryScoreBadge").textContent = `${totalWon}/${totalRounds} CLEARED · ${finalScore} PTS`;
-    $("summaryScoreBadge").className = "summary-score-badge";
-    stars = "⭐⭐⭐";
-    title = "Sharp Sleuth 🔍";
-    desc = `${totalWon} out of ${totalRounds} AI imposters caught in ${finalSecs.toFixed(1)}s (+${speedBonus} speed bonus).`;
-  } else if (totalWon >= Math.ceil(totalRounds * 0.5)) {
-    $("summaryScoreBadge").textContent = `${totalWon}/${totalRounds} CLEARED · ${finalScore} PTS`;
-    $("summaryScoreBadge").className = "summary-score-badge";
-    stars = "⭐⭐";
-    title = "Keen Observer 👀";
-    desc = `${totalWon} out of ${totalRounds} AI imposters detected in ${finalSecs.toFixed(1)}s.`;
-  } else {
-    $("summaryScoreBadge").textContent = `${totalWon}/${totalRounds} CLEARED · ${finalScore} PTS`;
-    $("summaryScoreBadge").className = "summary-score-badge";
-    stars = "💀";
-    title = "Tricked by AI 🤖";
-    desc = `AI diffusion artifacts fooled your eye today. Come back tomorrow for a fresh daily case!`;
-  }
+  $("summaryScoreBadge").textContent = `${totalWon}/${totalRounds} FOUND · ${T}${wt ? ` · ${wt} WRONG` : ""}`;
+  $("summaryScoreBadge").className = "summary-score-badge" + (wt === 0 ? " flawless" : "");
+  const stars = { Mastermind: "⭐⭐⭐⭐⭐", Inspector: "⭐⭐⭐⭐", Detective: "⭐⭐⭐", Rookie: "⭐⭐" }[tier.name] || "⭐⭐";
+  let title, desc;
+  if (wt === 0 && finalSecs <= 30) { title = "Flawless and Fast 🏆"; desc = `All ${totalRounds} AI fakes in ${T} without a single wrong tap.`; }
+  else if (wt === 0) { title = "Flawless Run 🎯"; desc = `All ${totalRounds} AI fakes found in ${T}, no wrong taps.`; }
+  else { title = `${tier.name} ${tier.icon}`; desc = `All ${totalRounds} AI fakes found in ${T}. ${wt} wrong tap${wt > 1 ? "s" : ""} cost you ${wt * PENALTY_S}s.`; }
 
   $("starsRow").textContent = stars;
   $("resultTitle").textContent = title;
@@ -5484,9 +5473,7 @@ function showFinalResults() {
 
   // Update & Save Player Stats
   playerStats.played++;
-  if (totalWon >= Math.ceil(totalRounds * 0.6) || firstTryCount === totalRounds) {
-    playerStats.won++;
-  }
+  playerStats.won++; // time trial: every finished case is a solved case
 
   // Save official daily completion record first: the streak is derived from it
   const todayStr = dailyCaseData.date || localDayStr();
@@ -5494,7 +5481,7 @@ function showFinalResults() {
     const records = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}");
     const prior = records[todayStr];
     // First result stands: a finished day is never overwritten
-    if (!(prior && prior.solved && prior.caseNumber === dailyCaseData.caseNumber)) records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, speedBonus, stars, title, rounds: roundResults.map(r => ({ roundIndex: r.roundIndex, theme: r.theme, solved: r.solved, attempts: r.attempts, aiId: r.aiId, pickedId: r.pickedId })), date: new Date().toISOString() };
+    if (!(prior && prior.solved && prior.caseNumber === dailyCaseData.caseNumber)) records[todayStr] = { solved: true, score: finalScore, time: finalSecs, won: totalWon, total: totalRounds, grid: buildEmojiGrid(roundResults), caseNumber: dailyCaseData.caseNumber, speedBonus, wrong: wt, timeTrial: true, stars, title, rounds: roundResults.map(r => ({ roundIndex: r.roundIndex, theme: r.theme, solved: r.solved, attempts: r.attempts, aiId: r.aiId, pickedId: r.pickedId })), date: new Date().toISOString() };
     localStorage.setItem("imposter_daily_records", JSON.stringify(records));
     checkDailyStatus();
   } catch (_) {}
@@ -5503,19 +5490,19 @@ function showFinalResults() {
   playerStats.catches2 += secondTryCount;
   playerStats.catches3 += thirdTryCount;
   playerStats.strikes += (totalRounds - totalWon);
-  playerStats.history[dailyCaseData.id] = { won: totalWon, score: finalScore, time: finalSecs, date: new Date().toISOString() };
+  playerStats.history[dailyCaseData.id] = { won: totalWon, score: finalScore, time: finalSecs, wrong: wt, timeTrial: true, perfect: wt === 0 && finalSecs <= 30, date: new Date().toISOString() };
   saveStats();
 
   // Award Career Progression XP & Medals
   let earnedXp = 100;
-  if (totalWon === totalRounds) earnedXp += 50;
-  if (firstTryCount === totalRounds) earnedXp += 50;
+  if (wt === 0) earnedXp += 50;
+  if (finalSecs <= 45) earnedXp += 50;
   awardCareerXp(earnedXp);
 
   const medals = [];
   if (firstTryCount === totalRounds) medals.push("flawless_case", "eagle_eye");
-  if (finalScore >= (totalRounds * 100)) medals.push("top_detective");
-  if (finalScore >= maxScoreFor({ total: totalRounds })) medals.push("perfect_case");
+  if (finalSecs <= 45) medals.push("top_detective");
+  if (wt === 0 && finalSecs <= 30) medals.push("perfect_case");
   if (playerStats.currentStreak >= 3) medals.push("streak_master");
   if (playerStats.won >= 7) medals.push("case_veteran");
   if (finalSecs < 20.0 && firstTryCount >= (totalRounds - 1)) medals.push("lightning_instinct");
@@ -5564,13 +5551,10 @@ function getTodayResult() {
   // The saved record is the first result for this day, and it is what we share
   try {
     const rec = JSON.parse(localStorage.getItem("imposter_daily_records") || "{}")[dailyCaseData.date || localDayStr()];
-    if (rec && rec.solved && (!rec.caseNumber || rec.caseNumber === dailyCaseData.caseNumber)) return { won: rec.won || 0, total: rec.total || totalRounds, score: rec.score || 0, time: typeof rec.time === "number" ? rec.time : 0, grid: rec.grid || "", speedBonus: typeof rec.speedBonus === "number" ? rec.speedBonus : null };
+    if (rec && rec.solved && (!rec.caseNumber || rec.caseNumber === dailyCaseData.caseNumber)) return { won: rec.won || 0, total: rec.total || totalRounds, score: rec.score || 0, time: typeof rec.time === "number" ? rec.time : 0, grid: rec.grid || "", speedBonus: typeof rec.speedBonus === "number" ? rec.speedBonus : null, wrong: typeof rec.wrong === "number" ? rec.wrong : null, timeTrial: !!rec.timeTrial };
   } catch (_) {}
   if (roundResults.length > 0 && roundResults.length === totalRounds) {
-    const firstTry = roundResults.filter(r => r.solved && r.attempts === 1).length;
-    const base = (firstTry * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
-    const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
-    return { won: roundResults.filter(r => r.solved).length, total: totalRounds, score: base + speedBonus, time: elapsedSeconds, grid: buildEmojiGrid(roundResults), speedBonus };
+    return { won: roundResults.filter(r => r.solved).length, total: totalRounds, score: scoreFor(elapsedSeconds), time: elapsedSeconds, grid: buildEmojiGrid(roundResults), speedBonus: 0, wrong: wrongTaps(roundResults), timeTrial: true };
   }
   return null;
 }
@@ -5604,11 +5588,14 @@ function getShareParts() {
   head = head.filter(Boolean);
   if (playerStats.currentStreak >= 2) head.push(`🔥 ${playerStats.currentStreak} day streak`);
   // The posted message is the dare (one button does share and challenge); head stays for titles
-  const tier = tierOf(res.score);
-  const dare = [`${tier.icon} ${tier.name} · ${res.score}/${maxScoreFor(res)} on today's Imposter`, `I caught ${won} of ${total} AI fakes in ${T}. Can you beat me?`, grid];
+  const tier = tierOf(res.time);
+  const wrongPart = res.wrong == null ? "" : res.wrong ? ` (${res.wrong} wrong tap${res.wrong > 1 ? "s" : ""})` : " without a wrong tap";
+  const dare = res.timeTrial
+    ? [`${tier.icon} ${tier.name} · ${T} on today's Imposter`, `I found all ${total} AI fakes in ${T}${wrongPart}. Can you beat my time?`, grid]
+    : [`${tier.icon} ${tier.name} · ${T} on today's Imposter`, `I caught ${won} of ${total} AI fakes in ${T}. Can you beat me?`, grid];
   if (boardRank && boardRank.rank === 1 && boardRank.of >= 2) dare.push(`👑 #1 of ${boardRank.of} friends today`);
   if (playerStats.currentStreak >= 2) dare.push(`🔥 ${playerStats.currentStreak} day streak`);
-  return { res, head, link, text: dare.concat(link).join("\n"), title: "Think you can beat my Imposter score?" };
+  return { res, head, link, text: dare.concat(link).join("\n"), title: "Think you can beat my Imposter time?" };
 }
 
 function getDailyShareText() {
@@ -5619,8 +5606,11 @@ function getDailyShareText() {
 // Head to head with whoever dared you, and a one-tap reply that sends it back to them
 function rivalOutcome(score, time) {
   const f = friendChallenge;
-  const beat = score > f.s || (score === f.s && f.t !== null && time < f.t);
-  const tie = score === f.s && (f.t === null || time === f.t);
+  if (f.t !== null) {
+    const d = Math.round((f.t - time) * 10) / 10;
+    return { beat: d > 0, tie: d === 0, diff: Math.abs(d) };
+  }
+  const beat = score > f.s, tie = score === f.s;
   return { beat, tie, diff: Math.abs(score - f.s) };
 }
 function renderRival(score, time) {
@@ -5629,9 +5619,10 @@ function renderRival(score, time) {
   if (!friendChallenge || ARCHIVE_DATE) { box.hidden = true; return; }
   const o = rivalOutcome(score, time), who = rivalName(), Who = who[0].toUpperCase() + who.slice(1);
   const cmp = $("challengeResult");
-  cmp.textContent = o.tie ? `🤝 Dead even with ${who}: ${friendChallenge.s} pts each`
-    : o.beat ? `🏆 You beat ${who} by ${o.diff || "a few seconds"}${o.diff ? " pts" : ""}`
-    : `😤 ${Who} beat you by ${o.diff} pts`;
+  const unit = friendChallenge.t !== null ? "s" : " pts";
+  cmp.textContent = o.tie ? `🤝 Dead even with ${who}`
+    : o.beat ? `🏆 You beat ${who} by ${o.diff}${unit}`
+    : `😤 ${Who} beat you by ${o.diff}${unit}`;
   cmp.className = "challenge-result " + (o.beat || o.tie ? "won" : "lost");
   $("btnReply").textContent = o.beat ? `😎 Rub it in${friendChallenge.name ? ", tell " + friendChallenge.name : ""}` : `📨 Tell ${friendChallenge.name || "them"} you took the dare`;
   box.hidden = false;
@@ -5688,44 +5679,43 @@ async function submitNameSheet(e) {
 }
 
 // Results-screen extras: streak, friend comparison, ad slot
-// Ranks on the 0-700 score. 700 = all 6 caught first try in 30s or less.
-const TIERS = [[0, "Rookie", "🔰"], [250, "Detective", "🕵️"], [450, "Inspector", "🔎"], [600, "Mastermind", "👑"], [700, "Perfect", "💯"]];
-function tierOf(score) { let t = TIERS[0]; for (const x of TIERS) if (score >= x[0]) t = x; return { name: t[1], icon: t[2] }; }
+// Time-trial ranks: [slowest time for the rank, name, icon]. Wrong taps are already in the time.
+const TIERS = [[25, "Mastermind", "👑"], [40, "Inspector", "🔎"], [60, "Detective", "🕵️"], [Infinity, "Rookie", "🔰"]];
+function tierOf(secs) { const t = TIERS.find(x => secs <= x[0]) || TIERS[3]; return { name: t[1], icon: t[2] }; }
 function maxScoreFor(res) { return ((res && res.total) || 6) * 100 + 100; }
-function renderScoreTier(score, res) {
-  const max = maxScoreFor(res);
-  $("heroMax").textContent = `/ ${max}`;
-  // Four equal bands (Rookie, Detective, Inspector, Mastermind); the marker sits within its band
-  const edges = [0, 250, 450, 600, max];
-  let i = 0; while (i < 3 && score >= edges[i + 1]) i++;
-  const pos = `${Math.min(100, 25 * (i + Math.min(1, (score - edges[i]) / (edges[i + 1] - edges[i]))))}%`;
+function renderScoreTier(time, res) {
+  $("heroMax").textContent = "seconds";
+  // Four equal bands, slow on the left: Rookie (>60s), Detective, Inspector, Mastermind (<=25s)
+  const edges = [90, 60, 40, 25, 10];
+  let i = 0; while (i < 3 && time <= edges[i + 1]) i++;
+  const pos = `${Math.max(2, Math.min(100, 25 * (i + Math.max(0, Math.min(1, (edges[i] - time) / (edges[i] - edges[i + 1]))))))}%`;
   const labels = $("heroTierLabels");
   labels.innerHTML = "";
-  TIERS.slice(0, 4).forEach((t, k) => {
+  ["Rookie", "Detective", "Inspector", "Mastermind"].forEach((n, k) => {
     const sp = document.createElement("span");
-    sp.textContent = t[1];
+    sp.textContent = n;
     if (k === i) sp.className = "on";
     labels.appendChild(sp);
   });
   requestAnimationFrame(() => { $("heroTierFill").style.width = pos; $("heroTierMark").style.left = pos; });
-  const bonus = res && typeof res.speedBonus === "number" ? res.speedBonus : null;
-  $("heroBreak").textContent = bonus === null ? `${cur} · perfect is ${max}`
-    : score >= max ? "💯 Perfect case: every fake first try, under 30s"
-    : `${score - bonus} catches + ${bonus} speed · 💯 = 6/6 first try, ≤30s`;
+  const wt = res && typeof res.wrong === "number" ? res.wrong : null;
+  $("heroBreak").textContent = wt === null ? "Fastest time wins · wrong taps add 5s"
+    : wt === 0 ? (time <= 30 ? "💯 Clean run under 30s" : "🎯 No wrong taps · clean run")
+    : `${wt} wrong tap${wt > 1 ? "s" : ""} · +${wt * PENALTY_S}s included`;
 }
 function renderScoreHero(score, time) {
   const res = getTodayResult();
-  renderScoreTier(Math.max(0, Math.round(score || 0)), res);
-  $("heroCaught").textContent = `🎯 ${res ? res.won : "?"}/${res ? res.total : 6} caught`;
-  $("heroTime").textContent = `⚡ ${Number(time || 0).toFixed(1)}s`;
+  renderScoreTier(Number(time || 0), res);
+  $("heroCaught").textContent = `🎯 ${res ? res.won : "?"}/${res ? res.total : 6} found`;
+  $("heroTime").textContent = res && typeof res.wrong === "number" ? `❌ ${res.wrong} wrong` : "";
   const streak = playerStats.currentStreak || 0;
   $("heroStreak").textContent = `🔥 ${streak}`;
   $("heroStreak").title = `${streak} day streak`;
   $("heroStreak").hidden = streak < 2;
   $("scoreHero").hidden = false;
-  const el = $("heroScore"), end = Math.max(0, Math.round(score || 0)), t0 = performance.now();
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = end; return; }
-  const step = now => { const k = Math.min(1, (now - t0) / 900); el.textContent = Math.round(end * (1 - (1 - k) ** 3)); if (k < 1) requestAnimationFrame(step); };
+  const el = $("heroScore"), end = Math.max(0, Number(time || 0)), t0 = performance.now();
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = end.toFixed(1); return; }
+  const step = now => { const k = Math.min(1, (now - t0) / 900); el.textContent = (end * (1 - (1 - k) ** 3)).toFixed(1); if (k < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
 
@@ -5861,39 +5851,21 @@ function renderStoryCard() {
 
   const totalWon = roundResults.filter(r => r.solved).length;
   const firstTryCount = roundResults.filter(r => r.solved && r.attempts === 1).length;
-  const baseScore = (firstTryCount * 100) + (roundResults.filter(r => r.solved && r.attempts === 2).length * 45) + (roundResults.filter(r => r.solved && r.attempts === 3).length * 15);
-  const speedBonus = calculateSpeedBonus(elapsedSeconds, roundResults);
-  const finalScore = baseScore + speedBonus;
+  const wt = wrongTaps(roundResults), tier = tierOf(elapsedSeconds);
   const totalRounds = dailyCaseData?.rounds?.length || 6;
-  const maxScore = (totalRounds * 100) + 100;
 
-  // Score Area
-  if (firstTryCount === totalRounds) {
-    ctx.font = "800 100px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "#39ff14";
-    ctx.fillText("FLAWLESS", 540, 450);
+  // Time Area: the finish time is the result
+  ctx.font = "800 120px 'JetBrains Mono', monospace";
+  ctx.fillStyle = wt === 0 ? "#39ff14" : P.accent;
+  ctx.fillText(fmtS(elapsedSeconds), 540, 455);
 
-    ctx.font = "700 36px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(`${totalRounds} / ${totalRounds} SPOTTED ⭐⭐⭐⭐⭐`, 540, 520);
+  ctx.font = "700 36px 'JetBrains Mono', monospace";
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(`${totalWon} / ${totalRounds} FOUND · ${wt === 0 ? "NO WRONG TAPS" : `${wt} WRONG TAP${wt > 1 ? "S" : ""}`}`, 540, 520);
 
-    ctx.font = "700 32px 'JetBrains Mono', monospace";
-    ctx.fillStyle = P.accent;
-    ctx.fillText(`⚡ ${elapsedSeconds.toFixed(1)}s · ${finalScore} / ${maxScore} PTS`, 540, 585);
-  } else {
-    ctx.font = "800 110px 'JetBrains Mono', monospace";
-    ctx.fillStyle = totalWon >= Math.ceil(totalRounds * 0.75) ? "#39ff14" : (totalWon >= Math.ceil(totalRounds * 0.5) ? "#ffde59" : "#ff3344");
-    ctx.fillText(`${totalWon} / ${totalRounds}`, 540, 450);
-
-    ctx.font = "700 36px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "#ffffff";
-    const subText = totalWon === totalRounds ? `${totalRounds} / ${totalRounds} CAUGHT · ${firstTryCount} ON 1ST TRY` : (totalWon >= 2 ? `${totalWon} IMPOSTERS CAUGHT` : `FOOLED BY AI`);
-    ctx.fillText(subText, 540, 520);
-
-    ctx.font = "700 32px 'JetBrains Mono', monospace";
-    ctx.fillStyle = P.accent;
-    ctx.fillText(`⚡ ${elapsedSeconds.toFixed(1)}s · ${finalScore} / ${maxScore} PTS`, 540, 585);
-  }
+  ctx.font = "700 32px 'JetBrains Mono', monospace";
+  ctx.fillStyle = P.accent;
+  ctx.fillText(`${tier.icon} ${tier.name.toUpperCase()} · CAN YOU BEAT IT?`, 540, 585);
 
   // Round Blocks in Card (Dynamic sizing for 6 rounds)
   const boxW = 860;
