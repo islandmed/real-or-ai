@@ -1,8 +1,9 @@
 import http.server
+import os
 import socketserver
 
 PORT = 8080
-DIRECTORY = "/home/tony/Work/real-or-ai"
+DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 class NoCacheHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):

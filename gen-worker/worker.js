@@ -10,7 +10,7 @@
 //   GET  /review/vetoes   [{date, round, card}]
 //   POST /review/vetoes/clear  [{date, round, card}]
 //
-// Review page (query k = REVIEW_KEY, Tony only):
+// Review page (query k = REVIEW_KEY, owner only):
 //   GET  /review?k=        the page
 //   GET  /review/api/index?k=, GET /review/api/day?d=&k=, POST /review/api/veto?k= {date, round, card, bad}
 //

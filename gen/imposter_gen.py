@@ -19,7 +19,7 @@ repo is public; never move that state anywhere that gets committed.
   python3 gen/imposter_gen.py --redo-ai 2026-10-12:3
   python3 gen/imposter_gen.py --swap 2026-10-12:3:B # replace one real photo
   python3 gen/imposter_gen.py --sheets              # rebuild contact sheets
-  python3 gen/imposter_gen.py --apply-vetoes        # swap photos Tony marked bad
+  python3 gen/imposter_gen.py --apply-vetoes        # swap photos the owner marked bad
   python3 gen/imposter_gen.py --upload-review       # refresh the review page
   python3 gen/imposter_gen.py --prefetch            # fetch pools for seasons in range
   python3 gen/imposter_gen.py --packs               # Case Packs, with what the daily run left
@@ -578,7 +578,7 @@ def worker_call(method, path, secret, body=None, timeout=90):
 # safe for a family audience and (d) is a photograph. Any doubt, any parse
 # failure and any unexpected answer is a rejection.
 
-# Off until the filter's false-approval rate is measured on Tony's hand-judged
+# Off until the filter's false-approval rate is measured on the owner's hand-judged
 # photos: IMPOSTER_VISION=on (repo variable for the Action) turns it on.
 VISION_ON = os.environ.get("IMPOSTER_VISION", "off").lower() == "on"
 
@@ -1082,7 +1082,7 @@ def decide(state, pool_key, bad):
 
 
 # ---------------------------------------------------------------- vetoes
-# Tony marks photos "bad" on the review page (gen Worker, KV). The nightly run
+# The owner marks photos "bad" on the review page (gen Worker, KV). The nightly run
 # swaps each one before its day goes live: same letter, same byte size, new
 # file name, so a player who loaded the round keeps a consistent board. When a
 # swap cannot be made in place the round is rebuilt. Only today (UTC) and later

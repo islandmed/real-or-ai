@@ -1,7 +1,7 @@
 # Nightly content run: the laptop can be off.
 #
 # Just after 00:00 UTC (when the Workers AI free quota resets) it pulls the
-# encrypted generator state, swaps any photos Tony marked bad on the review
+# encrypted generator state, swaps any photos the owner marked bad on the review
 # page, generates missing days up to ~45 days ahead within the free neuron
 # budget, then Case Pack cases with whatever budget is left, pushes the state back (encrypted), builds and deploys dist/ to both
 # Pages projects, checks the live API carries no answers, and refreshes the
@@ -40,7 +40,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       GH_TOKEN: ${{ github.token }}
-      # Vision approval of new photos: off (photos Tony approved by hand only)
+      # Vision approval of new photos: off (photos the owner approved by hand only)
       # until its false-approval rate is measured. gh variable set IMPOSTER_VISION --body on
       IMPOSTER_VISION: ${{ vars.IMPOSTER_VISION || 'off' }}
       WRANGLER: wrangler@4.149.0
@@ -89,7 +89,7 @@ jobs:
         if: steps.gate.outputs.ok == 'true'
         run: python3 gen/state_sync.py pull
 
-      - name: Apply Tony's vetoes
+      - name: Apply the owner's vetoes
         if: steps.pull.outcome == 'success'
         run: python3 gen/imposter_gen.py --apply-vetoes
 
@@ -103,7 +103,7 @@ jobs:
 
       # Case Packs only get what the daily lookahead left of the budget (the
       # generator waits while any daily case in the lookahead is unfinished).
-      # A pack stays off the site until Tony approves its contact sheets.
+      # A pack stays off the site until the owner approves its contact sheets.
       - name: Generate Case Packs (leftover budget)
         if: steps.pull.outcome == 'success' && (github.event_name == 'schedule' || inputs.generate)
         continue-on-error: true

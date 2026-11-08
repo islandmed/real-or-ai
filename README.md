@@ -91,7 +91,7 @@ day land in `private/sheets/`.
 `.github/workflows/nightly.yml` runs at 00:17 UTC (just after the Workers AI
 free quota resets) and on demand (Actions, "Nightly content", Run workflow):
 
-1. pulls the encrypted state, 2. swaps photos Tony marked bad, 3. fetches
+1. pulls the encrypted state, 2. swaps photos the owner marked bad, 3. fetches
 pools for every season within 45 days (Christmas from mid October),
 4. generates missing days within the neuron budget, 5. pushes the state back,
 6. builds and deploys `dist/` to both Pages projects, 7. checks the live
@@ -193,7 +193,7 @@ Server env (Pages secrets): `STRIPE_SECRET_KEY` (restricted key, read-only
 Checkout Sessions), `PASS_PAYMENT_LINK_ID` (`plink_...`), `PASS_SIGNING_KEY`
 (random string, 32+ bytes).
 
-Setup (Tony, in this order, so the site is never half-on):
+Setup (the owner, in this order, so the site is never half-on):
 
 1. Stripe, Product catalog: create a product **Imposter Detective Pass**, one-time
    price **$5.00 USD**.
