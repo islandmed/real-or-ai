@@ -30,5 +30,6 @@
 {"post_date": "2026-11-12", "slot": "pm", "kind": "photo", "case": "2026-11-10", "round": 5, "theme": "pies", "post_id": "1436699176184540_122121150645505076"},
 {"post_date": "2026-11-13", "slot": "pm", "kind": "reel", "case": "2026-11-11", "round": 1, "theme": "haybales", "video_id": "4055306061432867"},
 {"post_date": "2026-11-14", "slot": "pm", "kind": "photo", "case": "2026-11-11", "round": 5, "theme": "maple", "post_id": "1436699176184540_122121970503505076"},
-{"post_date": "2026-11-15", "slot": "am", "kind": "reel", "case": "2026-11-13", "round": 2, "theme": "orchards", "video_id": "2153192498635711"}
+{"post_date": "2026-11-15", "slot": "am", "kind": "reel", "case": "2026-11-13", "round": 2, "theme": "orchards", "video_id": "2153192498635711"},
+{"post_date": "2026-11-15", "slot": "pm", "kind": "photo", "case": "2026-11-12", "round": 5, "theme": "pumpkinpatch", "post_id": "1436699176184540_122122298103505076"}
 ]
