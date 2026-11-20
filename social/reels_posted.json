@@ -37,5 +37,6 @@
 {"post_date": "2026-11-17", "slot": "am", "kind": "reel", "case": "2026-11-15", "round": 3, "theme": "markets", "video_id": "1459198212210371"},
 {"post_date": "2026-11-17", "slot": "pm", "kind": "photo", "case": "2026-11-13", "round": 5, "theme": "gourds", "post_id": "1436699176184540_122123039631505076"},
 {"post_date": "2026-11-18", "slot": "pm", "kind": "reel", "case": "2026-11-07", "round": 3, "theme": "harvesttable", "video_id": "1677288154038338"},
-{"post_date": "2026-11-19", "slot": "pm", "kind": "photo", "case": "2026-11-17", "round": 3, "theme": "parades", "post_id": "1436699176184540_122123799609505076"}
+{"post_date": "2026-11-19", "slot": "pm", "kind": "photo", "case": "2026-11-17", "round": 3, "theme": "parades", "post_id": "1436699176184540_122123799609505076"},
+{"post_date": "2026-11-20", "slot": "am", "kind": "reel", "case": "2026-11-18", "round": 3, "theme": "foliage", "video_id": "4137967003162917"}
 ]
