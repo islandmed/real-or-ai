@@ -42,5 +42,6 @@
 {"post_date": "2026-11-20", "slot": "pm", "kind": "photo", "case": "2026-11-18", "round": 1, "theme": "cornfields", "post_id": "1436699176184540_122124183309505076"},
 {"post_date": "2026-11-21", "slot": "am", "kind": "reel", "case": "2026-11-19", "round": 1, "theme": "turkey", "video_id": "1718390749809384"},
 {"post_date": "2026-11-21", "slot": "pm", "kind": "photo", "case": "2026-11-19", "round": 3, "theme": "pies", "post_id": "1436699176184540_122124506037505076"},
-{"post_date": "2026-11-22", "slot": "am", "kind": "reel", "case": "2026-11-19", "round": 4, "theme": "haybales", "video_id": "2445384469604834"}
+{"post_date": "2026-11-22", "slot": "am", "kind": "reel", "case": "2026-11-19", "round": 4, "theme": "haybales", "video_id": "2445384469604834"},
+{"post_date": "2026-11-22", "slot": "pm", "kind": "photo", "case": "2026-11-14", "round": 2, "theme": "maple", "post_id": "1436699176184540_122124866709505076"}
 ]
