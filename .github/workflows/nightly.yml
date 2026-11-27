@@ -101,6 +101,10 @@ jobs:
 
       - name: Generate missing days
         if: steps.pull.outcome == 'success' && (github.event_name == 'schedule' || inputs.generate)
+        # Bounded so the build and deploy below still run inside the job's 150 minutes
+        # when a big backlog (a new season) is being built; the generator resumes by round.
+        continue-on-error: true
+        timeout-minutes: 90
         run: python3 gen/imposter_gen.py
 
       # Case Packs only get what the daily lookahead left of the budget (the
