@@ -43,6 +43,8 @@ jobs:
       # Vision approval of new photos: off (photos the owner approved by hand only)
       # until its false-approval rate is measured. gh variable set IMPOSTER_VISION --body on
       IMPOSTER_VISION: ${{ vars.IMPOSTER_VISION || 'off' }}
+      # Workers Paid since 2026-10-23: past the free 10k/day it bills ~$0.011 per 1000 neurons
+      IMPOSTER_NEURON_CAP: ${{ vars.IMPOSTER_NEURON_CAP || '9000' }}
       WRANGLER: wrangler@4.149.0
     steps:
       - name: Check secrets

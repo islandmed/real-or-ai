@@ -669,7 +669,7 @@ def vision_check(im, theme, secret, state):
     if neurons_left(state) < VISION_RESERVE:
         return "budget", None
     body = {"model": VISION_MODEL, "system": VISION_SYSTEM, "prompt": vision_prompt(theme),
-            "image_b64": vision_jpeg_b64(im), "max_tokens": 160, "schema": VISION_SCHEMA}
+            "image_b64": vision_jpeg_b64(im), "max_tokens": 1200, "schema": VISION_SCHEMA}
     for attempt in range(2):
         try:
             out = worker_call("POST", "/vision", secret, body)
