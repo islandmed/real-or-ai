@@ -998,6 +998,268 @@
      ]
     }
    ]
+  },
+  {
+   "id": "winter",
+   "start": "01-01",
+   "end": "03-15",
+   "badge": "❄️ WINTER SPECIAL",
+   "label": "Winter",
+   "themes": [
+    {
+     "key": "snowvillage",
+     "name": "Snowy Villages",
+     "short": "SNOWY VILLAGES",
+     "queries": [
+      "snowy village",
+      "village winter snow",
+      "snow covered town"
+     ],
+     "match": "\\bsnow|\\bwinter\\b",
+     "prompts": [
+      "a small village covered in fresh snow",
+      "snowy rooftops of an old town at dusk",
+      "a quiet village street in winter snow",
+      "a mountain village blanketed with snow"
+     ],
+     "cats": [
+      "Villages in winter",
+      "Snow in villages"
+     ]
+    },
+    {
+     "key": "fireplaces",
+     "name": "Fireplaces & Stockings",
+     "short": "FIREPLACES",
+     "queries": [
+      "fireplace christmas",
+      "christmas stockings",
+      "fireplace mantel decorated"
+     ],
+     "match": "fireplace|stocking|hearth|mantel",
+     "prompts": [
+      "a fireplace with christmas stockings hanging from the mantel",
+      "a crackling fire in a decorated living room",
+      "a mantel with garland and stockings",
+      "a cozy hearth with a wood fire"
+     ],
+     "cats": [
+      "Christmas stockings",
+      "Fireplaces"
+     ]
+    },
+    {
+     "key": "snowmen",
+     "name": "Snowmen",
+     "short": "SNOWMEN",
+     "queries": [
+      "snowman",
+      "snowmen",
+      "snow sculpture"
+     ],
+     "match": "\\bsnowm[ae]n",
+     "prompts": [
+      "a homemade snowman in a backyard",
+      "a snowman with a scarf and carrot nose",
+      "a lopsided snowman in a park",
+      "two snowmen in a snowy yard"
+     ],
+     "cats": [
+      "Snowmen"
+     ]
+    },
+    {
+     "key": "wintercabins",
+     "name": "Winter Cabins",
+     "short": "WINTER CABINS",
+     "queries": [
+      "cabin snow",
+      "log cabin winter",
+      "mountain hut winter"
+     ],
+     "match": "\\bcabins?\\b|\\bhut\\b|\\bcottage|\\blodge\\b|chalet",
+     "prompts": [
+      "a log cabin in deep snow",
+      "a snowy mountain hut under a clear sky",
+      "a wooden chalet with snow on the roof",
+      "a cabin in a winter forest with lit windows"
+     ],
+     "cats": [
+      "Log cabins in winter",
+      "Mountain huts in winter"
+     ]
+    },
+    {
+     "key": "winterscenes",
+     "name": "Winter Scenes",
+     "short": "WINTER SCENES",
+     "queries": [
+      "winter landscape snow",
+      "snowy forest",
+      "frozen lake winter"
+     ],
+     "match": "\\bwinter\\b|\\bsnow|\\bfrost|frozen",
+     "prompts": [
+      "a snowy forest on a quiet winter morning",
+      "a frozen lake surrounded by snowy trees",
+      "a winter landscape with frost on the fields",
+      "a snowy country road through pine trees"
+     ],
+     "cats": [
+      "Winter landscapes",
+      "Snowy forests"
+     ]
+    },
+    {
+     "key": "iceskating",
+     "name": "Ice Skating",
+     "short": "ICE SKATING",
+     "queries": [
+      "ice skating",
+      "outdoor skating rink",
+      "skating on a frozen pond"
+     ],
+     "match": "skat(e|ing)|rink|hockey",
+     "prompts": [
+      "people skating on a frozen pond at dusk",
+      "an outdoor ice rink with string lights in the evening",
+      "a lone skater on a frozen lake",
+      "a city skating rink in winter"
+     ],
+     "cats": [
+      "Ice skating",
+      "Ice rinks"
+     ]
+    },
+    {
+     "key": "skiresorts",
+     "name": "Ski Slopes",
+     "short": "SKI SLOPES",
+     "queries": [
+      "ski resort",
+      "ski slope snow",
+      "skiing mountain"
+     ],
+     "match": "\\bski|slope|piste|chairlift",
+     "prompts": [
+      "a ski slope with skiers under a blue sky",
+      "a chairlift over a snowy mountainside",
+      "a ski village at the foot of snowy peaks",
+      "fresh tracks on a powdery ski slope"
+     ],
+     "cats": [
+      "Ski resorts",
+      "Skiing"
+     ]
+    },
+    {
+     "key": "snowyforests",
+     "name": "Snowy Forests",
+     "short": "SNOWY FORESTS",
+     "queries": [
+      "snow covered pine forest",
+      "snowy woods",
+      "winter forest path"
+     ],
+     "match": "\\bsnow|\\bfrost|winter",
+     "prompts": [
+      "a path through snow-laden pine trees",
+      "a quiet birch forest after fresh snowfall",
+      "a snowy forest clearing in morning light",
+      "frosted spruce trees on a hillside"
+     ],
+     "cats": [
+      "Snowy forests",
+      "Winter forests"
+     ]
+    },
+    {
+     "key": "icicles",
+     "name": "Icicles and Frost",
+     "short": "ICICLES AND FROST",
+     "queries": [
+      "icicles",
+      "frost on window",
+      "frozen waterfall"
+     ],
+     "match": "icicle|frost|frozen|ice\\b",
+     "prompts": [
+      "long icicles hanging from a wooden roof edge",
+      "frost patterns on a window pane",
+      "a frozen waterfall in a rocky gorge",
+      "frost-covered leaves close up"
+     ],
+     "cats": [
+      "Icicles",
+      "Frost",
+      "Frozen waterfalls"
+     ]
+    },
+    {
+     "key": "winterbirds",
+     "name": "Winter Birds",
+     "short": "WINTER BIRDS",
+     "queries": [
+      "bird in snow",
+      "cardinal snow",
+      "winter birds feeder"
+     ],
+     "match": "\\bsnow|winter|frost",
+     "prompts": [
+      "a small bird perched on a snowy branch",
+      "a red cardinal in a snowy bush",
+      "chickadees at a feeder in winter",
+      "a robin on a frosty fence post"
+     ],
+     "cats": [
+      "Birds in snow",
+      "Birds in winter"
+     ]
+    },
+    {
+     "key": "sleddogs",
+     "name": "Sleds and Sleigh Rides",
+     "short": "SLEDS AND SLEIGH RIDES",
+     "queries": [
+      "dog sled",
+      "sledding hill children",
+      "horse sleigh winter"
+     ],
+     "match": "sled|sleigh|toboggan|musher",
+     "prompts": [
+      "a dog sled team crossing a snowy field",
+      "children sledding down a snowy hill",
+      "a horse drawn sleigh in a snowy meadow",
+      "a wooden toboggan resting in the snow"
+     ],
+     "cats": [
+      "Dog sledding",
+      "Sledding",
+      "Sleighs"
+     ]
+    },
+    {
+     "key": "snowpeaks",
+     "name": "Snowy Peaks",
+     "short": "SNOWY PEAKS",
+     "queries": [
+      "snow capped mountain",
+      "alpine winter peaks",
+      "mountain snow sunrise"
+     ],
+     "match": "\\bsnow|alpine|glacier|peak",
+     "prompts": [
+      "snow-capped mountain peaks at sunrise",
+      "an alpine ridge under fresh snow",
+      "a glacier valley in winter light",
+      "jagged snowy peaks above a cloud layer"
+     ],
+     "cats": [
+      "Snow-capped mountains",
+      "Mountains in winter"
+     ]
+    }
+   ]
   }
  ]
 }

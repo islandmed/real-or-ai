@@ -8,6 +8,7 @@ function seasonOg(date) {
   const m = date.getUTCMonth() + 1;
   if (m === 11) return "og-thanksgiving.png?v=3";
   if (m === 12) return "og-christmas.png?v=2";
+  if (m <= 3) return "og-winter.png?v=1";
   return "og-image.png?v=2";
 }
 

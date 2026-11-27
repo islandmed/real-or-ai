@@ -2448,6 +2448,15 @@
     --on-accent: #1a1204;
     --pine: #2f9e64;
   }
+  html[data-season="winter"] {
+    --h: 205; --sk: 1.0;
+    --accent: #8fd3ff; --accent-rgb: 143 211 255; --accent-deep: #3f8fd0;
+    --accent2: #5fb4f0; --accent2-rgb: 95 180 240;
+    --badge: #8fd3ff; --badge-rgb: 143 211 255; --badge2: #3f8fd0;
+    --on-accent: #06182a;
+    --fg: #eaf4ff; --fg-muted: #9db6d2;
+  }
+  html[data-season="winter"] .app-header { border-bottom: 2px solid rgb(95 180 240 / 0.5); }
   html[data-season="christmas"] .app-header { border-bottom: 2px solid rgb(47 158 100 / 0.55); }
   html[data-season="thanksgiving"] .app-header { border-bottom: 2px solid rgb(232 105 42 / 0.5); }
   html[data-season="halloween"] .app-header,
@@ -3162,10 +3171,15 @@ const SEASONS = {
   christmas: {
     id: "christmas", emoji: "🎄", badge: "🎄 CHRISTMAS SPECIAL", og: "og-christmas.png", fx: "snow",
     p: { bg: "#070d1f", bg2: "#0f1a36", panel: "#111c38", line: "#253a6a", accent: "#f5c451", accent2: "#e23a4e", badge: "#ff5a6a", fg: "#eef3ff", muted: "#9fb0d6", third: "#ff9a3c", pine: "#2f9e64" }
+  },
+  winter: {
+    id: "winter", emoji: "❄️", badge: "❄️ WINTER SPECIAL", og: "og-winter.png", fx: "snow",
+    p: { bg: "#06101c", bg2: "#0c1c30", panel: "#0e1e34", line: "#274868", accent: "#8fd3ff", accent2: "#5fb4f0", badge: "#8fd3ff", fg: "#eaf4ff", muted: "#9db6d2", third: "#c8e6ff" }
   }
 };
 // [month (1-12), lastDay, seasonId]: first row whose (month, lastDay) is on/after today wins.
 const SEASON_TABLE = [
+  [3, 15, "winter"],
   [10, 31, "halloween"],
   [11, 30, "thanksgiving"],
   [12, 31, "christmas"]
@@ -3188,7 +3202,7 @@ document.documentElement.setAttribute("data-season", SEASON.id);
   const tc = document.querySelector('meta[name="theme-color"]');
   if (tc) tc.setAttribute("content", SEASON.p.bg);
   // Case data may carry a seasonal badge; the player's season wins.
-  const re = /\p{Extended_Pictographic}️?\s*(HALLOWEEN|THANKSGIVING|HARVEST|CHRISTMAS)( SPECIAL)?/u;
+  const re = /\p{Extended_Pictographic}️?\s*(HALLOWEEN|THANKSGIVING|HARVEST|CHRISTMAS|WINTER)( SPECIAL)?/u;
   ["caseTag", "cdBadge", "cdActiveBadge"].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -5931,7 +5945,7 @@ function renderStoryCard() {
   ctx.fillStyle = P.muted;
   ctx.fillText(`ON THE CASE WITH ${partner.name.toUpperCase()}`, 540, 1845);
 
-  if (SEASON.id === "christmas") {
+  if (SEASON.id === "christmas" || SEASON.id === "winter") {
     ctx.fillStyle = "#ffffff";
     for (let i = 0; i < 26; i++) { ctx.globalAlpha = 0.25 + (i % 5) * 0.12; ctx.beginPath(); ctx.arc((i * 397) % 1080, 60 + (i * 211) % 1800, 2 + (i % 3) * 1.6, 0, 6.283); ctx.fill(); }
     ctx.globalAlpha = 1;

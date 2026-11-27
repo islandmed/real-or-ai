@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Redraw only the season badge pill on a link-preview image (og-*.png), keeping photos and title.
-Usage: rebadge.py IN.png OUT.png "🍂" "HARVEST SPECIAL · DAILY CASE"
+Usage: rebadge.py IN.png OUT.png "🍂" "HARVEST SPECIAL · DAILY CASE" [FILL BORDER INK as r,g,b]
 Pill geometry and colours were measured from og-thanksgiving.png (1200x630, 40px background grid)."""
 import sys
 from PIL import Image, ImageDraw, ImageFont
@@ -10,6 +10,8 @@ im = Image.open(src).convert("RGB")
 X0, X1, Y0, Y1 = 311, 888, 142, 191          # old pill incl. border
 GRID = 40
 FILL, BORDER, INK = (72, 37, 16), (180, 122, 50), (255, 197, 107)
+if len(sys.argv) >= 8:
+    FILL, BORDER, INK = (tuple(int(v) for v in a.split(",")) for a in sys.argv[5:8])
 
 # 1) erase the old pill: rebuild background + grid by blending the columns just left and right of it
 px = im.load()
